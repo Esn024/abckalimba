@@ -5,7 +5,7 @@ const morgan = require('morgan');
 
 const PORT = process.env.PORT || 3001;
 
-const { getTestData } = require('./handlers');
+const { getTestData, getUsers, getUser, addUser } = require('./handlers');
 
 express()
   .use(function (req, res, next) {
@@ -26,6 +26,9 @@ express()
 
   // REST endpoints
   .get('/test', getTestData)
+  .get('/api/users', getUsers)
+  .get('/api/users/:username', getUser)
+  .post('/api/users', addUser)
 
   .listen(PORT, () => {
     console.info(`Server listening on ${PORT}`);
