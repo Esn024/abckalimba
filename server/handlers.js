@@ -5,6 +5,14 @@ const { v4: uuidv4 } = require('uuid');
 const { MongoClient } = require('mongodb');
 const { sendResponse } = require('./utils');
 
+require('dotenv').config();
+const { MONGO_URI } = process.env;
+
+const options = {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+};
+
 // file paths for JSON data files
 const testDataFilepath = './data/testData.json';
 
@@ -70,7 +78,8 @@ const getUsers = async (req, res) => {
   }
 };
 
-const getUser = async (req, res) => {
+// get public info from any user with the username
+const getUserPublicInfo = async (req, res) => {
   const username = req.params.username;
 
   try {
@@ -80,6 +89,36 @@ const getUser = async (req, res) => {
     const db = client.db('abcsynth');
 
     const query = { username };
+    const user = await db.collection('users').findOne(query);
+
+    if (user) {
+      // return all user info other than the private stuff - ID and email
+      const userPublicInfo = user.map(({ _id, email, ...rest }) => {
+        return rest;
+      });
+      const successMsg = `Found user!`;
+      sendResponse(res, 200, userPublicInfo, successMsg);
+    } else {
+      const errMsg = 'No user was found...';
+      sendResponse(res, 404, null, errMsg);
+    }
+    client.close();
+  } catch (err) {
+    sendResponse(res, 500, req.body, err.message);
+  }
+};
+
+// get ALL user info through knowing the ID (which will be saved in person's localStorage, or the admin will naturally have access to)
+const getUserAllInfo = async (req, res) => {
+  const id = req.params.id;
+
+  try {
+    const client = new MongoClient(MONGO_URI, options);
+    await client.connect();
+
+    const db = client.db('abcsynth');
+
+    const query = { _id: id };
     const user = await db.collection('users').findOne(query);
 
     if (user) {
@@ -96,7 +135,7 @@ const getUser = async (req, res) => {
 };
 
 const addUser = async (req, res) => {
-  const { username, email, projects } = req.body;
+  const { username, email, projectIds } = req.body;
 
   try {
     const dbName = 'abcsynth';
@@ -114,7 +153,7 @@ const addUser = async (req, res) => {
         _id: uuidv4(),
         username,
         email,
-        projects,
+        projectIds,
       };
       const insertedUser = await db.collection('users').insertOne(newUser);
 
@@ -192,7 +231,7 @@ const deleteUser = async (req, res) => {
 
 const updateUser = async (req, res) => {
   const username = req.params.username;
-  const { email, projects } = req.body;
+  const { email, projectIds } = req.body;
 
   let successMsg = '';
 
@@ -236,6 +275,31 @@ const updateUser = async (req, res) => {
       }
     } else {
       sendResponse(res, 404, username, 'No user with that username was found');
+    }
+    client.close();
+  } catch (err) {
+    sendResponse(res, 500, req.body, err.message);
+  }
+};
+
+const getComment = async (req, res) => {
+  const id = req.params.id;
+
+  try {
+    const client = new MongoClient(MONGO_URI, options);
+    await client.connect();
+
+    const db = client.db('abcsynth');
+
+    const query = { _id: id };
+    const comment = await db.collection('comments').findOne(query);
+
+    if (comment) {
+      const successMsg = `Found comment!`;
+      sendResponse(res, 200, comment, successMsg);
+    } else {
+      const errMsg = 'No comment was found...';
+      sendResponse(res, 404, null, errMsg);
     }
     client.close();
   } catch (err) {
@@ -313,7 +377,9 @@ const updateComment = async (req, res) => {
       const errMsg = comment.length === 0 ? 'The comment is empty' : '';
 
       if (errMsg.length === 0) {
-        const newValues = { $set: { _id: id, ...req.body } };
+        //TODO is this ok?
+        const modified = new Date.now();
+        const newValues = { $set: { _id: id, modified, ...req.body } };
         const commentUpdated = await db
           .collection('comments')
           .updateOne(rQuery, newValues);
@@ -371,7 +437,7 @@ const deleteComment = async (req, res) => {
   }
 };
 
-const getCommentsForProject = async (req, res) => {
+const getCommentIdsForProject = async (req, res) => {
   const projectId = req.params.projectId;
   try {
     const client = new MongoClient(MONGO_URI, options);
@@ -380,13 +446,17 @@ const getCommentsForProject = async (req, res) => {
     const db = client.db('abcsynth');
 
     const query = { projectId };
-    const commentsArr = await db.collection('comments').find(query).toArray();
+    const commentIdsArr = await db
+      .collection('comments')
+      .find(query)
+      .toArray()
+      .map((comment) => comment._id);
 
-    if (commentsArr) {
-      const successMsg = `Found comments for project ${projectId}`;
-      sendResponse(res, 200, commentsArr, successMsg);
+    if (commentIdsArr) {
+      const successMsg = `Found comment IDs for project ${projectId}`;
+      sendResponse(res, 200, commentIdsArr, successMsg);
     } else {
-      const errMsg = `No comments for project ${projectId} were found!`;
+      const errMsg = `No comment IDs for project ${projectId} were found!`;
       sendResponse(res, 404, null, errMsg);
     }
     client.close();
@@ -395,7 +465,7 @@ const getCommentsForProject = async (req, res) => {
   }
 };
 
-const getCommentsByUser = async (req, res) => {
+const getCommentIdsByUser = async (req, res) => {
   const username = req.params.username;
   try {
     const client = new MongoClient(MONGO_URI, options);
@@ -404,14 +474,68 @@ const getCommentsByUser = async (req, res) => {
     const db = client.db('abcsynth');
 
     const query = { username };
-    const commentsArr = await db.collection('comments').find(query).toArray();
+    const commentsIdsArr = await db
+      .collection('comments')
+      .find(query)
+      .toArray()
+      .map((comment) => comment._id);
 
-    if (commentsArr) {
-      const successMsg = `Found comments by user ${username}`;
-      sendResponse(res, 200, commentsArr, successMsg);
+    if (commentsIdsArr) {
+      const successMsg = `Found comment IDs by user ${username}`;
+      sendResponse(res, 200, commentsIdsArr, successMsg);
     } else {
-      const errMsg = `No comments by user ${username} were found!`;
+      const errMsg = `No comment IDs by user ${username} were found!`;
       sendResponse(res, 404, null, errMsg);
+    }
+    client.close();
+  } catch (err) {
+    sendResponse(res, 500, req.body, err.message);
+  }
+};
+
+const addProject = async (req, res) => {
+  const { project, username, createDate, projectId } = req.body;
+
+  try {
+    const dbName = 'abcsynth';
+    const client = new MongoClient(MONGO_URI, options);
+    await client.connect();
+
+    const db = client.db(dbName);
+
+    //check for errors
+    const errMsg = comment.length === 0 ? 'The comment is empty' : '';
+
+    if (errMsg.length === 0) {
+      // insert new comment into DB
+      const newComment = {
+        _id: uuidv4(),
+        comment,
+        username,
+        projectId,
+        createDate,
+      };
+      const insertedComment = await db
+        .collection('comments')
+        .insertOne(newComment);
+
+      if (insertedComment) {
+        sendResponse(
+          res,
+          200,
+          newComment,
+          `New comment added from username ${username} to project ${projectId}!`
+        );
+      } else {
+        sendResponse(
+          res,
+          400,
+          req.body,
+          'Comment could not be inserted into database.'
+        );
+      }
+    } else {
+      sendResponse(res, 400, req.body, errMsg);
     }
     client.close();
   } catch (err) {
@@ -423,13 +547,15 @@ const getCommentsByUser = async (req, res) => {
 module.exports = {
   getTestData,
   getUsers,
-  getUser,
+  getUserPublicInfo,
+  getUserAllInfo,
   addUser,
   deleteUser,
   updateUser,
+  getComment,
   addComment,
   updateComment,
   deleteComment,
-  getCommentsForProject,
-  getCommentsByUser,
+  getCommentIdsForProject,
+  getCommentIdsByUser,
 };
