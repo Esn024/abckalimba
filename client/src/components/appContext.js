@@ -23,6 +23,7 @@ export const appProvider = ({ children }) => {
   const navigate = useNavigate();
 
   //create new user
+  //have this as an onsubmit on create new user form
   const createNewUser = (ev) => {
     ev.preventDefault();
     fetch('/api/users', {
@@ -85,6 +86,14 @@ export const appProvider = ({ children }) => {
       });
   };
 
+  const permissionToEditProject = (currentUser, project) => {
+    // allow only the project creator or the site Admin to edit a project
+    return (
+      currentUser.username === project.username ||
+      currentUser.username === 'Admin'
+    );
+  };
+
   return (
     <appContext.Provider
       value={{
@@ -93,6 +102,7 @@ export const appProvider = ({ children }) => {
         dateFromMs,
         createNewUser,
         updateUser,
+        permissionToEditProject,
       }}
     >
       {children}

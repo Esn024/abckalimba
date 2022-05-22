@@ -135,7 +135,7 @@ const getUserAllInfo = async (req, res) => {
 };
 
 const addUser = async (req, res) => {
-  const { username, email, projectIds } = req.body;
+  const { username, email, projectIds, created } = req.body;
 
   try {
     const dbName = 'abcsynth';
@@ -151,9 +151,7 @@ const addUser = async (req, res) => {
       // insert new user into DB
       const newUser = {
         _id: uuidv4(),
-        username,
-        email,
-        projectIds,
+        ...req.body,
       };
       const insertedUser = await db.collection('users').insertOne(newUser);
 
@@ -231,7 +229,7 @@ const deleteUser = async (req, res) => {
 
 const updateUser = async (req, res) => {
   const username = req.params.username;
-  const { email, projectIds } = req.body;
+  const { email, projectIds, modified } = req.body;
 
   let successMsg = '';
 
@@ -308,7 +306,7 @@ const getComment = async (req, res) => {
 };
 
 const addComment = async (req, res) => {
-  const { comment, username, createDate, projectId } = req.body;
+  const { comment, username, created, projectId } = req.body;
 
   try {
     const dbName = 'abcsynth';
@@ -324,10 +322,7 @@ const addComment = async (req, res) => {
       // insert new comment into DB
       const newComment = {
         _id: uuidv4(),
-        comment,
-        username,
-        projectId,
-        createDate,
+        ...req.body,
       };
       const insertedComment = await db
         .collection('comments')
@@ -359,7 +354,7 @@ const addComment = async (req, res) => {
 
 const updateComment = async (req, res) => {
   const id = req.params.id;
-  const { comment, username, createDate, projectId } = req.body;
+  const { comment, username, created, modified, projectId } = req.body;
 
   let successMsg = '';
 
@@ -377,9 +372,7 @@ const updateComment = async (req, res) => {
       const errMsg = comment.length === 0 ? 'The comment is empty' : '';
 
       if (errMsg.length === 0) {
-        //TODO is this ok?
-        const modified = new Date.now();
-        const newValues = { $set: { _id: id, modified, ...req.body } };
+        const newValues = { $set: { _id: id, ...req.body } };
         const commentUpdated = await db
           .collection('comments')
           .updateOne(rQuery, newValues);
@@ -494,7 +487,7 @@ const getCommentIdsByUser = async (req, res) => {
 };
 
 const addProject = async (req, res) => {
-  const { project, username, createDate, projectId } = req.body;
+  const { project, username, created } = req.body;
 
   try {
     const dbName = 'abcsynth';
@@ -504,34 +497,31 @@ const addProject = async (req, res) => {
     const db = client.db(dbName);
 
     //check for errors
-    const errMsg = comment.length === 0 ? 'The comment is empty' : '';
+    const errMsg = project.length === 0 ? 'The project is empty' : '';
 
     if (errMsg.length === 0) {
-      // insert new comment into DB
-      const newComment = {
+      // insert new project into DB
+      const newProject = {
         _id: uuidv4(),
-        comment,
-        username,
-        projectId,
-        createDate,
+        ...req.body,
       };
-      const insertedComment = await db
-        .collection('comments')
-        .insertOne(newComment);
+      const insertedProject = await db
+        .collection('projects')
+        .insertOne(newProject);
 
-      if (insertedComment) {
+      if (insertedProject) {
         sendResponse(
           res,
           200,
-          newComment,
-          `New comment added from username ${username} to project ${projectId}!`
+          newProject,
+          `New project added from username ${username}!`
         );
       } else {
         sendResponse(
           res,
           400,
           req.body,
-          'Comment could not be inserted into database.'
+          'Project could not be inserted into database.'
         );
       }
     } else {
