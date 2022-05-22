@@ -46,8 +46,8 @@ express()
   .get('/api/users/:username', getUserPublicInfo)
   .get('/api/users/id/:id', getUserAllInfo)
   .post('/api/users', addUser)
-  .put('/api/users/:username', updateUser)
-  .delete('/api/users/:username', deleteUser)
+  .put('/api/users/id/:id', updateUser)
+  .delete('/api/users/id/:id', deleteUser)
 
   // comments
   .get('/api/comments/:id', getComment)

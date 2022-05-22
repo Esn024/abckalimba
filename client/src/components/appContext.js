@@ -24,61 +24,87 @@ export const AppProvider = ({ children }) => {
 
   //create new user
   //have this as an onsubmit on create new user form. "form" is the useRef reference to the form from which user data is being submitted
-  const createNewUser = (data) => {
-    //ev.preventDefault();
+  const createNewUser = (formData) => {
+    // console.log({ formData });
 
-    console.log({ data });
+    fetch('/api/users', {
+      method: 'POST',
+      body: JSON.stringify({ ...formData, created: Date.now() }),
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+    })
+      .then((res) => res.json())
+      .then((json) => {
+        // console.log(json);
+        const { status, message, data } = json;
 
-    // fetch('/api/users', {
-    //   method: 'POST',
-    //   body: formData,
-    // })
-    //   .then((res) => res.json())
-    //   .then((json) => {
-    //     // console.log(json);
-    //     const { status, message, data } = json;
+        if (status == 200) {
+          setUserId(data._id);
+          // add it to localStorage so it persists even after browser is closed
+          localStorage.setItem('userId', data._id);
 
-    //     if (status == 200) {
-    //       setServerResponse(json);
-    //       setUserId(data._id);
-    //       // add it to localStorage so it persists even after browser is closed
-    //       localStorage.setItem('userId', data._id);
-
-    //       // return to homepage
-    //       navigate('/');
-    //     } else {
-    //       // TODO remove console log
-    //       console.log('There was an error', { status, message, data });
-    //     }
-    //   });
+          // return to homepage
+          navigate('/');
+        } else {
+          // TODO remove console log
+          console.log('There was an error', { status, message, data });
+        }
+      });
   };
 
-  // handle update user (send properly-formatted PUT request to api/users/:id)
-  const updateUser = () => {
-    // fetch(`/items/buy`, {
-    //   method: 'PUT',
-    //   body: JSON.stringify({
-    //     email,
-    //     projectIds,
-    //   }),
-    //   headers: {
-    //     Accept: 'application/json',
-    //     'Content-Type': 'application/json',
-    //   },
-    // })
-    //   .then((res) => res.json())
-    //   .then((json) => {
-    //     const { status, message, data } = json;
-    //     // check that the request got successfully through to server
-    //     if (status === 202) {
-    //       // Display confirmation message that user info was updated.
-    //       // TODO change this to something other than alert
-    //       alert(`Successfully changed user info for ${username}`);
-    //     } else {
-    //       // if it didn't go through, show an error.
-    //       throw new Error({ status, message, data });
-    //     }
-    //   });
+  // handle update user (send properly-formatted PUT request to api/users/id/:id)
+  const updateUser = (formData) => {
+    console.log({ formData });
+
+    fetch(`/api/users/id/${userId}`, {
+      method: 'PUT',
+      body: JSON.stringify({ ...formData, modified: Date.now() }),
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+    })
+      .then((res) => res.json())
+      .then((json) => {
+        const { status, message, data } = json;
+        // check that the request got successfully through to server
+        if (status === 202) {
+          // Display confirmation message that user info was updated.
+          // TODO change this to something other than alert
+          alert(`Successfully changed user info for ${formData.username}`);
+        } else {
+          // if it didn't go through, show an error.
+          throw new Error({ status, message, data });
+        }
+      });
+  };
+
+  // handle delete user (send properly-formatted PUT request to api/users/id/:id)
+  const deleteUser = (formData) => {
+    fetch(`/api/users/id/${userId}`, {
+      method: 'DELETE',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+    })
+      .then((res) => res.json())
+      .then((json) => {
+        const { status, message, data } = json;
+        // check that the request got successfully through to server
+        if (status === 207) {
+          // remove the userId from localstorage
+          localStorage.removeItem('userId');
+          // Display confirmation message that user info was deleted.
+          // TODO change this to something other than alert
+          alert(`Successfully deleted user!`);
+        } else {
+          // if it didn't go through, show an error.
+          throw new Error({ status, message, data });
+        }
+      });
   };
 
   const permissionToEditProject = (currentUser, project) => {
@@ -97,6 +123,7 @@ export const AppProvider = ({ children }) => {
         dateFromMs,
         createNewUser,
         updateUser,
+        deleteUser,
         permissionToEditProject,
       }}
     >

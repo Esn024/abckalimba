@@ -4,6 +4,7 @@ const fs = require('fs');
 const { v4: uuidv4 } = require('uuid');
 const { MongoClient } = require('mongodb');
 const { sendResponse } = require('./utils');
+const { networkInterfaces } = require('os');
 
 require('dotenv').config();
 const { MONGO_URI } = process.env;
@@ -19,17 +20,20 @@ const testDataFilepath = './data/testData.json';
 // importing data of companies and items (products) from JSON files
 const testData = require(testDataFilepath);
 
-const checkForUserErrors = async (db, email, username) => {
+const checkForUserErrors = async (db, email, username, oldUsername = null) => {
   let errMsg = '';
 
   const usernameInvalid = !username.match(/^[a-zA-Z0-9_-]{1,30}$/);
   if (usernameInvalid) {
     errMsg += `Sorry, username can only consist of English letters, numbers, _ - symbols, and must be no longer than 30 characters. `;
   } else {
-    const usernameTaken = await db
-      .collection('users')
-      .findOne({ username: username });
-    if (usernameTaken) errMsg += `Username ${username} is already taken. `;
+    // only do duplicate username check if this is for a new registration, or if the username is being changed
+    if (username !== oldUsername) {
+      const usernameTaken = await db
+        .collection('users')
+        .findOne({ username: username });
+      if (usernameTaken) errMsg += `Username ${username} is already taken. `;
+    }
   }
 
   const emailValid = email.includes('@');
@@ -181,7 +185,7 @@ const addUser = async (req, res) => {
 };
 
 const deleteUser = async (req, res) => {
-  const username = req.params.username;
+  const id = req.params.id;
 
   try {
     const client = new MongoClient(MONGO_URI, options);
@@ -189,7 +193,7 @@ const deleteUser = async (req, res) => {
 
     const db = client.db('abcsynth');
 
-    const rQuery = { username };
+    const rQuery = { _id: id };
     const user = await db.collection('users').findOne(rQuery);
     const userDeleted = await db.collection('users').deleteOne(rQuery);
 
@@ -208,7 +212,7 @@ const deleteUser = async (req, res) => {
       if (projectsDeleted) {
         projectsDeletedHttpResp = {
           status: 204,
-          message: `All projects by username ${username} have been deleted.`,
+          message: `All projects by username ${user.username} have been deleted.`,
         };
       }
 
@@ -216,7 +220,7 @@ const deleteUser = async (req, res) => {
         res,
         207,
         [userDeletedHttpResp, projectsDeletedHttpResp],
-        `User ${username} deleted, and all projects.`
+        `User ${user.username} deleted, and all projects.`
       );
     } else {
       const errMsg = 'No user was found, so nothing was deleted...';
@@ -229,8 +233,8 @@ const deleteUser = async (req, res) => {
 };
 
 const updateUser = async (req, res) => {
-  const username = req.params.username;
-  const { email, projectIds, modified } = req.body;
+  const id = req.params.id;
+  const { username, email, projectIds, modified, about } = req.body;
 
   let successMsg = '';
 
@@ -240,12 +244,13 @@ const updateUser = async (req, res) => {
 
     const db = client.db('abcsynth');
 
-    const rQuery = { username };
+    const rQuery = { _id: id };
     const userOriginal = await db.collection('users').findOne(rQuery);
 
     if (userOriginal) {
+      const oldUsername = userOriginal.username;
       //tests
-      const errMsg = await checkForUserErrors(db, email, username);
+      const errMsg = await checkForUserErrors(db, email, username, oldUsername);
 
       if (errMsg.length === 0) {
         const newValues = { $set: { _id: userOriginal._id, ...req.body } };
