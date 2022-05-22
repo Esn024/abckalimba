@@ -8,6 +8,8 @@ export const AppContext = createContext();
 export const AppProvider = ({ children }) => {
   const [userId, setUserId] = useState(localStorage.getItem('userId'));
 
+  const navigate = useNavigate();
+
   // return human-readable date from milliseconds since 1970
   const dateFromMs = (ms) => {
     const date = new Date(ms);
@@ -18,6 +20,37 @@ export const AppProvider = ({ children }) => {
     const m = date.getMinutes();
     const s = date.getSeconds();
     return `${year}-${month}-${day} ${h}:${m}:${s}`;
+  };
+
+  //create new user
+  //have this as an onsubmit on create new user form. "form" is the useRef reference to the form from which user data is being submitted
+  const createNewUser = (data) => {
+    //ev.preventDefault();
+
+    console.log({ data });
+
+    // fetch('/api/users', {
+    //   method: 'POST',
+    //   body: formData,
+    // })
+    //   .then((res) => res.json())
+    //   .then((json) => {
+    //     // console.log(json);
+    //     const { status, message, data } = json;
+
+    //     if (status == 200) {
+    //       setServerResponse(json);
+    //       setUserId(data._id);
+    //       // add it to localStorage so it persists even after browser is closed
+    //       localStorage.setItem('userId', data._id);
+
+    //       // return to homepage
+    //       navigate('/');
+    //     } else {
+    //       // TODO remove console log
+    //       console.log('There was an error', { status, message, data });
+    //     }
+    //   });
   };
 
   // handle update user (send properly-formatted PUT request to api/users/:id)
@@ -62,6 +95,7 @@ export const AppProvider = ({ children }) => {
         userId,
         setUserId,
         dateFromMs,
+        createNewUser,
         updateUser,
         permissionToEditProject,
       }}

@@ -22,7 +22,7 @@ const testData = require(testDataFilepath);
 const checkForUserErrors = async (db, email, username) => {
   let errMsg = '';
 
-  const usernameInvalid = !username.matches(/^[a-zA-Z0-9_-]{1,30}$/);
+  const usernameInvalid = !username.match(/^[a-zA-Z0-9_-]{1,30}$/);
   if (usernameInvalid) {
     errMsg += `Sorry, username can only consist of English letters, numbers, _ - symbols, and must be no longer than 30 characters. `;
   } else {
