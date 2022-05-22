@@ -8,6 +8,8 @@ export const AppContext = createContext();
 export const AppProvider = ({ children }) => {
   const [userId, setUserId] = useState(localStorage.getItem('userId'));
   const [numberOfTines, setNumberOfTines] = useState(7);
+  const [beatsPerMeasure, setBeatsPerMeasure] = useState(4);
+  const [tines, setTines] = useState();
 
   const navigate = useNavigate();
 
@@ -110,6 +112,15 @@ export const AppProvider = ({ children }) => {
     );
   };
 
+  // replace one value in array, return the changed array
+  const replaceOneValueInArray = (changedValue, index, originalArray) => {
+    let newArray = [...originalArray]; // create copy of tines array
+    newArray[index] = changedValue; //new value
+    return newArray;
+  };
+
+  const clickOnNoteButton = (keyboardLetter, abcNote) => {};
+
   return (
     <AppContext.Provider
       value={{
@@ -117,6 +128,12 @@ export const AppProvider = ({ children }) => {
         setUserId,
         numberOfTines,
         setNumberOfTines,
+        beatsPerMeasure,
+        setBeatsPerMeasure,
+        tines,
+        clickOnNoteButton,
+        setTines,
+        replaceOneValueInArray,
         dateFromMs,
         createNewUser,
         updateUser,

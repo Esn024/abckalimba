@@ -6,6 +6,8 @@ import abcjs from 'abcjs';
 import AbcComponent from './abc/AbcComponent1.js';
 import AbcSetNumberOfTines from './abc/AbcSetNumberOfTines';
 import AbcKeyDefinitions from './abc/AbcKeyDefinitions.js';
+
+import AbcSetBeatsPerMeasure from './abc/AbcSetBeatsPerMeasure';
 import AbcSelectTune from './abc/AbcSelectTune.js';
 import AbcTines from './abc/AbcTines.js';
 import AbcThumbOneOrTwo from './abc/AbcThumbOneOrTwo.js';
@@ -94,6 +96,7 @@ const Home = () => {
       <Text>ABC Test</Text>
       <AbcSetNumberOfTines />
       <AbcKeyDefinitions />
+      <AbcSetBeatsPerMeasure />
       <AbcSelectTune />
       <AbcComponent abc={abc2} />
       {/* <AbcTines /> */}
