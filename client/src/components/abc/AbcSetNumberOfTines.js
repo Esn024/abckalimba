@@ -3,7 +3,10 @@ import styled from 'styled-components';
 import { AppContext } from '../AppContext';
 
 const AbcSetNumberOfTines = () => {
-  const { numberOfTines, setNumberOfTines } = useContext(AppContext);
+  // const [numberOfTines, setNumberOfTines] = useState();
+  const { numberOfTines, setNumberOfTines, tines, setTines } =
+    useContext(AppContext);
+
   return (
     <>
       <StyledLabel>

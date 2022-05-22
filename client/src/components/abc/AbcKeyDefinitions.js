@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { AppContext } from '../AppContext';
 
 const AbcKeyDefinitions = () => {
-  const { numberOfTines, tines, setTines, replaceOneValueInArray } =
+  const { tines, setTines, numberOfTines, replaceOneValueInArray } =
     useContext(AppContext);
 
   //create array of tines of the right length, with empty values
@@ -22,54 +22,56 @@ const AbcKeyDefinitions = () => {
   return (
     <>
       <KeyDefinitions>
-        {tines.map((tine, index) => {
-          return (
-            <div className='key-definition'>
-              <LetterInput
-                type='text'
-                pattern={tineLetterTriggerRegex}
-                maxlength='1'
-                value={tine.keyboardLetter}
-                onChange={(e) => {
-                  //change the keyboard letter value in one tine of the tines array
-                  const newLetterValue = e.target.value;
-                  const newTine = { ...tine, keyboardLetter: newLetterValue };
-                  setTines(replaceOneValueInArray(newTine, index, tines));
-                }}
-              />
-              <DefInput
-                id='w-input'
-                type='text'
-                pattern={abcNoteRegex}
-                maxlength='6'
-                size='4'
-                value={tine.abcNote}
-                onChange={(e) => {
-                  //TODO changeTineInnerText
+        {tines &&
+          tines.map((tine, index) => {
+            return (
+              <div className='key-definition' key={index}>
+                <DefInput
+                  type='text'
+                  pattern={tineLetterTriggerRegex}
+                  maxlength='1'
+                  value={tine.keyboardLetter}
+                  onChange={(e) => {
+                    //change the keyboard letter value in one tine of the tines array
+                    const newLetterValue = e.target.value;
+                    const newTine = { ...tine, keyboardLetter: newLetterValue };
+                    setTines(replaceOneValueInArray(newTine, index, tines));
+                  }}
+                />
+                <br />
+                <DefInput
+                  id='w-input'
+                  type='text'
+                  pattern={abcNoteRegex}
+                  maxlength='6'
+                  size='4'
+                  value={tine.abcNote}
+                  onChange={(e) => {
+                    //TODO changeTineInnerText
 
-                  //change the abcNote value in one tine of the tines array
-                  const newAbcNoteValue = e.target.value;
-                  const newTine = { ...tine, abcNote: newAbcNoteValue };
-                  setTines(replaceOneValueInArray(newTine, index, tines));
-                }}
-              />
-              <br />
-              <DefInput
-                id='w-cents'
-                type='text'
-                pattern={abcCentRegex}
-                value={tine.cents}
-                size='4'
-                onChange={(e) => {
-                  //change the cents value in one tine of the tines array
-                  const newCentsValue = e.target.value;
-                  const newTine = { ...tine, cents: newCentsValue };
-                  setTines(replaceOneValueInArray(newTine, index, tines));
-                }}
-              />
-            </div>
-          );
-        })}
+                    //change the abcNote value in one tine of the tines array
+                    const newAbcNoteValue = e.target.value;
+                    const newTine = { ...tine, abcNote: newAbcNoteValue };
+                    setTines(replaceOneValueInArray(newTine, index, tines));
+                  }}
+                />
+                <br />
+                <DefInput
+                  id='w-cents'
+                  type='text'
+                  pattern={abcCentRegex}
+                  value={tine.cents}
+                  size='4'
+                  onChange={(e) => {
+                    //change the cents value in one tine of the tines array
+                    const newCentsValue = e.target.value;
+                    const newTine = { ...tine, cents: newCentsValue };
+                    setTines(replaceOneValueInArray(newTine, index, tines));
+                  }}
+                />
+              </div>
+            );
+          })}
       </KeyDefinitions>
     </>
   );

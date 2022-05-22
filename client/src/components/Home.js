@@ -97,8 +97,8 @@ const Home = () => {
       <AbcSetNumberOfTines />
       <AbcKeyDefinitions />
       <AbcSetBeatsPerMeasure />
-      <AbcSelectTune />
-      <AbcComponent abc={abc2} />
+      {/* <AbcSelectTune /> */}
+      {/* <AbcComponent abc={abc2} /> */}
       {/* <AbcTines /> */}
       {/* <AbcThumbOneOrTwo /> */}
     </Wrapper>
