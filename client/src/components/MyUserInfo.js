@@ -27,16 +27,16 @@ const MyUserInfo = () => {
 
   return (
     <Wrapper>
-      <Text>
-        {!userId
-          ? 'Please fill out the required information below.'
-          : 'You can edit your user info below.'}
-      </Text>
       {currentUser && (
         <SmallerText>
           Account created on: {dateFromMs(currentUser.created)}
         </SmallerText>
       )}
+      <SmallerText>
+        {!userId
+          ? 'Please fill out the required information below.'
+          : 'You can edit your user info below.'}
+      </SmallerText>
       <form
         onSubmit={
           !userId ? handleSubmit(createNewUser) : handleSubmit(updateUser)
@@ -101,21 +101,12 @@ const Wrapper = styled.div`
   }
 `;
 
-const Text = styled.p`
-  color: black;
-  font-family: var(--font-heading);
-  font-size: 20px;
-  text-align: center;
-  margin: 12px 0 0 24px;
-  margin-bottom: 20px;
-`;
-
 const SmallerText = styled.p`
   color: var(--color-alabama-crimson);
   font-family: var(--font-heading);
-  font-size: 24px;
+  font-size: var(--font-size-small);
   text-align: center;
-  margin: 12px 0 0 24px;
+  margin-bottom: 12px;
 `;
 
 export default MyUserInfo;

@@ -15,9 +15,9 @@ const Header = () => {
         <h1>abcKalimbaSynth</h1>
       </Link>
       {currentUser ? (
-        <div>
+        <SmallerText>
           Welcome, <Link to='/myuserinfo'>{currentUser.username}</Link>!
-        </div>
+        </SmallerText>
       ) : (
         <div>
           <Link to='/registration'>Register for a new account!</Link>
@@ -42,6 +42,10 @@ const HeaderElement = styled.header`
     color: var(--color-orange)
     transition: all 0.2s;
   }
+`;
+
+const SmallerText = styled.p`
+  font-size: var(--font-size-small);
 `;
 
 const Link = styled(NavLink)`

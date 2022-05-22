@@ -10,6 +10,9 @@ export default createGlobalStyle`
     --font-heading: 'Permanent Marker', Arial, Helvetica, sans-serif;
     --font-body: 'Kosugi', Arial, Helvetica, sans-serif;
     --padding-page: 24px;
+    --font-size-big: 24px;
+    --font-size-medium: 20px;
+    --font-size-small: 16px;
   }
 
   /* http://meyerweb.com/eric/tools/css/reset/
@@ -64,7 +67,7 @@ label,
 button {
   color: var(--color-alabama-crimson);
   font-family: var(--font-heading);
-  font-size: 32px;
+  font-size: var(--font-size-big);
   text-align: center;
   transition: all 0.2s;
 }
@@ -84,7 +87,7 @@ a:hover {
 }
 
   input {
-    font-size: 24px;
+    font-size: var(--font-size-medium);
     height: 42px;
     border: 2px solid var(--color-orange);
     border-radius: 4px;

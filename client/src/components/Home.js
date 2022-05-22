@@ -57,7 +57,7 @@ const Wrapper = styled.div`
 const Text = styled.p`
   color: var(--color-alabama-crimson);
   font-family: var(--font-heading);
-  font-size: 36px;
+  font-size: var(--font-size-small);
   text-align: center;
   margin: 12px 0 0 24px;
 `;

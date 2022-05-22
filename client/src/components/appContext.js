@@ -13,13 +13,14 @@ export const AppProvider = ({ children }) => {
   // return human-readable date from milliseconds since 1970
   const dateFromMs = (ms) => {
     const date = new Date(ms);
-    const year = date.getYear();
-    const month = date.getMonth();
-    const day = date.getDate();
-    const h = date.getHours();
-    const m = date.getMinutes();
-    const s = date.getSeconds();
-    return `${year}-${month}-${day} ${h}:${m}:${s}`;
+    // const year = date.getYear();
+    // const month = date.getMonth();
+    // const day = date.getDate();
+    // const h = date.getHours();
+    // const m = date.getMinutes();
+    // const s = date.getSeconds();
+    // return `${year}-${month}-${day} ${h}:${m}:${s}`;
+    return date.toString();
   };
 
   //create new user
