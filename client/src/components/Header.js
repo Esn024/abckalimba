@@ -28,6 +28,8 @@ const Header = () => {
 };
 
 const HeaderElement = styled.header`
+  background: white;
+  border-bottom: 4px dotted black;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -36,14 +38,15 @@ const HeaderElement = styled.header`
   /* max-width: 1280px; */
   margin-left: auto;
   margin-right: auto;
-  h1 {
-    font-size: 50px;
+  h1:hover {
+    color: var(--color-orange)
+    transition: all 0.2s;
   }
 `;
 
 const Link = styled(NavLink)`
   text-decoration: none;
-  color: black;
+  color: var(--color-alabama-crimson);
 `;
 
 export default Header;

@@ -27,7 +27,11 @@ const MyUserInfo = () => {
 
   return (
     <Wrapper>
-      <Text>{!userId ? 'Registration Form' : 'Edit My User Info'}</Text>
+      <Text>
+        {!userId
+          ? 'Please fill out the required information below.'
+          : 'You can edit your user info below.'}
+      </Text>
       {currentUser && (
         <SmallerText>
           Account created on: {dateFromMs(currentUser.created)}
@@ -54,11 +58,10 @@ const MyUserInfo = () => {
         />
         {errors.email && <span>This field is required</span>}
 
-        <label htmlFor='about'>A few words about yourself (optional):</label>
         <textarea
-          id='about'
           defaultValue={currentUser && currentUser.about}
           {...register('about')}
+          placeholder='A few words about yourself (optional)'
         ></textarea>
 
         <input type='submit' value='Submit' />
@@ -78,15 +81,33 @@ const MyUserInfo = () => {
 // display flex makes it not work
 const Wrapper = styled.div`
   display: flex;
+  flex-direction: column;
+  align-items: center;
   margin: 24px auto;
+  form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  textarea {
+    width: 100%;
+    height: 100px;
+    margin: 5px;
+    padding: 12px;
+  }
+  input {
+    width: 100%;
+    margin: 5px;
+  }
 `;
 
 const Text = styled.p`
-  color: var(--color-alabama-crimson);
+  color: black;
   font-family: var(--font-heading);
-  font-size: 36px;
+  font-size: 20px;
   text-align: center;
   margin: 12px 0 0 24px;
+  margin-bottom: 20px;
 `;
 
 const SmallerText = styled.p`

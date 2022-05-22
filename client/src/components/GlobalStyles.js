@@ -62,10 +62,11 @@ h2,
 h3,
 label,
 button {
-  color: #fff;
+  color: var(--color-alabama-crimson);
   font-family: var(--font-heading);
   font-size: 32px;
   text-align: center;
+  transition: all 0.2s;
 }
 p,
 a,
@@ -73,6 +74,13 @@ li,
 blockquote,
 input {
   font-family: var(--font-body);
+}
+
+button:hover,
+a:hover {
+  color: var(--color-orange);
+  
+  transition: all 0.2s;
 }
 
   input {
