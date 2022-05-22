@@ -39,6 +39,7 @@ export default createGlobalStyle`
       box-sizing: border-box;
       font-size: 100%;
       vertical-align: baseline;
+      font-family: Roboto, Arial, sans-serif;
   }
   /* HTML5 display-role reset for older browsers */
   article, aside, details, figcaption, figure,
@@ -88,9 +89,33 @@ a:hover {
 
   input {
     font-size: var(--font-size-medium);
-    height: 42px;
-    border: 2px solid var(--color-orange);
-    border-radius: 4px;
-    padding: 0 12px;
+    height: 20px;
+    border: 1px solid black;
+    padding: 1px 2px;
+    font-size: var(--font-size-small);
+  }
+  /* music-specific styles */
+  .abcjs-cursor {
+    stroke: red;
+  }
+  .abcjs-rest {
+    opacity: 0.1;
+  }
+  .color {
+      stroke: red;
+      fill: red;
+    }
+  .active-tine {
+      background-color: #3FB07C;
+  }
+  
+  .timed-note {
+    width: 30px;
+    height:30px;
+  }
+  .note-grid-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
   }
 `;
