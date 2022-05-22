@@ -93,9 +93,10 @@ const getUserPublicInfo = async (req, res) => {
 
     if (user) {
       // return all user info other than the private stuff - ID and email
-      const userPublicInfo = user.map(({ _id, email, ...rest }) => {
-        return rest;
-      });
+      const userPublicInfo = Object.assign({}, { ...user });
+      delete userPublicInfo._id;
+      delete userPublicInfo.email;
+
       const successMsg = `Found user!`;
       sendResponse(res, 200, userPublicInfo, successMsg);
     } else {

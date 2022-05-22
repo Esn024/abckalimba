@@ -1,11 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import styled from 'styled-components';
 
 import abcjs from 'abcjs';
 // import Abcjs from 'react-abcjs';
 import AbcComponent from './abc/AbcComponent1.js';
 
+import { AppContext } from './AppContext';
+
 const Home = () => {
+  const { userId } = useContext(AppContext);
   // useEffect(() => {
   //   console.log({ midi });
   // }, [midi]);
@@ -37,6 +40,7 @@ const Home = () => {
 
   return (
     <Wrapper>
+      <Text>userID is {userId}</Text>
       <Text>ABC Test</Text>
       <AbcComponent abc={abc2} />
     </Wrapper>
