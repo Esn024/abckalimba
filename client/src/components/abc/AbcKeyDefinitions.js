@@ -3,17 +3,21 @@ import styled from 'styled-components';
 import { AppContext } from '../AppContext';
 
 const AbcKeyDefinitions = () => {
-  const { tines, setTines, numberOfTines, replaceOneValueInArray } =
-    useContext(AppContext);
+  const { tines, setTines, replaceOneValueInArray } = useContext(AppContext);
+
+  // useEffect(() => {
+  //   props.setAuthenticated(true);
+  // }, []);
 
   //create array of tines of the right length, with empty values
-  setTines(
-    Array.from({ length: numberOfTines }).map((x) => ({
-      keyboardLetter: '',
-      abcNote: '',
-      cents: 0,
-    }))
-  );
+  // setTines(
+  //   Array.from({ length: 7 }).map((x) => ({
+  //     keyboardLetter: '',
+  //     abcNote: '',
+  //     cents: 0,
+  //   }))
+  // );
+  // setTines(Array.from({ length: numberOfTines }));
 
   const tineLetterTriggerRegex = `/[a-z]/`;
   const abcNoteRegex = `[\^_]?[A-Ga-g][,']{0,4}`;
@@ -64,7 +68,7 @@ const AbcKeyDefinitions = () => {
                   size='4'
                   onChange={(e) => {
                     //change the cents value in one tine of the tines array
-                    const newCentsValue = e.target.value;
+                    const newCentsValue = e.target.value * 1;
                     const newTine = { ...tine, cents: newCentsValue };
                     setTines(replaceOneValueInArray(newTine, index, tines));
                   }}

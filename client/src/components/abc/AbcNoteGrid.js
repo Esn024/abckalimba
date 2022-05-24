@@ -1,11 +1,16 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import styled from 'styled-components';
 import { AppContext } from '../AppContext';
-
+//clickOnNoteButton(keyboardLetter, abcNote)
 const AbcNoteGrid = () => {
+  const [row, setRow] = useState(1);
+  const { tines, userPlayNote, getRowNumFromIndex, beatsPerMeasure } =
+    useContext(AppContext);
+  const rowBeatsTines = [];
+
   return (
     <NoteGrid id='note-grid'>
-      <NoteGridRow className='note-grid-row'>
+      {tines.map((tine, index) => (
         <TimedNote
           className='timed-note'
           id='a-timed-note-1'
@@ -13,124 +18,20 @@ const AbcNoteGrid = () => {
         >
           0
         </TimedNote>
-        <TimedNote
+      ))}
+
+      <NoteGridRow className='note-grid-row'>
+        {/* <TimedNote
           className='timed-note'
-          id='w-timed-note-1'
+          id='a-timed-note-1'
           onClick='setNoteInNoteGrid(this)'
-        >
-          0
-        </TimedNote>
-        <TimedNote
-          className='timed-note'
-          id='s-timed-note-1'
-          onClick='setNoteInNoteGrid(this)'
-        >
-          0
-        </TimedNote>
-        <TimedNote
-          className='timed-note'
-          id='e-timed-note-1'
-          onClick='setNoteInNoteGrid(this)'
-        >
-          0
-        </TimedNote>
-        <TimedNote
-          className='timed-note'
-          id='d-timed-note-1'
-          onClick='setNoteInNoteGrid(this)'
-        >
-          0
-        </TimedNote>
-        <TimedNote
-          className='timed-note'
-          id='r-timed-note-1'
-          onClick='setNoteInNoteGrid(this)'
-        >
-          0
-        </TimedNote>
-        <TimedNote
-          className='timed-note'
-          id='f-timed-note-1'
-          onClick='setNoteInNoteGrid(this)'
-        >
-          0
-        </TimedNote>
-        <TimedNote
-          className='timed-note'
-          id='t-timed-note-1'
-          onClick='setNoteInNoteGrid(this)'
-        >
-          0
-        </TimedNote>
-        <TimedNote
-          className='timed-note'
-          id='g-timed-note-1'
-          onClick='setNoteInNoteGrid(this)'
-        >
-          0
-        </TimedNote>
+        > */}
       </NoteGridRow>
 
       <NoteGridRow className='note-grid-row'>
         <TimedNote
           className='timed-note'
           id='a-timed-note-2'
-          onClick='setNoteInNoteGrid(this)'
-        >
-          0
-        </TimedNote>
-        <TimedNote
-          className='timed-note'
-          id='w-timed-note-2'
-          onClick='setNoteInNoteGrid(this)'
-        >
-          0
-        </TimedNote>
-        <TimedNote
-          className='timed-note'
-          id='s-timed-note-2'
-          onClick='setNoteInNoteGrid(this)'
-        >
-          0
-        </TimedNote>
-        <TimedNote
-          className='timed-note'
-          id='e-timed-note-2'
-          onClick='setNoteInNoteGrid(this)'
-        >
-          0
-        </TimedNote>
-        <TimedNote
-          className='timed-note'
-          id='d-timed-note-2'
-          onClick='setNoteInNoteGrid(this)'
-        >
-          0
-        </TimedNote>
-        <TimedNote
-          className='timed-note'
-          id='r-timed-note-2'
-          onClick='setNoteInNoteGrid(this)'
-        >
-          0
-        </TimedNote>
-        <TimedNote
-          className='timed-note'
-          id='f-timed-note-2'
-          onClick='setNoteInNoteGrid(this)'
-        >
-          0
-        </TimedNote>
-        <TimedNote
-          class='timed-note'
-          id='t-timed-note-2'
-          onClick='setNoteInNoteGrid(this)'
-        >
-          0
-        </TimedNote>
-        <TimedNote
-          className='timed-note'
-          id='g-timed-note-2'
           onClick='setNoteInNoteGrid(this)'
         >
           0

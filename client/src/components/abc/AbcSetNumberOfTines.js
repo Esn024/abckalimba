@@ -1,11 +1,10 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import styled from 'styled-components';
 import { AppContext } from '../AppContext';
 
 const AbcSetNumberOfTines = () => {
-  // const [numberOfTines, setNumberOfTines] = useState();
-  const { numberOfTines, setNumberOfTines, tines, setTines } =
-    useContext(AppContext);
+  const [numberOfTines, setNumberOfTines] = useState(4);
+  const { tines, setTines } = useContext(AppContext);
 
   return (
     <>
@@ -18,7 +17,24 @@ const AbcSetNumberOfTines = () => {
           min='3'
           max='21'
           value={numberOfTines}
-          onChange={(e) => setNumberOfTines(e.target.value)}
+          onChange={(e) => {
+            setNumberOfTines(e.target.value);
+            //if new # of tines is longer than previous one, keep previous data & add the right number of empty values; if shorter, remove some
+            setTines(
+              e.target.value > tines.length
+                ? [
+                    ...tines,
+                    ...Array.from({
+                      length: e.target.value - tines.length,
+                    }).map(() => ({
+                      keyboardLetter: '',
+                      abcNote: '',
+                      cents: 0,
+                    })),
+                  ]
+                : tines.slice(0, e.target.value)
+            );
+          }}
         />
       </StyledLabel>
     </>

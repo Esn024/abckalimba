@@ -1,15 +1,38 @@
 import React, { createContext, useReducer, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
+import abcjs from 'abcjs';
 
 export const AppContext = createContext();
 
 // context provider
 export const AppProvider = ({ children }) => {
   const [userId, setUserId] = useState(localStorage.getItem('userId'));
-  const [numberOfTines, setNumberOfTines] = useState(7);
+  // const [numberOfTines, setNumberOfTines] = useState(3);
+  const [audioContext, setAudioContext] = useState(new window.AudioContext());
   const [beatsPerMeasure, setBeatsPerMeasure] = useState(4);
-  const [tines, setTines] = useState();
+  const [tines, setTines] = useState([
+    {
+      keyboardLetter: 'a',
+      abcNote: 'a',
+      cents: 0,
+    },
+    {
+      keyboardLetter: 'w',
+      abcNote: 'b',
+      cents: 0,
+    },
+    {
+      keyboardLetter: 's',
+      abcNote: 'c',
+      cents: 0,
+    },
+    {
+      keyboardLetter: 'e',
+      abcNote: 'd',
+      cents: 0,
+    },
+  ]);
 
   const navigate = useNavigate();
 
@@ -119,26 +142,193 @@ export const AppProvider = ({ children }) => {
     return newArray;
   };
 
-  const clickOnNoteButton = (keyboardLetter, abcNote) => {};
+  //find how many times index goes into number of tines
+  const getRowNumFromIndex = (tines, index) => {
+    Math.floor((index + 1) / tines.length);
+  };
+
+  const userPlayNote = async (abcNoteName, cents) => {
+    // get the midi pitch of the abc note name
+    const midiPitch = midiNoteNameToNumber(abcToMidiNoteName(abcNoteName));
+    // when input a note name in abc notation, play that note
+
+    //console.log({abcNoteName});
+    const visualObj = abcjs.renderAbc('*', abcNoteName, {})[0];
+
+    const sequenceCallbackOneNote = (tracks) => {
+      tracks.forEach((track) => {
+        track.forEach((event) => {
+          //console.log({event});
+          //console.log('event pitch', event.pitch);
+          // apply any custom user tuning correction in cents
+          if (event.pitch === midiPitch) {
+            event.cents = cents;
+            //console.log('sequenceCallback event', event);
+          }
+        });
+      });
+    };
+
+    try {
+      const synth = new abcjs.synth.CreateSynth();
+
+      //should the below line be here?
+      await audioContext.resume();
+      // In theory the AC shouldn't start suspended because it is being initialized in a click handler, but iOS seems to anyway.
+
+      await synth.init({
+        audioContext: audioContext,
+        visualObj: visualObj,
+        options: {
+          sequenceCallback: sequenceCallbackOneNote,
+          soundFontUrl: 'soundfonts',
+          onEnded: () => {
+            //console.log("playback ended")
+          },
+        },
+      });
+
+      await synth.prime();
+      synth.start();
+
+      //console.log("note played");
+    } catch (error) {
+      console.log('error playing note', error);
+    }
+  };
+
+  //helper functions
+
+  //helper function. Convert a scientific notation (midi note name) to ABC notation.
+  const midiNoteNameToAbc = (midiNoteName) => {
+    let abcNoteName = '';
+    let noteName = midiNoteName.match(/([A-G])/)[1];
+    let octave = midiNoteName.match(/([0-8])/)[1];
+    let flat = midiNoteName.includes('b');
+    //for now, it doesn't output sharps, only flat notes
+    if (flat) abcNoteName += '_';
+    if (octave >= 5) noteName = noteName.toLowerCase();
+    abcNoteName += noteName;
+    if (octave == 0) abcNoteName += ',,,,';
+    if (octave == 1) abcNoteName += ',,,';
+    if (octave == 2) abcNoteName += ',,';
+    if (octave == 3) abcNoteName += ',';
+    if (octave == 6) abcNoteName += "'";
+    if (octave == 7) abcNoteName += "''";
+    if (octave == 8) abcNoteName += "'''";
+    //examples:
+    //C3 = C,
+    //C4 = C
+    //C5 = c
+    //C6 = c'
+    return abcNoteName;
+  };
+
+  //helper function. Convert an ABC note name to scientific notation (midi note name).
+  const abcToMidiNoteName = (abcNoteName) => {
+    let midiNoteName = '';
+    let noteName = abcNoteName.match(/([a-gA-G])/)[1].toUpperCase();
+    // console.log({ abcNoteName });
+    // console.log({ noteName });
+    let flat = abcNoteName.includes('_');
+    let sharp = abcNoteName.includes('^');
+    midiNoteName = noteName;
+    // for now, the return is always flat notes
+    if (flat) midiNoteName += 'b';
+    if (sharp) {
+      if (noteName === 'A') {
+        midiNoteName = 'Bb';
+      } else if (noteName === 'B') {
+        midiNoteName = 'C';
+      } else if (noteName === 'C') {
+        midiNoteName = 'Db';
+      } else if (noteName === 'D') {
+        midiNoteName = 'Eb';
+      } else if (noteName === 'E') {
+        midiNoteName = 'F';
+      } else if (noteName === 'F') {
+        midiNoteName = 'Gb';
+      } else if (noteName === 'G') {
+        midiNoteName = 'Ab';
+      }
+    }
+    // figure out the octave
+    let octave = abcNoteName.includes(',,,,')
+      ? '0'
+      : abcNoteName.includes(',,,')
+      ? '1'
+      : abcNoteName.includes(',,')
+      ? '2'
+      : abcNoteName.includes(',')
+      ? '3'
+      : abcNoteName.includes("'''")
+      ? '8'
+      : abcNoteName.includes("''")
+      ? '7'
+      : abcNoteName.includes("'")
+      ? '6'
+      : abcNoteName.match(/([a-g])/)
+      ? '5'
+      : '4';
+    // console.log({ octave });
+    midiNoteName += octave;
+    //examples:
+    // C, = C3
+    // C = C4
+    // c = C5
+    // c' = C6
+    // console.log({ midiNoteName });
+    return midiNoteName;
+  };
+
+  //helper function. Convert scientific notation (midi note name) to midi number.
+  const midiNoteNameToNumber = (midiNoteName) => {
+    let noteName = midiNoteName.match(/([A-G])/)[1];
+    let octave = midiNoteName.match(/([0-8])/)[1];
+    let flat = midiNoteName.includes('b');
+    // first get the midiNumber as if octave was "0"
+    let midiNumber =
+      noteName === 'C'
+        ? 12
+        : noteName === 'D'
+        ? 14
+        : noteName === 'E'
+        ? 16
+        : noteName === 'F'
+        ? 17
+        : noteName === 'G'
+        ? 19
+        : noteName === 'A'
+        ? 21
+        : noteName === 'B'
+        ? 23
+        : null;
+    // check if there's a flat
+    if (flat) midiNumber--;
+    //now return the right midiNumber for the octave
+    return midiNumber + 12 * parseInt(octave);
+  };
 
   return (
     <AppContext.Provider
       value={{
         userId,
         setUserId,
-        numberOfTines,
-        setNumberOfTines,
         beatsPerMeasure,
         setBeatsPerMeasure,
         tines,
-        clickOnNoteButton,
+        userPlayNote,
         setTines,
+        getRowNumFromIndex,
         replaceOneValueInArray,
         dateFromMs,
         createNewUser,
         updateUser,
         deleteUser,
         permissionToEditProject,
+        midiNoteNameToAbc,
+        abcToMidiNoteName,
+        midiNoteNameToNumber,
       }}
     >
       {children}

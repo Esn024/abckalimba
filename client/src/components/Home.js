@@ -99,7 +99,7 @@ const Home = () => {
       <AbcSetBeatsPerMeasure />
       {/* <AbcSelectTune /> */}
       {/* <AbcComponent abc={abc2} /> */}
-      {/* <AbcTines /> */}
+      <AbcTines />
       {/* <AbcThumbOneOrTwo /> */}
     </Wrapper>
   );
