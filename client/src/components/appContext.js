@@ -33,6 +33,15 @@ export const AppProvider = ({ children }) => {
       cents: 0,
     },
   ]);
+  // what a click on the note-grid means. "1" is thumb one, "2" is thumb two. (if clicked again, notegrid toggles to "0" - a musical rest)
+  const [thumbOneOrTwo, setThumbOneOrTwo] = useState(1);
+
+  const [musicalSections, setMusicalSections] = useState([
+    {
+      letterId: 'A',
+      description: 'blah blah',
+    },
+  ]);
 
   const navigate = useNavigate();
 
@@ -319,6 +328,10 @@ export const AppProvider = ({ children }) => {
         tines,
         userPlayNote,
         setTines,
+        thumbOneOrTwo,
+        setThumbOneOrTwo,
+        musicalSections,
+        setMusicalSections,
         getRowNumFromIndex,
         replaceOneValueInArray,
         dateFromMs,

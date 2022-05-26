@@ -10,7 +10,6 @@ const AbcTine = ({ abcNote, keyboardLetter, cents }) => {
 
   //onClick - clickOnNoteButton(this)
   //id is keyboard letter
-  //height depends on how low note is.
   //innerText is the ABC note
 
   useEffect(() => {
@@ -28,13 +27,25 @@ const AbcTine = ({ abcNote, keyboardLetter, cents }) => {
     };
   }, [keyboardLetter]);
 
+  //height of tine in CSS depends on how low note pitch is.
+  const tineHeight = abcNote
+    ? 150 - midiNoteNameToNumber(abcToMidiNoteName(abcNote))
+    : 80;
+
   return (
     <Tine
       className='tine'
       id={keyboardLetter}
-      onClick={() => userPlayNote(abcNote, cents)}
+      onClick={() => {
+        userPlayNote(abcNote, cents);
+        tineEl.current.classList.add('active-tine');
+        // after a time interval, remove the "active-tine" class, thereby removing the color
+        setTimeout(() => {
+          tineEl.current.classList.remove('active-tine');
+        }, '400');
+      }}
       style={{
-        height: `${150 - midiNoteNameToNumber(abcToMidiNoteName(abcNote))}px`,
+        height: `${tineHeight}px`,
       }}
       ref={tineEl}
     >

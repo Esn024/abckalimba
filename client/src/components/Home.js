@@ -9,8 +9,11 @@ import AbcKeyDefinitions from './abc/AbcKeyDefinitions.js';
 
 import AbcSetBeatsPerMeasure from './abc/AbcSetBeatsPerMeasure';
 import AbcSelectTune from './abc/AbcSelectTune.js';
+import AbcSelectThumb from './abc/AbcSelectThumb.js';
+import AbcSetNumberOfMusicalSections from './abc/AbcSetNumberOfMusicalSections.js';
+import AbcMusicalSection from './abc/AbcMusicalSection.js';
+
 import AbcTines from './abc/AbcTines.js';
-import AbcThumbOneOrTwo from './abc/AbcThumbOneOrTwo.js';
 import AbcNoteGrid from './abc/AbcNoteGrid.js';
 
 //AbcThumbOneOrTwo
@@ -18,7 +21,7 @@ import AbcNoteGrid from './abc/AbcNoteGrid.js';
 import { AppContext } from './AppContext';
 
 const Home = () => {
-  const { userId } = useContext(AppContext);
+  const { userId, musicalSections } = useContext(AppContext);
 
   const abc = `X:1
   T: Cooley's
@@ -97,17 +100,24 @@ const Home = () => {
       <AbcSetNumberOfTines />
       <AbcKeyDefinitions />
       <AbcSetBeatsPerMeasure />
+      <AbcSetNumberOfMusicalSections />
+      <AbcSelectThumb />
       {/* <AbcSelectTune /> */}
       {/* <AbcComponent abc={abc2} /> */}
       <AbcTines />
       {/* <AbcThumbOneOrTwo /> */}
+      {musicalSections.map((e, i) => (
+        <AbcMusicalSection key={i} />
+      ))}
     </Wrapper>
   );
 };
 
 // display flex makes it not work
 const Wrapper = styled.div`
-  /* display: flex; */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   margin: 24px auto;
   height: 660px;
 `;

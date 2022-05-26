@@ -2,20 +2,20 @@ import React, { useContext } from 'react';
 import styled from 'styled-components';
 import { AppContext } from '../AppContext';
 
-const AbcSetBeatsPerMeasure = () => {
-  const { beatsPerMeasure, setBeatsPerMeasure } = useContext(AppContext);
+const AbcSetNumberOfMeasuresInSection = ({
+  numberOfMeasures,
+  setNumberOfMeasures,
+}) => {
   return (
     <>
       <StyledLabel>
-        <Text>Beats Per Measure:</Text>
+        <Text># of Measures:</Text>
         <StyledInput
           type='number'
-          id='quantity'
-          name='quantity'
-          min='2'
-          max='13'
-          value={beatsPerMeasure}
-          onChange={(e) => setBeatsPerMeasure(e.target.value)}
+          min='1'
+          max='100'
+          value={numberOfMeasures}
+          onChange={(e) => setNumberOfMeasures(e.target.value)}
         />
       </StyledLabel>
     </>
@@ -37,4 +37,4 @@ const Text = styled.p`
   margin-right: 8px;
 `;
 
-export default AbcSetBeatsPerMeasure;
+export default AbcSetNumberOfMeasuresInSection;

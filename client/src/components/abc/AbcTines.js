@@ -12,7 +12,7 @@ const AbcTines = () => {
   //height depends on how low note is.
   //innerText is the ABC note
 
-  console.log({ tines });
+  // console.log({ tines });
   return (
     <Tines>
       {tines &&
@@ -33,13 +33,5 @@ const Tines = styled.div`
   align-items: flex-start;
   justify-content: center;
 `;
-
-// const Tine = styled.button`
-//   width: 30px;
-//   padding: 0;
-//   display: flex;
-//   align-items: flex-start;
-//   justify-content: center;
-// `;
 
 export default AbcTines;

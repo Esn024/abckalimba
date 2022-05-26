@@ -64,14 +64,26 @@ export default createGlobalStyle`
   h1,
 h2,
 h3,
-label,
-button {
+label {
   color: var(--color-alabama-crimson);
   font-family: var(--font-heading);
   font-size: var(--font-size-big);
   text-align: center;
   transition: all 0.2s;
 }
+
+button {
+  color: var(--color-alabama-crimson);
+  font-family: var(--font-heading);
+  font-size: var(--font-size-small);
+  text-align: center;
+  
+  /* border: none; */
+  /* outline: none; */
+  text-decoration: none;
+  /* transition: color 0.2s; */
+}
+
 p,
 a,
 li,
@@ -83,8 +95,7 @@ input {
 button:hover,
 a:hover {
   color: var(--color-orange);
-  
-  transition: all 0.2s;
+  transition: color 0.2s;
 }
 
   input {
@@ -106,7 +117,9 @@ a:hover {
       fill: red;
     }
   .active-tine {
-      background-color: #3FB07C;
+    background-color: #3FB07C;
+    border: 1px solid grey;
+    border-radius: 5px;
   }
   
   .timed-note {

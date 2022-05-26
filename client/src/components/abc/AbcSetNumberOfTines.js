@@ -9,7 +9,7 @@ const AbcSetNumberOfTines = () => {
   return (
     <>
       <StyledLabel>
-        <Text>Select Number of Tines:</Text>
+        <Text>Number of Tines:</Text>
         <StyledInput
           type='number'
           id='quantity'
