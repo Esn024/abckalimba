@@ -4,8 +4,19 @@ import { AppContext } from '../AppContext';
 
 const AbcSetNumberOfMeasuresInSection = ({
   numberOfMeasures,
-  setNumberOfMeasures,
+  currentMusicalSectionIndex,
 }) => {
+  const {
+    musicalSections,
+    setMusicalSections,
+    beatsPerMeasure,
+    tines,
+    replaceOneValueInArray,
+  } = useContext(AppContext);
+
+  const currentMusicalGridArray =
+    musicalSections[currentMusicalSectionIndex].musicalGridArray;
+
   return (
     <>
       <StyledLabel>
@@ -15,7 +26,35 @@ const AbcSetNumberOfMeasuresInSection = ({
           min='1'
           max='100'
           value={numberOfMeasures}
-          onChange={(e) => setNumberOfMeasures(e.target.value)}
+          onChange={(e) =>
+            setMusicalSections(
+              replaceOneValueInArray(
+                {
+                  ...musicalSections[currentMusicalSectionIndex],
+                  numberOfMeasures: e.target.value,
+                  //if new # of measures is longer than before, keep previous data & add the right number of empty values; if shorter, remove some
+                  musicalGridArray:
+                    e.target.value > currentMusicalGridArray.length
+                      ? [
+                          // keep the previous existing measures
+                          ...currentMusicalGridArray,
+                          // add the required new # of measures, with as many columns as tines and as many rows as the # of beats per measure
+                          ...Array.from({
+                            length:
+                              e.target.value - currentMusicalGridArray.length,
+                          }).map((measure) =>
+                            new Array(beatsPerMeasure)
+                              .fill(0)
+                              .map((row) => new Array(tines.length).fill(0))
+                          ),
+                        ]
+                      : currentMusicalGridArray.slice(0, e.target.value),
+                },
+                currentMusicalSectionIndex,
+                musicalSections
+              )
+            )
+          }
         />
       </StyledLabel>
     </>

@@ -106,8 +106,13 @@ const Home = () => {
       {/* <AbcComponent abc={abc2} /> */}
       <AbcTines />
       {/* <AbcThumbOneOrTwo /> */}
-      {musicalSections.map((e, i) => (
-        <AbcMusicalSection key={i} />
+      {musicalSections.map((section, i) => (
+        <AbcMusicalSection
+          key={i}
+          currentMusicalSectionIndex={i}
+          letterId={section.letterId}
+          numberOfMeasures={section.numberOfMeasures}
+        />
       ))}
     </Wrapper>
   );

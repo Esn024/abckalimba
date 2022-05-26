@@ -6,13 +6,13 @@ const AbcSelectThumb = () => {
   const { thumbOneOrTwo, setThumbOneOrTwo } = useContext(AppContext);
   return (
     <Wrapper>
-      <Text>Thumb:</Text>
+      <Text>Thumb (left or right):</Text>
       <StyledInput
         type='radio'
         id='left'
         name='rest-left-right'
         value='1'
-        checked={thumbOneOrTwo === 1}
+        defaultChecked={thumbOneOrTwo === 1}
         onClick={() => setThumbOneOrTwo(1)}
       />
       <StyledLabel htmlFor='left'>1</StyledLabel>
@@ -21,7 +21,7 @@ const AbcSelectThumb = () => {
         id='right'
         name='rest-left-right'
         value='2'
-        checked={thumbOneOrTwo === 2}
+        defaultChecked={thumbOneOrTwo === 2}
         onClick={() => setThumbOneOrTwo(2)}
       />
       <StyledLabel htmlFor='right'>2</StyledLabel>

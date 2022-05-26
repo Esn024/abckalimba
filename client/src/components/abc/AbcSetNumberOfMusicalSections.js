@@ -3,19 +3,20 @@ import styled from 'styled-components';
 import { AppContext } from '../AppContext';
 
 const AbcSetNumberOfMusicalSections = () => {
-  const { musicalSections, setMusicalSections } = useContext(AppContext);
+  const { musicalSections, setMusicalSections, beatsPerMeasure, tines } =
+    useContext(AppContext);
   const [numberOfMusicalSections, setNumberOfMusicalSections] = useState(1);
 
   return (
     <>
       <StyledLabel>
-        <Text># of Musical Sections:</Text>
+        <Text>Musical Sections:</Text>
         <StyledInput
           type='number'
           id='quantity'
           name='quantity'
           min='1'
-          max='100'
+          max='26'
           value={numberOfMusicalSections}
           onChange={(e) => {
             setNumberOfMusicalSections(e.target.value);
@@ -26,9 +27,19 @@ const AbcSetNumberOfMusicalSections = () => {
                     ...musicalSections,
                     ...Array.from({
                       length: e.target.value - musicalSections.length,
-                    }).map(() => ({
-                      letterId: 'B',
+                    }).map((el) => ({
+                      // make sure that each the 1st musical section is "A", the 2nd "B" and so on
+                      letterId: `${String.fromCharCode(
+                        e.target.value * 1 + 64
+                      )}`,
                       description: '',
+                      numberOfMeasures: 1,
+                      // create a musicalGridArray 1 measure long, with as many columns as tines and as many rows as the # of beats per measure
+                      musicalGridArray: [
+                        Array(beatsPerMeasure)
+                          .fill(0)
+                          .map((row) => new Array(tines.length).fill(0)),
+                      ],
                     })),
                   ]
                 : musicalSections.slice(0, e.target.value)

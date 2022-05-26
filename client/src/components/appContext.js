@@ -40,6 +40,21 @@ export const AppProvider = ({ children }) => {
     {
       letterId: 'A',
       description: 'blah blah',
+      numberOfMeasures: 2,
+      musicalGridArray: [
+        [
+          [0, 0, 0, 0],
+          [0, 1, 0, 0],
+          [0, 0, 0, 0],
+          [0, 2, 1, 0],
+        ],
+        [
+          [0, 2, 0, 0],
+          [0, 0, 0, 0],
+          [0, 1, 0, 0],
+          [0, 2, 0, 0],
+        ],
+      ],
     },
   ]);
 

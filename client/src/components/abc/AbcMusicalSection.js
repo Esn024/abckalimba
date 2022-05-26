@@ -2,24 +2,30 @@ import React, { useContext, useState } from 'react';
 import styled from 'styled-components';
 import { AppContext } from '../AppContext';
 import AbcSetNumberOfMeasuresInSection from './AbcSetNumberOfMeasuresInSection.js';
+import AbcNoteGrid from './AbcNoteGrid.js';
 
-const AbcMusicalSection = ({ letterId }) => {
-  const { numberOfMeasures, setNumberOfMeasures } = useState(1);
+const AbcMusicalSection = ({
+  letterId,
+  description,
+  numberOfMeasures,
+  currentMusicalSectionIndex,
+}) => {
   // const { thumbOneOrTwo, setThumbOneOrTwo } = useContext(AppContext);
   return (
-    <Wrapper>
+    <Wrapper id={`section-${letterId}`}>
       <AbcSetNumberOfMeasuresInSection
-        id={`section-${letterId}`}
         numberOfMeasures={numberOfMeasures}
-        setNumberOfMeasures={setNumberOfMeasures}
+        currentMusicalSectionIndex={currentMusicalSectionIndex}
       />
-      <Text>Section:</Text>
+      <Text>Section {letterId}:</Text>
+      <AbcNoteGrid currentMusicalSectionIndex={currentMusicalSectionIndex} />
     </Wrapper>
   );
 };
 
 const Wrapper = styled.div`
   display: flex;
+  flex-direction: column;
   align-items: center;
 `;
 

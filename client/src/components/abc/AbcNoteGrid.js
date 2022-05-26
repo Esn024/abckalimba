@@ -1,46 +1,62 @@
 import React, { useContext, useState } from 'react';
 import styled from 'styled-components';
 import { AppContext } from '../AppContext';
+
 //clickOnNoteButton(keyboardLetter, abcNote)
-const AbcNoteGrid = () => {
-  const [row, setRow] = useState(1);
-  const { tines, userPlayNote, getRowNumFromIndex, beatsPerMeasure } =
-    useContext(AppContext);
+
+const AbcNoteGrid = ({ currentMusicalSectionIndex }) => {
+  // const [row, setRow] = useState(1);
+  const {
+    tines,
+    userPlayNote,
+    getRowNumFromIndex,
+    beatsPerMeasure,
+    musicalSections,
+  } = useContext(AppContext);
   const rowBeatsTines = [];
 
   return (
-    <NoteGrid id='note-grid'>
-      {tines.map((tine, index) => (
-        <TimedNote
-          className='timed-note'
-          id='a-timed-note-1'
-          onClick='setNoteInNoteGrid(this)'
-        >
-          0
-        </TimedNote>
-      ))}
-
-      <NoteGridRow className='note-grid-row'>
-        {/* <TimedNote
-          className='timed-note'
-          id='a-timed-note-1'
-          onClick='setNoteInNoteGrid(this)'
-        > */}
-      </NoteGridRow>
-
-      <NoteGridRow className='note-grid-row'>
-        <TimedNote
-          className='timed-note'
-          id='a-timed-note-2'
-          onClick='setNoteInNoteGrid(this)'
-        >
-          0
-        </TimedNote>
-      </NoteGridRow>
-
-      {/* <button onClick='getAbcFromNoteGrid()'>Get ABC from note grid</button> */}
-    </NoteGrid>
+    <div>
+      {musicalSections[currentMusicalSectionIndex].musicalGridArray.map(
+        (measure, index) => (
+          <div key={index}>measure 1</div>
+        )
+      )}
+    </div>
   );
+  //   return (
+  //     <NoteGrid id='note-grid'>
+  //       {tines.map((tine, index) => (
+  //         <TimedNote
+  //           className='timed-note'
+  //           id='a-timed-note-1'
+  //           onClick='setNoteInNoteGrid(this)'
+  //         >
+  //           0
+  //         </TimedNote>
+  //       ))}
+
+  //       <NoteGridRow className='note-grid-row'>
+  //         {/* <TimedNote
+  //           className='timed-note'
+  //           id='a-timed-note-1'
+  //           onClick='setNoteInNoteGrid(this)'
+  //         > */}
+  //       </NoteGridRow>
+
+  //       <NoteGridRow className='note-grid-row'>
+  //         <TimedNote
+  //           className='timed-note'
+  //           id='a-timed-note-2'
+  //           onClick='setNoteInNoteGrid(this)'
+  //         >
+  //           0
+  //         </TimedNote>
+  //       </NoteGridRow>
+
+  //       {/* <button onClick='getAbcFromNoteGrid()'>Get ABC from note grid</button> */}
+  //     </NoteGrid>
+  //   );
 };
 
 const NoteGrid = styled.div``;
