@@ -40,6 +40,8 @@ const AbcNoteGrid = ({ currentMusicalSectionIndex }) => {
                           key={uniqueNoteId}
                           id={uniqueNoteId}
                           note={note}
+                          // when mouse hovers over note, it will display the abcNote that gets played
+                          title={tines[noteIndex].abcNote}
                           onClick={() => {
                             // tine-0-key-a
                             document
