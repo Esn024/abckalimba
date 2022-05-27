@@ -19,18 +19,20 @@ const AbcSetNumberOfMusicalSections = () => {
           max='26'
           value={numberOfMusicalSections}
           onChange={(e) => {
-            setNumberOfMusicalSections(e.target.value);
+            const newNumberOfMusicalSections = e.target.value * 1;
+            setNumberOfMusicalSections(newNumberOfMusicalSections);
             //if new # of musical sections is longer than previous one, keep previous data & add the right number of empty values; if shorter, remove some
             setMusicalSections(
-              e.target.value > musicalSections.length
+              newNumberOfMusicalSections > musicalSections.length
                 ? [
                     ...musicalSections,
                     ...Array.from({
-                      length: e.target.value - musicalSections.length,
+                      length:
+                        newNumberOfMusicalSections - musicalSections.length,
                     }).map((el) => ({
                       // make sure that the 1st musical section is "A", the 2nd "B" and so on
                       letterId: `${String.fromCharCode(
-                        e.target.value * 1 + 64
+                        newNumberOfMusicalSections + 64
                       )}`,
                       description: '',
                       numberOfMeasures: 1,
@@ -42,7 +44,7 @@ const AbcSetNumberOfMusicalSections = () => {
                       ],
                     })),
                   ]
-                : musicalSections.slice(0, e.target.value)
+                : musicalSections.slice(0, newNumberOfMusicalSections)
             );
           }}
         />

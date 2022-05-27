@@ -24,7 +24,7 @@ const AbcSetNumberOfTines = () => {
           max='21'
           value={numberOfTines}
           onChange={(e) => {
-            const newNumberOfTines = e.target.value;
+            const newNumberOfTines = e.target.value * 1;
             const tinesHaveBeenAdded = newNumberOfTines > tines.length;
             const numberOfNewTinesAdded = newNumberOfTines - tines.length;
 

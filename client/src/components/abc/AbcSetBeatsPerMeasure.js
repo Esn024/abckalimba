@@ -22,12 +22,14 @@ const AbcSetBeatsPerMeasure = () => {
           max='13'
           value={beatsPerMeasure}
           onChange={(e) => {
-            const newBeatsPerMeasure = e.target.value;
+            const newBeatsPerMeasure = e.target.value * 1;
             const beatsHaveBeenAdded = newBeatsPerMeasure > beatsPerMeasure;
             const numberOfNewBeatsAdded = newBeatsPerMeasure - beatsPerMeasure;
             const numberOfTines = tines.length;
 
             setBeatsPerMeasure(newBeatsPerMeasure);
+
+            console.log({ newBeatsPerMeasure });
 
             // also change musicalSections (add or remove the right number of beat rows in the measures array)
             let modifiedMusicalSections = [];
