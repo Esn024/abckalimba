@@ -28,17 +28,17 @@ const AbcSetNumberOfMusicalSections = () => {
                     ...Array.from({
                       length: e.target.value - musicalSections.length,
                     }).map((el) => ({
-                      // make sure that each the 1st musical section is "A", the 2nd "B" and so on
+                      // make sure that the 1st musical section is "A", the 2nd "B" and so on
                       letterId: `${String.fromCharCode(
                         e.target.value * 1 + 64
                       )}`,
                       description: '',
                       numberOfMeasures: 1,
-                      // create a musicalGridArray 1 measure long, with as many columns as tines and as many rows as the # of beats per measure
-                      musicalGridArray: [
+                      // create a measures array 1 measure long, with as many columns as tines and as many rows as the # of beats per measure
+                      measures: [
                         Array(beatsPerMeasure)
                           .fill(0)
-                          .map((row) => new Array(tines.length).fill(0)),
+                          .map((beatRow) => new Array(tines.length).fill(0)),
                       ],
                     })),
                   ]

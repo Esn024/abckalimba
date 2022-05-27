@@ -101,7 +101,7 @@ const LetterInput = styled.input`
 `;
 
 const DefInput = styled.input`
-  width: 55px;
+  width: 40px;
   height: 20px;
   border: 1px solid black;
   padding: 1px 2px;

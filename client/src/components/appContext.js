@@ -41,7 +41,7 @@ export const AppProvider = ({ children }) => {
       letterId: 'A',
       description: 'blah blah',
       numberOfMeasures: 2,
-      musicalGridArray: [
+      measures: [
         [
           [0, 0, 0, 0],
           [0, 1, 0, 0],
@@ -221,6 +221,22 @@ export const AppProvider = ({ children }) => {
     }
   };
 
+  const changeOneNote = (
+    musicalSectionIndex,
+    measureIndex,
+    beatIndex,
+    noteIndex,
+    note,
+    thumbOneOrTwo
+  ) => {
+    let modifiedMusicalSections = [...musicalSections];
+
+    modifiedMusicalSections[musicalSectionIndex].measures[measureIndex][
+      beatIndex
+    ][noteIndex] = note > 0 ? 0 : thumbOneOrTwo;
+    setMusicalSections(modifiedMusicalSections);
+  };
+
   //helper functions
 
   //helper function. Convert a scientific notation (midi note name) to ABC notation.
@@ -354,6 +370,7 @@ export const AppProvider = ({ children }) => {
         updateUser,
         deleteUser,
         permissionToEditProject,
+        changeOneNote,
         midiNoteNameToAbc,
         abcToMidiNoteName,
         midiNoteNameToNumber,

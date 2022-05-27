@@ -10,15 +10,25 @@ const AbcMusicalSection = ({
   numberOfMeasures,
   currentMusicalSectionIndex,
 }) => {
+  const [visible, setVisible] = useState(1);
   // const { thumbOneOrTwo, setThumbOneOrTwo } = useContext(AppContext);
   return (
     <Wrapper id={`section-${letterId}`}>
-      <AbcSetNumberOfMeasuresInSection
-        numberOfMeasures={numberOfMeasures}
-        currentMusicalSectionIndex={currentMusicalSectionIndex}
-      />
-      <Text>Section {letterId}:</Text>
-      <AbcNoteGrid currentMusicalSectionIndex={currentMusicalSectionIndex} />
+      <Text>Section {letterId}</Text>
+      <StyledButton onClick={() => setVisible(!visible)}>
+        {visible ? 'Hide' : 'Show'}
+      </StyledButton>
+      {visible && (
+        <>
+          <AbcSetNumberOfMeasuresInSection
+            numberOfMeasures={numberOfMeasures}
+            currentMusicalSectionIndex={currentMusicalSectionIndex}
+          />
+          <AbcNoteGrid
+            currentMusicalSectionIndex={currentMusicalSectionIndex}
+          />
+        </>
+      )}
     </Wrapper>
   );
 };
@@ -27,6 +37,10 @@ const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+`;
+
+const StyledButton = styled.button`
+  font-size: 12px;
 `;
 
 const StyledInput = styled.input`

@@ -4,6 +4,9 @@ export default createGlobalStyle`
   :root {
     --color-cadmium-red: #D80026;
     --color-alabama-crimson: #AA001E;
+    --color-dark-green: #3FB07C;
+    --color-very-light-green: #e2fdf1;
+    --color-dark-grey: #5c5c5c;
     --color-orange: #F79D00;
     --color-selective-yellow: #FDBB01;
     --color-desert-sand: #E3C4A6;
@@ -117,8 +120,8 @@ a:hover {
       fill: red;
     }
   .active-tine {
-    background-color: #3FB07C;
-    border: 1px solid grey;
+    background-color: var(--color-dark-green);
+    border: 1px solid var(--color-dark-grey);
     border-radius: 5px;
   }
   

@@ -14,8 +14,7 @@ const AbcSetNumberOfMeasuresInSection = ({
     replaceOneValueInArray,
   } = useContext(AppContext);
 
-  const currentMusicalGridArray =
-    musicalSections[currentMusicalSectionIndex].musicalGridArray;
+  const currentMeasures = musicalSections[currentMusicalSectionIndex].measures;
 
   return (
     <>
@@ -33,22 +32,21 @@ const AbcSetNumberOfMeasuresInSection = ({
                   ...musicalSections[currentMusicalSectionIndex],
                   numberOfMeasures: e.target.value,
                   //if new # of measures is longer than before, keep previous data & add the right number of empty values; if shorter, remove some
-                  musicalGridArray:
-                    e.target.value > currentMusicalGridArray.length
+                  measures:
+                    e.target.value > currentMeasures.length
                       ? [
                           // keep the previous existing measures
-                          ...currentMusicalGridArray,
+                          ...currentMeasures,
                           // add the required new # of measures, with as many columns as tines and as many rows as the # of beats per measure
                           ...Array.from({
-                            length:
-                              e.target.value - currentMusicalGridArray.length,
+                            length: e.target.value - currentMeasures.length,
                           }).map((measure) =>
                             new Array(beatsPerMeasure)
                               .fill(0)
                               .map((row) => new Array(tines.length).fill(0))
                           ),
                         ]
-                      : currentMusicalGridArray.slice(0, e.target.value),
+                      : currentMeasures.slice(0, e.target.value),
                 },
                 currentMusicalSectionIndex,
                 musicalSections
