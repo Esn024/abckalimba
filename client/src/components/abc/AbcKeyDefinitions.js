@@ -29,7 +29,7 @@ const AbcKeyDefinitions = () => {
         {tines &&
           tines.map((tine, index) => {
             return (
-              <div className='key-definition' key={index}>
+              <div className='key-definition' key={'tine-defitition-' + index}>
                 <DefInput
                   type='text'
                   pattern={tineLetterTriggerRegex}
@@ -44,7 +44,7 @@ const AbcKeyDefinitions = () => {
                 />
                 <br />
                 <DefInput
-                  id='w-input'
+                  id={'w-abcNote-' + index}
                   type='text'
                   pattern={abcNoteRegex}
                   maxlength='6'
@@ -61,7 +61,7 @@ const AbcKeyDefinitions = () => {
                 />
                 <br />
                 <DefInput
-                  id='w-cents'
+                  id={'w-cents-' + index}
                   type='text'
                   pattern={abcCentRegex}
                   value={tine.cents}

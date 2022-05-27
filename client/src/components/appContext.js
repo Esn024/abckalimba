@@ -349,6 +349,79 @@ export const AppProvider = ({ children }) => {
     return midiNumber + 12 * parseInt(octave);
   };
 
+  // convert measures stored in the format of a note grid array into abc notation
+  const noteGridToAbc = (measures, tempo = 180) => {
+    // TODO may need to update the below line later in case this number will be able to change mid-piece
+    const beatsPerBar = measures[0].length;
+
+    let handOneAbcNotesThisBeat = [];
+    let handTwoAbcNotesThisBeat = [];
+
+    let handOneAbc = '';
+    let handTwoAbc = '';
+
+    measures.forEach((measure) => {
+      measure.forEach((beat) => {
+        beat.forEach((note, index) => {
+          if (note === 1) {
+            handOneAbcNotesThisBeat.push(tines[index].abcNote);
+          } else if (note === 2) {
+            handTwoAbcNotesThisBeat.push(tines[index].abcNote);
+          }
+        });
+
+        //hand one (up-facing stems)
+        if (handOneAbcNotesThisBeat.length === 0) {
+          handOneAbc += 'z'; // rest (no notes)
+        } else if (handOneAbcNotesThisBeat.length === 1) {
+          // if just one note per beat
+          handOneAbc += handOneAbcNotesThisBeat[0];
+        } else {
+          // if there are multiple notes per beat, they should be combined in square brackets, e.g. "[ceg]"
+          handOneAbc += '[';
+          handOneAbcNotesThisBeat.forEach((n) => (handOneAbc += n));
+          handOneAbc += ']';
+        }
+
+        //hand two (down-facing stems)
+        if (handTwoAbcNotesThisBeat.length === 0) {
+          handTwoAbc += 'z'; // rest (no notes)
+        } else if (handTwoAbcNotesThisBeat.length === 1) {
+          // if just one note per beat
+          handTwoAbc += handTwoAbcNotesThisBeat[0];
+        } else {
+          // if there are multiple notes per beat, they should be combined in square brackets, e.g. "[ceg]"
+          handTwoAbc += '[';
+          handTwoAbcNotesThisBeat.forEach((n) => (handTwoAbc += n));
+          handTwoAbc += ']';
+        }
+
+        // reset arrays
+        handOneAbcNotesThisBeat = [];
+        handTwoAbcNotesThisBeat = [];
+      });
+
+      // add bar-lines at the end of each bar/measure in ABC string
+      handOneAbc += ' | ';
+      handTwoAbc += ' | ';
+    });
+
+    const abc = `X:1
+  M:${beatsPerBar}/8
+  Q:1/8=${tempo}
+  L:1/8
+  %%score (H1 H2)
+  V:H1           clef=treble  name="Hand 1"   snm="1"
+  V:H2           clef=treble  name="Hand 2"  snm="2"
+  K:Am
+  % 1
+  [V:T1]  ${handOneAbc}
+  [V:T2]  ${handTwoAbc}`;
+
+    console.log(abc);
+    return abc;
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -374,6 +447,7 @@ export const AppProvider = ({ children }) => {
         midiNoteNameToAbc,
         abcToMidiNoteName,
         midiNoteNameToNumber,
+        noteGridToAbc,
       }}
     >
       {children}

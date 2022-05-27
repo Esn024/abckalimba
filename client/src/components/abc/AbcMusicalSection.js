@@ -11,10 +11,15 @@ const AbcMusicalSection = ({
   currentMusicalSectionIndex,
 }) => {
   const [visible, setVisible] = useState(1);
-  // const { thumbOneOrTwo, setThumbOneOrTwo } = useContext(AppContext);
+  const { musicalSections, noteGridToAbc } = useContext(AppContext);
+  const currentNoteGrid = musicalSections[currentMusicalSectionIndex].measures;
+
   return (
     <Wrapper id={`section-${letterId}`}>
       <Text>Section {letterId}</Text>
+      <StyledButton onClick={() => noteGridToAbc(currentNoteGrid)}>
+        note grid to Abc
+      </StyledButton>
       <StyledButton onClick={() => setVisible(!visible)}>
         {visible ? 'Hide' : 'Show'}
       </StyledButton>
