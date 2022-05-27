@@ -21,6 +21,7 @@ const AbcTines = () => {
             abcNote={tine.abcNote}
             keyboardLetter={tine.keyboardLetter}
             cents={tine.cents}
+            tineIndex={index}
             key={index}
           />
         ))}

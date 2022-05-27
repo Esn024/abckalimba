@@ -40,7 +40,12 @@ const AbcNoteGrid = ({ currentMusicalSectionIndex }) => {
                           key={uniqueNoteId}
                           id={uniqueNoteId}
                           note={note}
-                          onClick={() =>
+                          onClick={() => {
+                            // tine-0-key-a
+                            document
+                              .getElementById('tine-' + noteIndex)
+                              .click();
+
                             changeOneNote(
                               currentMusicalSectionIndex,
                               measureIndex,
@@ -48,8 +53,8 @@ const AbcNoteGrid = ({ currentMusicalSectionIndex }) => {
                               noteIndex,
                               note,
                               thumbOneOrTwo
-                            )
-                          }
+                            );
+                          }}
                         >
                           {note}
                         </TimedNote>

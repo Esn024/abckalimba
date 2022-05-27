@@ -2,7 +2,7 @@ import React, { useContext, useRef, useEffect } from 'react';
 import styled from 'styled-components';
 import { AppContext } from '../AppContext';
 
-const AbcTine = ({ abcNote, keyboardLetter, cents }) => {
+const AbcTine = ({ abcNote, keyboardLetter, cents, tineIndex }) => {
   const { userPlayNote, abcToMidiNoteName, midiNoteNameToNumber } =
     useContext(AppContext);
 
@@ -35,7 +35,7 @@ const AbcTine = ({ abcNote, keyboardLetter, cents }) => {
   return (
     <Tine
       className='tine'
-      id={keyboardLetter}
+      id={'tine-' + tineIndex}
       onClick={() => {
         userPlayNote(abcNote, cents);
         tineEl.current.classList.add('active-tine');
