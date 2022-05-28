@@ -1,5 +1,6 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
+import abcjs from 'abcjs';
 import { AppContext } from '../AppContext';
 import AbcSetNumberOfMeasuresInSection from './AbcSetNumberOfMeasuresInSection.js';
 import AbcNoteGrid from './AbcNoteGrid.js';
@@ -10,12 +11,56 @@ const AbcMusicalSection = ({
   numberOfMeasures,
   currentMusicalSectionIndex,
 }) => {
-  const { musicalSections, noteGridToAbc } = useContext(AppContext);
-  const [visible, setVisible] = useState(1);
+  const { musicalSections, noteGridToAbc, initializeMusic } =
+    useContext(AppContext);
+  const [notegridVisible, setNotegridVisible] = useState(true);
+  const [scoreVisible, setScoreVisible] = useState(true);
   const [musicIsPlaying, setMusicIsPlaying] = useState(false);
   const [sliderPosition, setSliderPosition] = useState(0);
+  const [synth, setSynth] = useState(new abcjs.synth.CreateSynth());
 
-  const currentNoteGrid = musicalSections[currentMusicalSectionIndex].measures;
+  const refForScoreDiv = useRef(null);
+  const idForScoreDiv = 'score-' + currentMusicalSectionIndex;
+
+  const currentMusicalSection = musicalSections[currentMusicalSectionIndex];
+  const currentNoteGrid = currentMusicalSection.measures;
+
+  // create synth
+  useEffect(() => {
+    // renderAbc or renderMidi
+    // currentMusicalSection &&
+    // try {
+    // setSynth(new abcjs.synth.CreateSynth());
+    // } catch (error) {
+    //   console.log('Creating synth failed', error);
+    // }
+
+    // if (synth) {
+    const abc = noteGridToAbc(currentNoteGrid);
+    const abc2 = 'abcde';
+    const abc3 = `X:1
+M:4/8
+Q:1/8=180
+L:1/8
+%%score (H1 H2)
+V:H1           clef=treble  name="Hand 1"  snm="1"
+V:H2           clef=treble  name="Hand 2"  snm="2"
+K:Am
+% 1
+[V:H1]  zbzc | zzbz | 
+[V:H2]  zzzb | bzzb |`;
+    initializeMusic(abc, idForScoreDiv, synth);
+    console.log(abc);
+    // }
+  }, [scoreVisible]);
+
+  // useEffect(() => {
+  //   const abc = noteGridToAbc(currentNoteGrid);
+  //   const loadMusic = async () => {
+  //     userLoadMusic(abc, idForScoreDiv, synth);
+  //   };
+  //   loadMusic();
+  // }, [currentNoteGrid, idForScoreDiv, synth]);
 
   return (
     <Wrapper id={`section-${letterId}`}>
@@ -23,11 +68,11 @@ const AbcMusicalSection = ({
       <StyledButton onClick={() => noteGridToAbc(currentNoteGrid)}>
         note grid to Abc
       </StyledButton>
-      <PlaybackWrapper>
+      <HorizontalWrapper>
         <PlaybackButton
           onClick={() => {
             setMusicIsPlaying(!musicIsPlaying);
-            console.log({ musicIsPlaying });
+            // console.log({ musicIsPlaying });
           }}
         >
           {musicIsPlaying ? '⏸' : '▶'}
@@ -45,11 +90,17 @@ const AbcMusicalSection = ({
             //goToSpecificPlaceInSong(this.value / 100)
           }}
         ></input>
-      </PlaybackWrapper>
-      <StyledButton onClick={() => setVisible(!visible)}>
-        {visible ? 'Hide' : 'Show'}
-      </StyledButton>
-      {visible && (
+      </HorizontalWrapper>
+      <HorizontalWrapper>
+        <StyledButton onClick={() => setNotegridVisible(!notegridVisible)}>
+          {notegridVisible ? 'Hide grid' : 'Show grid'}
+        </StyledButton>
+        <StyledButton onClick={() => setScoreVisible(!scoreVisible)}>
+          {scoreVisible ? 'Hide score' : 'Show score'}
+        </StyledButton>
+      </HorizontalWrapper>
+      {scoreVisible && <div id={idForScoreDiv} ref={refForScoreDiv}></div>}
+      {notegridVisible && (
         <>
           <AbcSetNumberOfMeasuresInSection
             numberOfMeasures={numberOfMeasures}
@@ -70,7 +121,7 @@ const Wrapper = styled.div`
   align-items: center;
 `;
 
-const PlaybackWrapper = styled.div`
+const HorizontalWrapper = styled.div`
   display: flex;
   align-items: center;
 `;

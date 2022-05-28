@@ -349,6 +349,60 @@ export const AppProvider = ({ children }) => {
     return midiNumber + 12 * parseInt(octave);
   };
 
+  //helper function. Convert midi number to scientific notation (midi note name). This uses abcjs's built-in converter
+  const midiNumberToMidiNoteName = (midiNumber) => {
+    return abcjs.synth.pitchToNoteName[midiNumber];
+  };
+
+  // the function for changing events in audio playback. Runs once after the array of notes is created, but just before it is used to create the audio buffer
+  const sequenceCallback = (tracks) => {
+    // time signature can be anywhere from 2/8 to 13/8. Find the # of eighth notes (beats) per measure
+    //const regexForTimeSignature = /M:\s?([2-9]|1[0-3])\/8/;
+    //const beatsPerMeasure = currentTune.match(regexForTimeSignature)[1];
+
+    // console.log({beatsPerMeasure});
+    // console.log(tracks);
+
+    let allNoteEvents = [];
+
+    tracks.forEach((track, trackIndex) => {
+      track.forEach((event) => {
+        //which measure this event is in
+        const measure = Math.floor(event.start);
+
+        //calculate which overall beat this event falls on, based on how many beats there are in each measure
+        const beatFromStart = event.start * beatsPerMeasure;
+
+        // calculate which beat this is within the current measure
+        const beatInMeasure = (event.start - measure) * beatsPerMeasure;
+
+        // MIDI (scientific notation) note name
+        const midiNoteName = midiNumberToMidiNoteName(event.pitch);
+
+        // ABC notation note name
+        const abcNoteName = midiNoteNameToAbc(midiNoteName);
+
+        // apply any tuning modifications set by the user
+        tines.forEach((tine) => {
+          if (abcNoteName === tine.abcNote) {
+            event.cents = tine.cents;
+          }
+        });
+
+        // make an array of all note events. Also add a new beat property to each one
+        allNoteEvents.push({
+          ...event,
+          beatFromStart,
+          beatInMeasure,
+          midiNoteName,
+          abcNoteName,
+        });
+      });
+    });
+
+    //console.log({allNoteEvents});
+  };
+
   // convert measures stored in the format of a note grid array into abc notation
   const noteGridToAbc = (measures, tempo = 180) => {
     // TODO may need to update the below line later in case this number will be able to change mid-piece
@@ -407,19 +461,58 @@ export const AppProvider = ({ children }) => {
     });
 
     const abc = `X:1
-  M:${beatsPerBar}/8
-  Q:1/8=${tempo}
-  L:1/8
-  %%score (H1 H2)
-  V:H1           clef=treble  name="Hand 1"   snm="1"
-  V:H2           clef=treble  name="Hand 2"  snm="2"
-  K:Am
-  % 1
-  [V:T1]  ${handOneAbc}
-  [V:T2]  ${handTwoAbc}`;
+M:${beatsPerBar}/8
+Q:1/8=${tempo}
+L:1/8
+%%score (H1 H2)
+V:H1           clef=treble  name="Hand 1"  snm="1"
+V:H2           clef=treble  name="Hand 2"  snm="2"
+K:Am
+% 1
+[V:H1]  ${handOneAbc}
+[V:H2]  ${handTwoAbc}`;
 
-    console.log(abc);
+    // console.log(abc);
     return abc;
+  };
+
+  // load sheet music score from correctly-formatted abc notation into a specific div. Must pass in the "synth" object loaded with "new abcjs.synth.CreateSynth();" (inside a useEffect)
+  const initializeMusic = async (abc, idForScoreDiv, synth) => {
+    // console.log({ abc, idForScoreDiv, synth });
+
+    const visualObj = abcjs.renderAbc(idForScoreDiv, abc, {
+      responsive: 'resize',
+      add_classes: true,
+    })[0];
+
+    // let allNoteEvents = [];
+
+    try {
+      // const synth = new abcjs.synth.CreateSynth();
+
+      //should the below line be here?
+      await audioContext.resume();
+      // In theory the AC shouldn't start suspended because it is being initialized in a click handler, but iOS seems to anyway.
+
+      await synth.init({
+        audioContext: audioContext,
+        visualObj: visualObj,
+        options: {
+          sequenceCallback: sequenceCallback,
+          soundFontUrl: 'soundfonts',
+          onEnded: () => {
+            //console.log("playback ended")
+          },
+        },
+      });
+
+      await synth.prime();
+      // synth.start();
+
+      //console.log("note played");
+    } catch (error) {
+      console.log('Audio failed', error);
+    }
   };
 
   return (
@@ -431,6 +524,7 @@ export const AppProvider = ({ children }) => {
         setBeatsPerMeasure,
         tines,
         userPlayNote,
+        initializeMusic,
         setTines,
         thumbOneOrTwo,
         setThumbOneOrTwo,

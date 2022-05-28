@@ -34,14 +34,14 @@ const AbcSetNumberOfMeasuresInSection = ({
                 newNumberOfMeasures - numberOfMeasures;
               const numberOfTines = tines.length;
 
-              console.log({
-                currentMeasures,
-                newNumberOfMeasures,
-                measuresHaveBeenAdded,
-                numberOfNewMeasuresAdded,
-                numberOfTines,
-                beatsPerMeasure,
-              });
+              // console.log({
+              //   currentMeasures,
+              //   newNumberOfMeasures,
+              //   measuresHaveBeenAdded,
+              //   numberOfNewMeasuresAdded,
+              //   numberOfTines,
+              //   beatsPerMeasure,
+              // });
               // change current musicalSection (add or remove the right number of measures)
               let modifiedMusicalSections = [];
               let modifiedMeasures = [];
