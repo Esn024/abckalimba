@@ -10,8 +10,11 @@ const AbcMusicalSection = ({
   numberOfMeasures,
   currentMusicalSectionIndex,
 }) => {
-  const [visible, setVisible] = useState(1);
   const { musicalSections, noteGridToAbc } = useContext(AppContext);
+  const [visible, setVisible] = useState(1);
+  const [musicIsPlaying, setMusicIsPlaying] = useState(false);
+  const [sliderPosition, setSliderPosition] = useState(0);
+
   const currentNoteGrid = musicalSections[currentMusicalSectionIndex].measures;
 
   return (
@@ -20,6 +23,29 @@ const AbcMusicalSection = ({
       <StyledButton onClick={() => noteGridToAbc(currentNoteGrid)}>
         note grid to Abc
       </StyledButton>
+      <PlaybackWrapper>
+        <PlaybackButton
+          onClick={() => {
+            setMusicIsPlaying(!musicIsPlaying);
+            console.log({ musicIsPlaying });
+          }}
+        >
+          {musicIsPlaying ? '⏸' : '▶'}
+        </PlaybackButton>
+        <PlaybackButton>⏹</PlaybackButton>
+        <input
+          type='range'
+          min='0'
+          max='100'
+          value={sliderPosition}
+          id={'slider-' + currentMusicalSectionIndex}
+          onChange={(ev) => {
+            const newSliderPosition = ev.target.value;
+            setSliderPosition(newSliderPosition);
+            //goToSpecificPlaceInSong(this.value / 100)
+          }}
+        ></input>
+      </PlaybackWrapper>
       <StyledButton onClick={() => setVisible(!visible)}>
         {visible ? 'Hide' : 'Show'}
       </StyledButton>
@@ -44,8 +70,21 @@ const Wrapper = styled.div`
   align-items: center;
 `;
 
+const PlaybackWrapper = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
 const StyledButton = styled.button`
   font-size: 12px;
+`;
+
+const PlaybackButton = styled(StyledButton)`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
 `;
 
 const StyledInput = styled.input`
