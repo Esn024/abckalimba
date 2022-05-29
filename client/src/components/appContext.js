@@ -489,12 +489,12 @@ K:${key}
         .map((e) => e.pitch);
       // since I've added an abcNoteName to each event, I can also get the abcPitches
       const currentAbcPitches = allNoteEvents
-        .filter((e) => e.beatFromStartOfSong === beatNumber)
+        .filter((e) => e.beatNumber === beatNumber)
         .map((e) => e.abcNoteName);
 
       console.log({ allNoteEvents });
-      console.log({ currentPitches });
-      // console.log({ currentAbcPitches });
+      // console.log({ currentPitches });
+      console.log({ currentAbcPitches });
 
       // move the position of the audio slider
       setSliderPosition((beatNumber / totalBeats) * 100);
