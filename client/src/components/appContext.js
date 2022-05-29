@@ -357,14 +357,16 @@ export const AppProvider = ({ children }) => {
   };
 
   // function and variable to do with adding & removing the CSS that gives red color to elements that are "playing"
-  const colorElements = (currentEls, lastEls, setLastEls) => {
+  const colorElements = (currentEls) => {
+    if (currentEls.length > 0) {
+      // remove any earlier red coloration
+      Array.from(document.querySelectorAll('.color')).forEach((el) =>
+        el.classList.remove('color')
+      );
+    }
+
     let i;
     let j;
-    for (i = 0; i < lastEls.length; i++) {
-      for (j = 0; j < lastEls[i].length; j++) {
-        lastEls[i][j].classList.remove('color');
-      }
-    }
     //currentEls.forEach((currentEl) => {});
     for (i = 0; i < currentEls.length; i++) {
       //console.log('currentEls[i]', currentEls[i]);
@@ -373,7 +375,6 @@ export const AppProvider = ({ children }) => {
         currentEls[i][j].classList.add('color');
       }
     }
-    setLastEls(currentEls);
   };
 
   // convert measures stored in the format of a note grid array into abc notation
@@ -454,9 +455,7 @@ K:${key}
   const getEventCallback = (
     colorElements,
     musicIsPlaying,
-    setMusicIsPlaying,
-    lastEls,
-    setLastEls
+    setMusicIsPlaying
   ) => {
     // the function to change colours to red
     const eventCallback = (ev) => {
@@ -465,7 +464,7 @@ K:${key}
         return;
       }
 
-      colorElements(ev.elements, lastEls, setLastEls);
+      colorElements(ev.elements);
     };
 
     return eventCallback;

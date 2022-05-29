@@ -36,7 +36,6 @@ const AbcMusicalSection = ({
   const [sliderPosition, setSliderPosition] = useState(0);
   const [synth, setSynth] = useState(new abcjs.synth.CreateSynth());
   // const [visualObj, setVisualObj] = useState();
-  const [lastEls, setLastEls] = useState([]);
   const [timingCallbacks, setTimingCallbacks] = useState();
   const [allNoteEvents, setAllNoteEvents] = useState([]);
 
@@ -60,9 +59,7 @@ const AbcMusicalSection = ({
         eventCallback: getEventCallback(
           colorElements,
           musicIsPlaying,
-          setMusicIsPlaying,
-          lastEls,
-          setLastEls
+          setMusicIsPlaying
         ),
         beatCallback: getBeatCallback(
           allNoteEvents,
