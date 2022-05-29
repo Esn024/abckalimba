@@ -356,74 +356,24 @@ export const AppProvider = ({ children }) => {
     return abcjs.synth.pitchToNoteName[midiNumber];
   };
 
-  // the function for changing events in audio playback. Runs once after the array of notes is created, but just before it is used to create the audio buffer
-  const sequenceCallback = (tracks) => {
-    // time signature can be anywhere from 2/8 to 13/8. Find the # of eighth notes (beats) per measure
-    //const regexForTimeSignature = /M:\s?([2-9]|1[0-3])\/8/;
-    //const beatsPerMeasure = currentTune.match(regexForTimeSignature)[1];
-
-    // console.log({beatsPerMeasure});
-    // console.log(tracks);
-
-    let allNoteEvents = [];
-
-    tracks.forEach((track, trackIndex) => {
-      track.forEach((event) => {
-        //which measure this event is in
-        const measure = Math.floor(event.start);
-
-        //calculate which overall beat this event falls on, based on how many beats there are in each measure
-        const beatFromStart = event.start * beatsPerMeasure;
-
-        // calculate which beat this is within the current measure
-        const beatInMeasure = (event.start - measure) * beatsPerMeasure;
-
-        // MIDI (scientific notation) note name
-        const midiNoteName = midiNumberToMidiNoteName(event.pitch);
-
-        // ABC notation note name
-        const abcNoteName = midiNoteNameToAbc(midiNoteName);
-
-        // apply any tuning modifications set by the user
-        tines.forEach((tine) => {
-          if (abcNoteName === tine.abcNote) {
-            event.cents = tine.cents;
-          }
-        });
-
-        // make an array of all note events. Also add a new beat property to each one
-        allNoteEvents.push({
-          ...event,
-          measure,
-          beatFromStart,
-          beatInMeasure,
-          midiNoteName,
-          abcNoteName,
-        });
-      });
-    });
-
-    //console.log({allNoteEvents});
-  };
-
-  // this runs every beat
-  const beatCallback = async (beatNumber, totalBeats) => {
-    //console.log(beatNumber);
-
-    // array of pitches currently playing (e.g. [60, 62])
-    // const currentPitches = allNoteEvents.filter(e => e.beat === beatNumber).map(e => e.pitch);
-    //console.log({currentPitches});
-
-    // move the position of the audio slider
-    slider.value = (beatNumber / totalBeats) * 100;
-    if (beatNumber == totalBeats) {
-      //tune has ended
-      //console.log("piece is over");
-      // loop
-      await resetPlayback();
-      await synth.start(0);
-      timingCallbacks.start(0);
+  // function and variable to do with adding & removing the CSS that gives red color to elements that are "playing"
+  const colorElements = (currentEls, lastEls, setLastEls) => {
+    let i;
+    let j;
+    for (i = 0; i < lastEls.length; i++) {
+      for (j = 0; j < lastEls[i].length; j++) {
+        lastEls[i][j].classList.remove('color');
+      }
     }
+    //currentEls.forEach((currentEl) => {});
+    for (i = 0; i < currentEls.length; i++) {
+      //console.log('currentEls[i]', currentEls[i]);
+      for (j = 0; j < currentEls[i].length; j++) {
+        //console.log('currentEls[i][j]', currentEls[i][j]);
+        currentEls[i][j].classList.add('color');
+      }
+    }
+    setLastEls(currentEls);
   };
 
   // convert measures stored in the format of a note grid array into abc notation
@@ -501,7 +451,7 @@ K:${key}
   };
 
   // load sheet music score from correctly-formatted abc notation into a specific div. Must pass in the "synth" object loaded with "new abcjs.synth.CreateSynth();" (inside a useEffect)
-  const initializeMusic = async (visualObj, synth) => {
+  const initializeMusic = async (visualObj, synth, sequenceCallback) => {
     // console.log({ abc, idForScoreDiv, synth });
 
     // const visualObj = abcjs.renderAbc(idForScoreDiv, abc, {
@@ -539,6 +489,47 @@ K:${key}
     }
   };
 
+  const resetPlayback = (
+    synth,
+    timingCallbacks,
+    setMusicIsPlaying,
+    setSliderPosition
+  ) => {
+    setMusicIsPlaying(false);
+    timingCallbacks.stop();
+    setSliderPosition(0);
+    synth.stop();
+    // remove any remaining red coloration
+    Array.from(document.querySelectorAll('.color')).forEach((el) =>
+      el.classList.remove('color')
+    );
+  };
+
+  const goToSpecificPlaceInSong = async (position, synth, timingCallbacks) => {
+    //console.log({position});
+    await synth.seek(position);
+    timingCallbacks.setProgress(position);
+  };
+
+  const startPause = async (
+    synth,
+    timingCallbacks,
+    musicIsPlaying,
+    setMusicIsPlaying,
+    sliderPosition
+  ) => {
+    console.log({ timingCallbacks });
+    if (musicIsPlaying) {
+      await synth.pause();
+      timingCallbacks.pause();
+    } else {
+      await synth.start();
+      // if slider is at 0, make sure it starts at the very beginning
+      sliderPosition > 0 ? timingCallbacks.start() : timingCallbacks.start(0);
+    }
+    setMusicIsPlaying(!musicIsPlaying);
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -547,8 +538,6 @@ K:${key}
         beatsPerMeasure,
         setBeatsPerMeasure,
         tines,
-        userPlayNote,
-        initializeMusic,
         setTines,
         thumbOneOrTwo,
         setThumbOneOrTwo,
@@ -569,7 +558,14 @@ K:${key}
         midiNoteNameToAbc,
         abcToMidiNoteName,
         midiNoteNameToNumber,
+        midiNumberToMidiNoteName,
         noteGridToAbc,
+        userPlayNote,
+        initializeMusic,
+        colorElements,
+        resetPlayback,
+        goToSpecificPlaceInSong,
+        startPause,
       }}
     >
       {children}

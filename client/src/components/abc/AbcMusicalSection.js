@@ -11,16 +11,31 @@ const AbcMusicalSection = ({
   numberOfMeasures,
   currentMusicalSectionIndex,
 }) => {
-  const { musicalSections, noteGridToAbc, initializeMusic, tempo, key } =
-    useContext(AppContext);
+  const {
+    beatsPerMeasure,
+    musicalSections,
+    noteGridToAbc,
+    initializeMusic,
+    tempo,
+    key,
+    colorElements,
+    midiNumberToMidiNoteName,
+    midiNoteNameToAbc,
+    tines,
+    resetPlayback,
+    goToSpecificPlaceInSong,
+    startPause,
+  } = useContext(AppContext);
   const [notegridVisible, setNotegridVisible] = useState(true);
   const [scoreVisible, setScoreVisible] = useState(true);
   const [musicIsPlaying, setMusicIsPlaying] = useState(false);
+  //TODO move into object so it can be passed be reference? Or else, just pass the ID into the beatCallback, and the ID never changes...
   const [sliderPosition, setSliderPosition] = useState(0);
   const [synth, setSynth] = useState(new abcjs.synth.CreateSynth());
-  const [visualObj, setVisualObj] = useState();
+  // const [visualObj, setVisualObj] = useState();
   const [lastEls, setLastEls] = useState([]);
   const [timingCallbacks, setTimingCallbacks] = useState();
+  const [allNoteEvents, setAllNoteEvents] = useState([]);
 
   const refForScoreDiv = useRef(null);
   const idForScoreDiv = 'score-' + currentMusicalSectionIndex;
@@ -28,76 +43,125 @@ const AbcMusicalSection = ({
   const currentMusicalSection = musicalSections[currentMusicalSectionIndex];
   const currentNoteGrid = currentMusicalSection.measures;
 
-  // create synth
+  // I would have liked to move the big callback functions below (eventCallback, sequenceCallback and beatCallback) into the AppContext, to improve organization and reduce duplication, but this was unfortunately not possible because they modify certain local states within this function component which it was not possible to lift (because they are different for every musical section), and neither was it possible to pass in the setter functions (e.g. setLastEls) as function parameters into them, because in ABCJS the parameters that can be passed into these callbacks are already pre-defined.
+
+  // the function to change colours to red
+  const eventCallback = (ev) => {
+    if (!ev) {
+      setMusicIsPlaying(!musicIsPlaying);
+      return;
+    }
+
+    colorElements(ev.elements, lastEls, setLastEls);
+  };
+
+  // the function for changing events in audio playback. Runs once after the array of notes is created, but just before it is used to create the audio buffer
+  const sequenceCallback = (tracks) => {
+    // time signature can be anywhere from 2/8 to 13/8. Find the # of eighth notes (beats) per measure
+    //const regexForTimeSignature = /M:\s?([2-9]|1[0-3])\/8/;
+    //const beatsPerMeasure = currentTune.match(regexForTimeSignature)[1];
+
+    // console.log({beatsPerMeasure});
+    // console.log(tracks);
+
+    let newAllNoteEvents = [];
+
+    tracks.forEach((track, trackIndex) => {
+      track.forEach((event) => {
+        //which measure this event is in
+        const measure = Math.floor(event.start);
+
+        console.log({ beatsPerMeasure });
+
+        //calculate which overall beat this event falls on, based on how many beats there are in each measure
+        const beatFromStart = event.start * beatsPerMeasure;
+
+        // calculate which beat this is within the current measure
+        const beatInMeasure = (event.start - measure) * beatsPerMeasure;
+
+        // MIDI (scientific notation) note name
+        const midiNoteName = midiNumberToMidiNoteName(event.pitch);
+
+        // ABC notation note name
+        const abcNoteName = midiNoteNameToAbc(midiNoteName);
+
+        // apply any tuning modifications set by the user
+        tines.forEach((tine) => {
+          if (abcNoteName === tine.abcNote) {
+            event.cents = tine.cents;
+          }
+        });
+
+        // make an array of all note events. Also add a new beat property to each one
+        newAllNoteEvents.push({
+          ...event,
+          measure,
+          beatFromStart,
+          beatInMeasure,
+          midiNoteName,
+          abcNoteName,
+        });
+      });
+    });
+
+    setAllNoteEvents(newAllNoteEvents);
+    console.log({ newAllNoteEvents });
+  };
+
+  // this runs every beat
+  const beatCallback = async (beatNumber, totalBeats) => {
+    //console.log(beatNumber);
+
+    // array of MIDI pitches currently playing (e.g. [60, 62])
+    const currentPitches = allNoteEvents
+      .filter((e) => e.beatFromStartOfSong === beatNumber)
+      .map((e) => e.pitch);
+    // since I've added an abcNoteName to each event, I can also get the abcPitches
+    const currentAbcPitches = allNoteEvents
+      .filter((e) => e.beatFromStartOfSong === beatNumber)
+      .map((e) => e.abcNoteName);
+
+    console.log({ allNoteEvents });
+    // console.log({ currentPitches });
+    // console.log({ currentAbcPitches });
+
+    // move the position of the audio slider
+    setSliderPosition((beatNumber / totalBeats) * 100);
+    //if tune has ended
+    if (beatNumber == totalBeats) {
+      //console.log("piece is over");
+
+      //reset
+      await resetPlayback(
+        synth,
+        timingCallbacks,
+        setMusicIsPlaying,
+        setSliderPosition
+      );
+      //and start again (in effect, loop)
+      await synth.start(0);
+      timingCallbacks.start(0);
+    }
+  };
+
+  // initialize music
   useEffect(() => {
-    const colorElements = (currentEls) => {
-      let i;
-      let j;
-      for (i = 0; i < lastEls.length; i++) {
-        for (j = 0; j < lastEls[i].length; j++) {
-          lastEls[i][j].classList.remove('color');
-        }
-      }
-      //currentEls.forEach((currentEl) => {});
-      for (i = 0; i < currentEls.length; i++) {
-        //console.log('currentEls[i]', currentEls[i]);
-        for (j = 0; j < currentEls[i].length; j++) {
-          //console.log('currentEls[i][j]', currentEls[i][j]);
-          currentEls[i][j].classList.add('color');
-        }
-      }
-      setLastEls(currentEls);
-    };
-
-    // the function to change colours to red
-    const eventCallback = (ev) => {
-      if (!ev) {
-        setMusicIsPlaying(!musicIsPlaying);
-        return;
-      }
-      colorElements(ev.elements);
-
-      //tests
-      //console.log('midiPitches', ev.midiPitches);
-      //console.log('milliseconds', ev.milliseconds);
-      // BUG: ev.midiPitches doesn't seem to work
-      // console.log('eventCallback midiPitches', ev.midiPitches);
-    };
-
-    // renderAbc or renderMidi
-    // currentMusicalSection &&
-    // try {
-    // setSynth(new abcjs.synth.CreateSynth());
-    // } catch (error) {
-    //   console.log('Creating synth failed', error);
-    // }
-
-    // if (synth) {
     const abc = noteGridToAbc(currentNoteGrid, tempo, key);
-    //     const abc2 = 'abcde';
-    //     const abc3 = `X:1
-    // M:4/8
-    // Q:1/8=180
-    // L:1/8
-    // %%score (H1 H2)
-    // V:H1           clef=treble  name="Hand 1"  snm="1"
-    // V:H2           clef=treble  name="Hand 2"  snm="2"
-    // K:Am
-    // % 1
-    // [V:H1]  zbzc | zzbz |
-    // [V:H2]  zzzb | bzzb |`;
 
-    setVisualObj(
-      abcjs.renderAbc(idForScoreDiv, abc, {
-        responsive: 'resize',
-        add_classes: true,
-      })[0]
+    const visualObj = abcjs.renderAbc(idForScoreDiv, abc, {
+      responsive: 'resize',
+      add_classes: true,
+    })[0];
+
+    setTimingCallbacks(
+      new abcjs.TimingCallbacks(visualObj, {
+        eventCallback: eventCallback,
+        beatCallback: beatCallback,
+      })
     );
 
-    initializeMusic(visualObj, synth);
-    // console.log(abc);
-    // }
-  }, [scoreVisible, tempo, key, musicalSections]);
+    initializeMusic(visualObj, synth, sequenceCallback);
+  }, [tempo, key, musicalSections]);
 
   // useEffect(() => {
   //   const abc = noteGridToAbc(currentNoteGrid);
@@ -116,13 +180,31 @@ const AbcMusicalSection = ({
       <HorizontalWrapper>
         <PlaybackButton
           onClick={() => {
-            setMusicIsPlaying(!musicIsPlaying);
+            //setMusicIsPlaying(!musicIsPlaying);
             // console.log({ musicIsPlaying });
+            startPause(
+              synth,
+              timingCallbacks,
+              musicIsPlaying,
+              setMusicIsPlaying,
+              sliderPosition
+            );
           }}
         >
           {musicIsPlaying ? '⏸' : '▶'}
         </PlaybackButton>
-        <PlaybackButton>⏹</PlaybackButton>
+        <PlaybackButton
+          onClick={() =>
+            resetPlayback(
+              synth,
+              timingCallbacks,
+              setMusicIsPlaying,
+              setSliderPosition
+            )
+          }
+        >
+          ⏹
+        </PlaybackButton>
         <input
           type='range'
           min='0'
@@ -132,7 +214,11 @@ const AbcMusicalSection = ({
           onChange={(ev) => {
             const newSliderPosition = ev.target.value;
             setSliderPosition(newSliderPosition);
-            //goToSpecificPlaceInSong(this.value / 100)
+            goToSpecificPlaceInSong(
+              newSliderPosition / 100,
+              synth,
+              timingCallbacks
+            );
           }}
         ></input>
       </HorizontalWrapper>
@@ -144,7 +230,13 @@ const AbcMusicalSection = ({
           {scoreVisible ? 'Hide score' : 'Show score'}
         </StyledButton>
       </HorizontalWrapper>
-      {scoreVisible && <div id={idForScoreDiv} ref={refForScoreDiv}></div>}
+      {
+        <div
+          id={idForScoreDiv}
+          ref={refForScoreDiv}
+          style={{ display: scoreVisible ? 'block' : 'none' }}
+        ></div>
+      }
       {notegridVisible && (
         <>
           <AbcSetNumberOfMeasuresInSection
