@@ -518,7 +518,7 @@ K:${key}
     return beatCallback;
   };
 
-  const getSequenceCallback = (beatsPerMeasure, setAllNoteEvents) => {
+  const getSequenceCallback = (setAllNoteEvents) => {
     // the function for changing events in audio playback. Runs once after the array of notes is created, but just before it is used to create the audio buffer
 
     const sequenceCallback = (tracks) => {
@@ -644,6 +644,8 @@ K:${key}
     setMusicIsPlaying,
     sliderPosition
   ) => {
+    const newMusicIsPlaying = !musicIsPlaying;
+    console.log({ newMusicIsPlaying });
     // console.log({ timingCallbacks });
     if (musicIsPlaying) {
       await synth.pause();
@@ -653,7 +655,7 @@ K:${key}
       // if slider is at 0, make sure it starts at the very beginning
       sliderPosition > 0 ? timingCallbacks.start() : timingCallbacks.start(0);
     }
-    setMusicIsPlaying(!musicIsPlaying);
+    setMusicIsPlaying(newMusicIsPlaying);
   };
 
   return (

@@ -75,11 +75,7 @@ const AbcMusicalSection = ({
       })
     );
 
-    initializeMusic(
-      visualObj,
-      synth,
-      getSequenceCallback(beatsPerMeasure, setAllNoteEvents)
-    );
+    initializeMusic(visualObj, synth, getSequenceCallback(setAllNoteEvents));
   }, [tempo, key, musicalSections]);
 
   // useEffect(() => {
