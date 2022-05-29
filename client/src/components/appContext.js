@@ -450,6 +450,132 @@ K:${key}
     return abc;
   };
 
+  // the three big callback functions below (eventCallback, sequenceCallback and beatCallback) are returned with getter functions, because in ABCJS the parameters that can be passed into these callbacks are already pre-defined.
+  const getEventCallback = (
+    colorElements,
+    musicIsPlaying,
+    setMusicIsPlaying,
+    lastEls,
+    setLastEls
+  ) => {
+    // the function to change colours to red
+    const eventCallback = (ev) => {
+      if (!ev) {
+        setMusicIsPlaying(!musicIsPlaying);
+        return;
+      }
+
+      colorElements(ev.elements, lastEls, setLastEls);
+    };
+
+    return eventCallback;
+  };
+
+  const getBeatCallback = (
+    allNoteEvents,
+    resetPlayback,
+    synth,
+    timingCallbacks,
+    setMusicIsPlaying,
+    setSliderPosition
+  ) => {
+    // this runs every beat
+    const beatCallback = async (beatNumber, totalBeats) => {
+      console.log({ beatNumber });
+
+      // array of MIDI pitches currently playing (e.g. [60, 62])
+      const currentPitches = allNoteEvents
+        .filter((e) => e.beatNumber === beatNumber)
+        .map((e) => e.pitch);
+      // since I've added an abcNoteName to each event, I can also get the abcPitches
+      const currentAbcPitches = allNoteEvents
+        .filter((e) => e.beatFromStartOfSong === beatNumber)
+        .map((e) => e.abcNoteName);
+
+      console.log({ allNoteEvents });
+      console.log({ currentPitches });
+      // console.log({ currentAbcPitches });
+
+      // move the position of the audio slider
+      setSliderPosition((beatNumber / totalBeats) * 100);
+      //if tune has ended
+      if (beatNumber == totalBeats) {
+        //console.log("piece is over");
+
+        //reset
+        await resetPlayback(
+          synth,
+          timingCallbacks,
+          setMusicIsPlaying,
+          setSliderPosition
+        );
+        //and start again (in effect, loop)
+        await synth.start(0);
+        timingCallbacks.start(0);
+      }
+    };
+
+    return beatCallback;
+  };
+
+  const getSequenceCallback = (beatsPerMeasure, setAllNoteEvents) => {
+    // the function for changing events in audio playback. Runs once after the array of notes is created, but just before it is used to create the audio buffer
+
+    const sequenceCallback = (tracks) => {
+      // time signature can be anywhere from 2/8 to 13/8. Find the # of eighth notes (beats) per measure
+      //const regexForTimeSignature = /M:\s?([2-9]|1[0-3])\/8/;
+      //const beatsPerMeasure = currentTune.match(regexForTimeSignature)[1];
+
+      // console.log({beatsPerMeasure});
+      // console.log(tracks);
+
+      let newAllNoteEvents = [];
+
+      tracks.forEach((track, trackIndex) => {
+        track.forEach((event) => {
+          //which measure this event is in
+          // const measure = Math.floor((event.start * 8) / beatsPerMeasure);
+
+          // console.log({ beatsPerMeasure });
+
+          //calculate which overall beat this event falls on (event.start measures in 8th notes, so multiply by 8)
+          const beatNumber = event.start * 8;
+
+          // calculate which beat this is within the current measure
+          // const beatInMeasure = beatFromStart - measure * beatsPerMeasure;
+
+          // MIDI (scientific notation) note name
+          const midiNoteName = midiNumberToMidiNoteName(event.pitch);
+
+          // ABC notation note name
+          const abcNoteName = midiNoteNameToAbc(midiNoteName);
+
+          // apply any tuning modifications set by the user
+          tines.forEach((tine) => {
+            if (abcNoteName === tine.abcNote) {
+              event.cents = tine.cents;
+            }
+          });
+
+          // make an array of all note events. Also add a new beat property to each one
+          newAllNoteEvents.push({
+            ...event,
+            // measure,
+            beatNumber,
+            // beatInMeasure,
+            midiNoteName,
+            abcNoteName,
+          });
+        });
+      });
+
+      setAllNoteEvents(newAllNoteEvents);
+      console.log({ newAllNoteEvents });
+    };
+
+    return sequenceCallback;
+  };
+
   // load sheet music score from correctly-formatted abc notation into a specific div. Must pass in the "synth" object loaded with "new abcjs.synth.CreateSynth();" (inside a useEffect)
   const initializeMusic = async (visualObj, synth, sequenceCallback) => {
     // console.log({ abc, idForScoreDiv, synth });
@@ -518,7 +644,7 @@ K:${key}
     setMusicIsPlaying,
     sliderPosition
   ) => {
-    console.log({ timingCallbacks });
+    // console.log({ timingCallbacks });
     if (musicIsPlaying) {
       await synth.pause();
       timingCallbacks.pause();
@@ -566,6 +692,9 @@ K:${key}
         resetPlayback,
         goToSpecificPlaceInSong,
         startPause,
+        getEventCallback,
+        getBeatCallback,
+        getSequenceCallback,
       }}
     >
       {children}
