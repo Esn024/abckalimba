@@ -11,6 +11,8 @@ export const AppProvider = ({ children }) => {
   // const [numberOfTines, setNumberOfTines] = useState(3);
   const [audioContext, setAudioContext] = useState(new window.AudioContext());
   const [beatsPerMeasure, setBeatsPerMeasure] = useState(4);
+  const [tempo, setTempo] = useState(180);
+  const [key, setKey] = useState('C');
   const [tines, setTines] = useState([
     {
       keyboardLetter: 'a',
@@ -392,6 +394,7 @@ export const AppProvider = ({ children }) => {
         // make an array of all note events. Also add a new beat property to each one
         allNoteEvents.push({
           ...event,
+          measure,
           beatFromStart,
           beatInMeasure,
           midiNoteName,
@@ -403,8 +406,28 @@ export const AppProvider = ({ children }) => {
     //console.log({allNoteEvents});
   };
 
+  // this runs every beat
+  const beatCallback = async (beatNumber, totalBeats) => {
+    //console.log(beatNumber);
+
+    // array of pitches currently playing (e.g. [60, 62])
+    // const currentPitches = allNoteEvents.filter(e => e.beat === beatNumber).map(e => e.pitch);
+    //console.log({currentPitches});
+
+    // move the position of the audio slider
+    slider.value = (beatNumber / totalBeats) * 100;
+    if (beatNumber == totalBeats) {
+      //tune has ended
+      //console.log("piece is over");
+      // loop
+      await resetPlayback();
+      await synth.start(0);
+      timingCallbacks.start(0);
+    }
+  };
+
   // convert measures stored in the format of a note grid array into abc notation
-  const noteGridToAbc = (measures, tempo = 180) => {
+  const noteGridToAbc = (measures, tempo, key = 'C') => {
     // TODO may need to update the below line later in case this number will be able to change mid-piece
     const beatsPerBar = measures[0].length;
 
@@ -417,6 +440,7 @@ export const AppProvider = ({ children }) => {
     measures.forEach((measure) => {
       measure.forEach((beat) => {
         beat.forEach((note, index) => {
+          // TODO modify the abc note based on the key
           if (note === 1) {
             handOneAbcNotesThisBeat.push(tines[index].abcNote);
           } else if (note === 2) {
@@ -467,7 +491,7 @@ L:1/8
 %%score (H1 H2)
 V:H1           clef=treble  name="Hand 1"  snm="1"
 V:H2           clef=treble  name="Hand 2"  snm="2"
-K:Am
+K:${key}
 % 1
 [V:H1]  ${handOneAbc}
 [V:H2]  ${handTwoAbc}`;
@@ -477,13 +501,13 @@ K:Am
   };
 
   // load sheet music score from correctly-formatted abc notation into a specific div. Must pass in the "synth" object loaded with "new abcjs.synth.CreateSynth();" (inside a useEffect)
-  const initializeMusic = async (abc, idForScoreDiv, synth) => {
+  const initializeMusic = async (visualObj, synth) => {
     // console.log({ abc, idForScoreDiv, synth });
 
-    const visualObj = abcjs.renderAbc(idForScoreDiv, abc, {
-      responsive: 'resize',
-      add_classes: true,
-    })[0];
+    // const visualObj = abcjs.renderAbc(idForScoreDiv, abc, {
+    //   responsive: 'resize',
+    //   add_classes: true,
+    // })[0];
 
     // let allNoteEvents = [];
 
@@ -530,6 +554,10 @@ K:Am
         setThumbOneOrTwo,
         musicalSections,
         setMusicalSections,
+        tempo,
+        setTempo,
+        key,
+        setKey,
         getRowNumFromIndex,
         replaceOneValueInArray,
         dateFromMs,

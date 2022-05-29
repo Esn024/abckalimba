@@ -8,6 +8,8 @@ import AbcSetNumberOfTines from './abc/AbcSetNumberOfTines';
 import AbcKeyDefinitions from './abc/AbcKeyDefinitions.js';
 
 import AbcSetBeatsPerMeasure from './abc/AbcSetBeatsPerMeasure';
+import AbcSetTempo from './abc/AbcSetTempo';
+import AbcSetKey from './abc/AbcSetKey';
 import AbcSelectTune from './abc/AbcSelectTune.js';
 import AbcSelectThumb from './abc/AbcSelectThumb.js';
 import AbcSetNumberOfMusicalSections from './abc/AbcSetNumberOfMusicalSections.js';
@@ -99,12 +101,16 @@ const Home = () => {
       <Text>ABC Test</Text>
       <AbcSetNumberOfTines />
       <AbcKeyDefinitions />
-      <AbcSetBeatsPerMeasure />
-      <AbcSetNumberOfMusicalSections />
+      <AbcTines />
+      <HorizontalWrapper>
+        <AbcSetNumberOfMusicalSections />
+        <AbcSetBeatsPerMeasure />
+        <AbcSetTempo />
+        {/* <AbcSetKey /> // TODO, no sense in adding this in until the abc notes are actually modified based on what the key is */}
+      </HorizontalWrapper>
       <AbcSelectThumb />
       {/* <AbcSelectTune /> */}
       {/* <AbcComponent abc={abc2} /> */}
-      <AbcTines />
       {/* <AbcThumbOneOrTwo /> */}
       {musicalSections.map((section, i) => (
         <AbcMusicalSection
@@ -125,6 +131,11 @@ const Wrapper = styled.div`
   align-items: center;
   margin: 24px auto;
   height: 660px;
+`;
+
+const HorizontalWrapper = styled.div`
+  display: flex;
+  align-items: center;
 `;
 
 const Text = styled.p`

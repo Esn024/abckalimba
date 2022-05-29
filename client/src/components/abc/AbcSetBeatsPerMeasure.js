@@ -72,6 +72,7 @@ const AbcSetBeatsPerMeasure = () => {
 const StyledLabel = styled.label`
   display: flex;
   justify-content: center;
+  align-items: center;
 `;
 
 const StyledInput = styled.input`
