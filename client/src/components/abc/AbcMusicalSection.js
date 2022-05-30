@@ -4,6 +4,7 @@ import abcjs from 'abcjs';
 import { AppContext } from '../AppContext';
 import AbcSetNumberOfMeasuresInSection from './AbcSetNumberOfMeasuresInSection.js';
 import AbcNoteGrid from './AbcNoteGrid.js';
+import useForceUpdate from '../../hooks/use-force-update.hook.js';
 
 const AbcMusicalSection = ({
   letterId,
@@ -72,6 +73,8 @@ const AbcMusicalSection = ({
       add_classes: true,
     })[0];
 
+    initializeMusic(visualObj, synth, getSequenceCallback(setAllNoteEvents));
+
     setTimingCallbacks(
       new abcjs.TimingCallbacks(visualObj, {
         eventCallback: getEventCallback(
@@ -79,11 +82,10 @@ const AbcMusicalSection = ({
           musicIsPlaying,
           setMusicIsPlaying
         ),
+        //TODO the allNoteEvents array that gets sent here is one state update behind
         beatCallback: getBeatCallback(allNoteEvents, setSliderPosition),
       })
     );
-
-    initializeMusic(visualObj, synth, getSequenceCallback(setAllNoteEvents));
   }, [tempo, key, musicalSections]);
 
   // useEffect(() => {

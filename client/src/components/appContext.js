@@ -373,12 +373,10 @@ export const AppProvider = ({ children }) => {
       );
     }
 
-    let i;
-    let j;
     //currentEls.forEach((currentEl) => {});
-    for (i = 0; i < currentEls.length; i++) {
+    for (let i = 0; i < currentEls.length; i++) {
       //console.log('currentEls[i]', currentEls[i]);
-      for (j = 0; j < currentEls[i].length; j++) {
+      for (let j = 0; j < currentEls[i].length; j++) {
         //console.log('currentEls[i][j]', currentEls[i][j]);
         currentEls[i][j].classList.add('color');
       }
@@ -481,20 +479,40 @@ K:${key}
   const getBeatCallback = (allNoteEvents, setSliderPosition) => {
     // this runs every beat
     const beatCallback = async (beatNumber, totalBeats) => {
-      console.log({ beatNumber });
+      // console.log({ beatNumber });
 
       // array of MIDI pitches currently playing (e.g. [60, 62])
-      const currentPitches = allNoteEvents
-        .filter((e) => e.beatNumber === beatNumber)
-        .map((e) => e.pitch);
+      // const currentPitches = allNoteEvents
+      //   .filter((e) => e.beatNumber === beatNumber)
+      //   .map((e) => e.pitch);
       // since I've added an abcNoteName to each event, I can also get the abcPitches
       const currentAbcPitches = allNoteEvents
         .filter((e) => e.beatNumber === beatNumber)
         .map((e) => e.abcNoteName);
 
-      console.log({ allNoteEvents });
+      // get indices of current tines playing
+      const currentTinesPlaying = tines
+        .map((tine, index) => {
+          return { ...tine, index };
+        })
+        .filter((tine) => currentAbcPitches.includes(tine.abcNote))
+        .map((tine) => tine.index);
+      // console.log({ allNoteEvents });
       // console.log({ currentPitches });
-      console.log({ currentAbcPitches });
+      // console.log({ currentAbcPitches });
+      // console.log({ currentTinesPlaying });
+
+      // change colour of tines active in current beat
+      tines.forEach((tine, index) => {
+        if (currentTinesPlaying.includes(index)) {
+          const tineEl = document.querySelector('#tine-' + index);
+          tineEl.classList.add('active-tine');
+          // after a time interval, remove the "active-tine" class, thereby removing the color
+          setTimeout(() => {
+            tineEl.classList.remove('active-tine');
+          }, '400');
+        }
+      });
 
       // move the position of the audio slider
       setSliderPosition((beatNumber / totalBeats) * 100);
@@ -630,7 +648,7 @@ K:${key}
     sliderPosition
   ) => {
     const newMusicIsPlaying = !musicIsPlaying;
-    console.log({ newMusicIsPlaying });
+    // console.log({ newMusicIsPlaying });
     // console.log({ timingCallbacks });
     if (musicIsPlaying) {
       await synth.pause();
