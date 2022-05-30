@@ -13,6 +13,9 @@ export const AppProvider = ({ children }) => {
   const [beatsPerMeasure, setBeatsPerMeasure] = useState(4);
   const [tempo, setTempo] = useState(180);
   const [key, setKey] = useState('C');
+  const [orderOfSections, setOrderOfSections] = useState('AA');
+
+  const [hideAllSections, setHideAllSections] = useState(false);
   const [tines, setTines] = useState([
     {
       keyboardLetter: 'a',
@@ -383,11 +386,8 @@ export const AppProvider = ({ children }) => {
     }
   };
 
-  // convert measures stored in the format of a note grid array into abc notation
-  const noteGridToAbc = (measures, tempo, key = 'C') => {
-    // TODO may need to update the below line later in case this number will be able to change mid-piece
-    const beatsPerBar = measures[0].length;
-
+  // convert measures stored in the format of a note grid array into abc notation (returns a 2-item array of abc for the left and right hand)
+  const noteGridToAbc = (measures) => {
     let handOneAbcNotesThisBeat = [];
     let handTwoAbcNotesThisBeat = [];
 
@@ -441,6 +441,27 @@ export const AppProvider = ({ children }) => {
       handTwoAbc += ' | ';
     });
 
+    // console.log(abc);
+    return [handOneAbc, handTwoAbc];
+  };
+
+  //convert ONE musical section to abc, properly formatted
+  const singleMusicalSectionToAbc = (
+    currentMusicalSection,
+    noteGridToAbc,
+    tempo = 180,
+    key = 'C'
+  ) => {
+    const { letterId, description, measures, numberOfMeasures } =
+      currentMusicalSection;
+    const [handOneAbc, handTwoAbc] = noteGridToAbc(measures);
+
+    // TODO may need to update the below line later in case this number will be able to change mid-piece
+    const beatsPerBar = measures[0].length;
+
+    // replace all spaces in description with tildes so that it displays under the notes like lyrics, but free of beat divisions
+    const modifiedDescription = description.replace(/\s/g, '~');
+
     const abc = `X:1
 M:${beatsPerBar}/8
 Q:1/8=${tempo}
@@ -450,8 +471,60 @@ V:H1           clef=treble  name="Hand 1"  snm="1"
 V:H2           clef=treble  name="Hand 2"  snm="2"
 K:${key}
 % 1
-[V:H1]  ${handOneAbc}
-[V:H2]  ${handTwoAbc}`;
+[P:${letterId}] [V:H1] ${handOneAbc}
+w:${modifiedDescription}
+[V:H2] ${handTwoAbc}`;
+
+    // console.log(abc);
+    return abc;
+  };
+
+  //convert all the musical sections to ABC that are specified as being included in the final piece in the "orderOfSections" string, and place them in the correct order
+  const musicalSectionsToAbc = (
+    musicalSections,
+    orderOfSections,
+    noteGridToAbc,
+    tempo = 180,
+    key = 'C'
+  ) => {
+    // TODO may need to update the below line later in case this number will be able to change mid-piece
+    const beatsPerBar = musicalSections[0].measures[0].length;
+
+    //TODO this currently assumes that musicalSections have no numbers in them, are a simple format like ABAC
+    const musicalSectionsArr = orderOfSections.split('');
+
+    let abc = `X:1
+M:${beatsPerBar}/8
+P:${orderOfSections}
+Q:1/8=${tempo}
+L:1/8
+%%score (H1 H2)
+V:H1           clef=treble  name="Hand 1"  snm="1"
+V:H2           clef=treble  name="Hand 2"  snm="2"
+K:${key}`;
+
+    //TODO put musical sections in the correct order
+    musicalSectionsArr.forEach((letterId) => {
+      const currentMusicalSection = musicalSections.find(
+        (s) => s.letterId === letterId
+      );
+
+      if (currentMusicalSection) {
+        const { description, measures, numberOfMeasures } =
+          currentMusicalSection;
+        const [handOneAbc, handTwoAbc] = noteGridToAbc(measures);
+
+        // replace all spaces in description with tildes so that it displays under the notes like lyrics, but free of beat divisions
+        // also add ' | ' string at the end times however many measures there are, so that the next description is aligned with the correct measure
+        const modifiedDescription =
+          description.replace(/\s/g, '~') + ' | '.repeat(measures.length);
+
+        abc += `
+[P:${letterId}] [V:H1] ${handOneAbc}
+w:${modifiedDescription}
+[V:H2] ${handTwoAbc}`;
+      }
+    });
 
     // console.log(abc);
     return abc;
@@ -573,7 +646,7 @@ K:${key}
       });
 
       setAllNoteEvents(newAllNoteEvents);
-      console.log({ newAllNoteEvents });
+      // console.log({ newAllNoteEvents });
     };
 
     return sequenceCallback;
@@ -678,6 +751,10 @@ K:${key}
         setTempo,
         key,
         setKey,
+        hideAllSections,
+        setHideAllSections,
+        orderOfSections,
+        setOrderOfSections,
         getRowNumFromIndex,
         replaceOneValueInArray,
         dateFromMs,
@@ -691,6 +768,8 @@ K:${key}
         midiNoteNameToNumber,
         midiNumberToMidiNoteName,
         noteGridToAbc,
+        singleMusicalSectionToAbc,
+        musicalSectionsToAbc,
         userPlayNote,
         initializeMusic,
         colorElements,

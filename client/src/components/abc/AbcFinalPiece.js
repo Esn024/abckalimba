@@ -5,52 +5,41 @@ import { AppContext } from '../AppContext';
 import AbcSetNumberOfMeasuresInSection from './AbcSetNumberOfMeasuresInSection.js';
 import AbcNoteGrid from './AbcNoteGrid.js';
 import AbcPlaybackControl from './AbcPlaybackControl.js';
-import useForceUpdate from '../../hooks/use-force-update.hook.js';
+import AbcSetOrderOfSections from './AbcSetOrderOfSections.js';
+//
 
-const AbcMusicalSection = ({
-  letterId,
-  description,
-  numberOfMeasures,
-  currentMusicalSectionIndex,
-}) => {
+const AbcFinalPiece = () => {
   const {
-    hideAllSections,
+    tines,
+    orderOfSections,
     beatsPerMeasure,
     musicalSections,
+    musicalSectionsToAbc,
     noteGridToAbc,
-    singleMusicalSectionToAbc,
     initializeMusic,
     tempo,
     key,
     colorElements,
-    midiNumberToMidiNoteName,
-    midiNoteNameToAbc,
-    tines,
-    resetPlayback,
-    goToSpecificPlaceInSong,
-    startPause,
     getEventCallback,
     getBeatCallback,
     getSequenceCallback,
   } = useContext(AppContext);
-  const [notegridVisible, setNotegridVisible] = useState(true);
+
   const [scoreVisible, setScoreVisible] = useState(true);
   const [musicIsPlaying, setMusicIsPlaying] = useState(false);
-  //TODO move into object so it can be passed be reference? Or else, just pass the ID into the beatCallback, and the ID never changes...
   const [sliderPosition, setSliderPosition] = useState(0);
   const [synth, setSynth] = useState(new abcjs.synth.CreateSynth());
-  // const [visualObj, setVisualObj] = useState();
   const [timingCallbacks, setTimingCallbacks] = useState();
   const [allNoteEvents, setAllNoteEvents] = useState([]);
 
   const refForScoreDiv = useRef(null);
-  const idForScoreDiv = 'score-' + currentMusicalSectionIndex;
+  const idForScoreDiv = 'final-score';
 
   // initialize music
   useEffect(() => {
-    const currentMusicalSection = musicalSections[currentMusicalSectionIndex];
-    const abc = singleMusicalSectionToAbc(
-      currentMusicalSection,
+    const abc = musicalSectionsToAbc(
+      musicalSections,
+      orderOfSections,
       noteGridToAbc,
       tempo,
       key
@@ -74,7 +63,7 @@ const AbcMusicalSection = ({
         beatCallback: getBeatCallback(allNoteEvents, setSliderPosition),
       })
     );
-  }, [tempo, key, musicalSections]);
+  }, [tempo, key, musicalSections, orderOfSections, tines]);
 
   // useEffect(() => {
   //   const abc = noteGridToAbc(currentNoteGrid);
@@ -85,13 +74,12 @@ const AbcMusicalSection = ({
   // }, [currentNoteGrid, idForScoreDiv, synth]);
 
   return (
-    <Wrapper
-      id={`section-${letterId}`}
-      style={{ display: hideAllSections ? 'none' : 'block' }}
-    >
-      <Text>Section {letterId}</Text>
+    <Wrapper id='final-music-wrapper'>
+      <Text>Final Music</Text>
+
+      <AbcSetOrderOfSections />
       <AbcPlaybackControl
-        currentMusicalSectionIndex={currentMusicalSectionIndex}
+        currentMusicalSectionIndex={null}
         synth={synth}
         timingCallbacks={timingCallbacks}
         musicIsPlaying={musicIsPlaying}
@@ -99,14 +87,9 @@ const AbcMusicalSection = ({
         sliderPosition={sliderPosition}
         setSliderPosition={setSliderPosition}
       />
-      <HorizontalWrapper>
-        <StyledButton onClick={() => setNotegridVisible(!notegridVisible)}>
-          {notegridVisible ? 'Hide grid' : 'Show grid'}
-        </StyledButton>
-        <StyledButton onClick={() => setScoreVisible(!scoreVisible)}>
-          {scoreVisible ? 'Hide score' : 'Show score'}
-        </StyledButton>
-      </HorizontalWrapper>
+      <StyledButton onClick={() => setScoreVisible(!scoreVisible)}>
+        {scoreVisible ? 'Hide score' : 'Show score'}
+      </StyledButton>
       {
         <div
           id={idForScoreDiv}
@@ -114,17 +97,6 @@ const AbcMusicalSection = ({
           style={{ display: scoreVisible ? 'block' : 'none' }}
         ></div>
       }
-      {notegridVisible && (
-        <>
-          <AbcSetNumberOfMeasuresInSection
-            numberOfMeasures={numberOfMeasures}
-            currentMusicalSectionIndex={currentMusicalSectionIndex}
-          />
-          <AbcNoteGrid
-            currentMusicalSectionIndex={currentMusicalSectionIndex}
-          />
-        </>
-      )}
     </Wrapper>
   );
 };
@@ -166,4 +138,4 @@ const Text = styled.p`
   margin-right: 8px;
 `;
 
-export default AbcMusicalSection;
+export default AbcFinalPiece;

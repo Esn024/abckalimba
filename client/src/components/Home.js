@@ -9,6 +9,7 @@ import AbcKeyDefinitions from './abc/AbcKeyDefinitions.js';
 
 import AbcSetBeatsPerMeasure from './abc/AbcSetBeatsPerMeasure';
 import AbcSetTempo from './abc/AbcSetTempo';
+import AbcSetOrderOfSections from './abc/AbcSetOrderOfSections';
 import AbcSetKey from './abc/AbcSetKey';
 import AbcSelectTune from './abc/AbcSelectTune.js';
 import AbcSelectThumb from './abc/AbcSelectThumb.js';
@@ -17,13 +18,15 @@ import AbcMusicalSection from './abc/AbcMusicalSection.js';
 
 import AbcTines from './abc/AbcTines.js';
 import AbcNoteGrid from './abc/AbcNoteGrid.js';
+import AbcFinalPiece from './abc/AbcFinalPiece.js';
 
 //AbcThumbOneOrTwo
 
 import { AppContext } from './AppContext';
 
 const Home = () => {
-  const { userId, musicalSections } = useContext(AppContext);
+  const { userId, musicalSections, hideAllSections, setHideAllSections } =
+    useContext(AppContext);
 
   const abc = `X:1
   T: Cooley's
@@ -108,7 +111,12 @@ const Home = () => {
         <AbcSetTempo />
         {/* <AbcSetKey /> // TODO, no sense in adding this in until the abc notes are actually modified based on what the key is */}
       </HorizontalWrapper>
-      <AbcSelectThumb />
+      <HorizontalWrapper>
+        <AbcSelectThumb />
+        <StyledButton onClick={() => setHideAllSections(!hideAllSections)}>
+          {hideAllSections ? 'Unhide' : 'Hide'} all sections
+        </StyledButton>
+      </HorizontalWrapper>
       {/* <AbcSelectTune /> */}
       {/* <AbcComponent abc={abc2} /> */}
       {/* <AbcThumbOneOrTwo /> */}
@@ -120,6 +128,7 @@ const Home = () => {
           numberOfMeasures={section.numberOfMeasures}
         />
       ))}
+      <AbcFinalPiece />
     </Wrapper>
   );
 };
@@ -144,6 +153,11 @@ const Text = styled.p`
   font-size: var(--font-size-small);
   text-align: center;
   margin: 12px 0 0 24px;
+`;
+
+const StyledButton = styled.button`
+  font-size: 12px;
+  margin: 10px;
 `;
 
 export default Home;
