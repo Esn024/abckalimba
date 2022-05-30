@@ -87,7 +87,7 @@ const AbcMusicalSection = ({
   return (
     <Wrapper
       id={`section-${letterId}`}
-      style={{ display: hideAllSections ? 'none' : 'block' }}
+      style={{ display: hideAllSections ? 'none' : 'flex' }}
     >
       <Text>Section {letterId}</Text>
       <AbcPlaybackControl
