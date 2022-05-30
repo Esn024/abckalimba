@@ -358,7 +358,15 @@ export const AppProvider = ({ children }) => {
 
   // function and variable to do with adding & removing the CSS that gives red color to elements that are "playing"
   const colorElements = (currentEls) => {
-    if (currentEls.length > 0) {
+    // check if there is a new note, or if there are only rests
+    let newNote = false;
+    currentEls.forEach((el) => {
+      if (el[0].classList.contains('abcjs-note')) {
+        newNote = true;
+      }
+    });
+    //if there is a new note, remove any previous red color, otherwise keep it until a new note shows up
+    if (newNote) {
       // remove any earlier red coloration
       Array.from(document.querySelectorAll('.color')).forEach((el) =>
         el.classList.remove('color')
@@ -470,14 +478,7 @@ K:${key}
     return eventCallback;
   };
 
-  const getBeatCallback = (
-    allNoteEvents,
-    resetPlayback,
-    synth,
-    timingCallbacks,
-    setMusicIsPlaying,
-    setSliderPosition
-  ) => {
+  const getBeatCallback = (allNoteEvents, setSliderPosition) => {
     // this runs every beat
     const beatCallback = async (beatNumber, totalBeats) => {
       console.log({ beatNumber });
@@ -497,21 +498,6 @@ K:${key}
 
       // move the position of the audio slider
       setSliderPosition((beatNumber / totalBeats) * 100);
-      //if tune has ended
-      if (beatNumber == totalBeats) {
-        //console.log("piece is over");
-
-        //reset
-        await resetPlayback(
-          synth,
-          timingCallbacks,
-          setMusicIsPlaying,
-          setSliderPosition
-        );
-        //and start again (in effect, loop)
-        await synth.start(0);
-        timingCallbacks.start(0);
-      }
     };
 
     return beatCallback;

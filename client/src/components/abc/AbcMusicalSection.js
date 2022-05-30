@@ -45,6 +45,24 @@ const AbcMusicalSection = ({
   const currentMusicalSection = musicalSections[currentMusicalSectionIndex];
   const currentNoteGrid = currentMusicalSection.measures;
 
+  useEffect(() => {
+    if (sliderPosition === 100) {
+      //reset
+      const loop = async () => {
+        resetPlayback(
+          synth,
+          timingCallbacks,
+          setMusicIsPlaying,
+          setSliderPosition
+        );
+        synth.start();
+        timingCallbacks.start();
+        setMusicIsPlaying(true);
+      };
+      loop();
+    }
+  }, [sliderPosition]);
+
   // initialize music
   useEffect(() => {
     const abc = noteGridToAbc(currentNoteGrid, tempo, key);
@@ -61,14 +79,7 @@ const AbcMusicalSection = ({
           musicIsPlaying,
           setMusicIsPlaying
         ),
-        beatCallback: getBeatCallback(
-          allNoteEvents,
-          resetPlayback,
-          synth,
-          timingCallbacks,
-          setMusicIsPlaying,
-          setSliderPosition
-        ),
+        beatCallback: getBeatCallback(allNoteEvents, setSliderPosition),
       })
     );
 
