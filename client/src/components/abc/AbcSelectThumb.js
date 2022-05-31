@@ -6,7 +6,7 @@ const AbcSelectThumb = () => {
   const { thumbOneOrTwo, setThumbOneOrTwo } = useContext(AppContext);
   return (
     <Wrapper>
-      <Text>Thumb (left or right):</Text>
+      <Text>Hand (left or right):</Text>
       <StyledInput
         type='radio'
         id='left'

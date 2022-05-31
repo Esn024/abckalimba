@@ -177,52 +177,54 @@ export const AppProvider = ({ children }) => {
   };
 
   const userPlayNote = async (abcNoteName, cents) => {
-    // get the midi pitch of the abc note name
-    const midiPitch = midiNoteNameToNumber(abcToMidiNoteName(abcNoteName));
-    // when input a note name in abc notation, play that note
+    if (abcNoteName) {
+      // get the midi pitch of the abc note name
+      const midiPitch = midiNoteNameToNumber(abcToMidiNoteName(abcNoteName));
+      // when input a note name in abc notation, play that note
 
-    //console.log({abcNoteName});
-    const visualObj = abcjs.renderAbc('*', abcNoteName, {})[0];
+      //console.log({abcNoteName});
+      const visualObj = abcjs.renderAbc('*', abcNoteName, {})[0];
 
-    const sequenceCallbackOneNote = (tracks) => {
-      tracks.forEach((track) => {
-        track.forEach((event) => {
-          //console.log({event});
-          //console.log('event pitch', event.pitch);
-          // apply any custom user tuning correction in cents
-          if (event.pitch === midiPitch) {
-            event.cents = cents;
-            //console.log('sequenceCallback event', event);
-          }
+      const sequenceCallbackOneNote = (tracks) => {
+        tracks.forEach((track) => {
+          track.forEach((event) => {
+            //console.log({event});
+            //console.log('event pitch', event.pitch);
+            // apply any custom user tuning correction in cents
+            if (event.pitch === midiPitch) {
+              event.cents = cents;
+              //console.log('sequenceCallback event', event);
+            }
+          });
         });
-      });
-    };
+      };
 
-    try {
-      const synth = new abcjs.synth.CreateSynth();
+      try {
+        const synth = new abcjs.synth.CreateSynth();
 
-      //should the below line be here?
-      await audioContext.resume();
-      // In theory the AC shouldn't start suspended because it is being initialized in a click handler, but iOS seems to anyway.
+        //should the below line be here?
+        await audioContext.resume();
+        // In theory the AC shouldn't start suspended because it is being initialized in a click handler, but iOS seems to anyway.
 
-      await synth.init({
-        audioContext: audioContext,
-        visualObj: visualObj,
-        options: {
-          sequenceCallback: sequenceCallbackOneNote,
-          soundFontUrl: 'soundfonts',
-          onEnded: () => {
-            //console.log("playback ended")
+        await synth.init({
+          audioContext: audioContext,
+          visualObj: visualObj,
+          options: {
+            sequenceCallback: sequenceCallbackOneNote,
+            soundFontUrl: 'soundfonts',
+            onEnded: () => {
+              //console.log("playback ended")
+            },
           },
-        },
-      });
+        });
 
-      await synth.prime();
-      synth.start();
+        await synth.prime();
+        synth.start();
 
-      //console.log("note played");
-    } catch (error) {
-      console.log('error playing note', error);
+        //console.log("note played");
+      } catch (error) {
+        console.log('error playing note', error);
+      }
     }
   };
 
@@ -271,6 +273,7 @@ export const AppProvider = ({ children }) => {
 
   //helper function. Convert an ABC note name to scientific notation (midi note name).
   const abcToMidiNoteName = (abcNoteName) => {
+    // if (abcNoteName) {
     let midiNoteName = '';
     let noteName = abcNoteName.match(/([a-gA-G])/)[1].toUpperCase();
     // console.log({ abcNoteName });
@@ -324,6 +327,7 @@ export const AppProvider = ({ children }) => {
     // c' = C6
     // console.log({ midiNoteName });
     return midiNoteName;
+    // }
   };
 
   //helper function. Convert scientific notation (midi note name) to midi number.
@@ -549,7 +553,13 @@ w:${modifiedDescription}
     return eventCallback;
   };
 
-  const getBeatCallback = (allNoteEvents, setSliderPosition) => {
+  const getBeatCallback = (
+    allNoteEvents,
+    setSliderPosition,
+    tempo = 180,
+    currentMusicalSectionIndex,
+    beatsPerMeasure
+  ) => {
     // this runs every beat
     const beatCallback = async (beatNumber, totalBeats) => {
       // console.log({ beatNumber });
@@ -575,6 +585,10 @@ w:${modifiedDescription}
       // console.log({ currentAbcPitches });
       // console.log({ currentTinesPlaying });
 
+      // how long the tone should be colored for (depends on the tempo).
+      const fullLengthOfBeat = (1000 * 60) / tempo;
+      const msToChangeColor = fullLengthOfBeat - 30000 / tempo;
+
       // change colour of tines active in current beat
       tines.forEach((tine, index) => {
         if (currentTinesPlaying.includes(index)) {
@@ -583,9 +597,56 @@ w:${modifiedDescription}
           // after a time interval, remove the "active-tine" class, thereby removing the color
           setTimeout(() => {
             tineEl.classList.remove('active-tine');
-          }, '400');
+          }, msToChangeColor);
         }
       });
+
+      // console.log({ currentMusicalSectionIndex });
+      // make the current note grid row different colour
+      if (currentMusicalSectionIndex !== undefined) {
+        // console.log('test2');
+        const currentMeasure =
+          beatNumber === totalBeats
+            ? 0
+            : Math.floor(beatNumber / beatsPerMeasure);
+        const currentBeatInMeasure =
+          beatNumber === totalBeats
+            ? 0
+            : beatNumber - currentMeasure * beatsPerMeasure;
+
+        const rowId = `musicalSection-${currentMusicalSectionIndex}-measure-${currentMeasure}-beat-${currentBeatInMeasure}`;
+
+        const currentRowEl = document.getElementById(rowId);
+        const allMeasuresEl = currentRowEl.parentNode.parentNode;
+        // first, remove green color from any other row in current musical section.
+        const allNodesInMeasure = allMeasuresEl.getElementsByTagName('button');
+        for (let i = 0; i < allNodesInMeasure.length; i++) {
+          allNodesInMeasure[i].classList.remove('active-row');
+        }
+
+        // now add green color to current row
+        const currentRowNodes = currentRowEl.getElementsByTagName('button');
+
+        for (let i = 0; i < currentRowNodes.length; i++) {
+          currentRowNodes[i].classList.add('active-row');
+        }
+
+        // for (let i = 0; i < nodes.length; i++) {
+        //   if (nodes[i].nodeName.toLowerCase() == 'div') {
+        //     nodes[i].classList.add('active-tine');
+        //     setTimeout(() => {
+        //       nodes[i].classList.remove('active-tine');
+        //     }, msToChangeColor);
+        //   }
+        // }
+
+        // console.log({ rowId });
+        // rowEl.classList.add('active-tine');
+        // after a time interval, remove the "active-tine" class, thereby removing the color
+        // setTimeout(() => {
+        //   rowEl.classList.remove('active-tine');
+        // }, msToChangeColor);
+      }
 
       // move the position of the audio slider
       setSliderPosition((beatNumber / totalBeats) * 100);

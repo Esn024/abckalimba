@@ -65,14 +65,6 @@ const AbcFinalPiece = () => {
     );
   }, [tempo, key, musicalSections, orderOfSections, tines]);
 
-  // useEffect(() => {
-  //   const abc = noteGridToAbc(currentNoteGrid);
-  //   const loadMusic = async () => {
-  //     userLoadMusic(abc, idForScoreDiv, synth);
-  //   };
-  //   loadMusic();
-  // }, [currentNoteGrid, idForScoreDiv, synth]);
-
   return (
     <Wrapper id='final-music-wrapper'>
       <Text>Final Music</Text>

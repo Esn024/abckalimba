@@ -71,7 +71,13 @@ const AbcMusicalSection = ({
           setMusicIsPlaying
         ),
         //TODO the allNoteEvents array that gets sent here is one state update behind
-        beatCallback: getBeatCallback(allNoteEvents, setSliderPosition),
+        beatCallback: getBeatCallback(
+          allNoteEvents,
+          setSliderPosition,
+          tempo,
+          currentMusicalSectionIndex,
+          beatsPerMeasure
+        ),
       })
     );
   }, [tempo, key, musicalSections]);

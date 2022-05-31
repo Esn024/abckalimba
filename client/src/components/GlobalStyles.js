@@ -119,12 +119,17 @@ a:hover {
       stroke: red;
       fill: red;
     }
+  
   .active-tine {
     background-color: var(--color-dark-green);
     border: 1px solid var(--color-dark-grey);
     border-radius: 5px;
   }
   
+  .active-row {
+    background-color: var(--color-dark-green);
+  }
+
   .timed-note {
     width: 30px;
     height:30px;

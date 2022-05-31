@@ -26,6 +26,11 @@ const AbcKeyDefinitions = () => {
   return (
     <>
       <KeyDefinitions>
+        <DefDescriptions>
+          <DefDescription>Keyboard Keys:</DefDescription>
+          <DefDescription>Musical Tones:</DefDescription>
+          <DefDescription>Tuning (in cents):</DefDescription>
+        </DefDescriptions>
         {tines &&
           tines.map((tine, index) => {
             return (
@@ -84,6 +89,7 @@ const AbcKeyDefinitions = () => {
 const KeyDefinitions = styled.div`
   display: flex;
   justify-content: center;
+  position: relative;
 `;
 
 // const LetterDiv = styled.div`
@@ -106,6 +112,18 @@ const DefInput = styled.input`
   border: 1px solid black;
   padding: 1px 2px;
   font-size: var(--font-size-small);
+`;
+
+const DefDescription = styled.div`
+  height: 24px;
+  padding: 1px 2px;
+  font-size: var(--font-size-small);
+  text-align: right;
+`;
+
+const DefDescriptions = styled.div`
+  position: absolute;
+  left: -130px;
 `;
 
 export default AbcKeyDefinitions;
