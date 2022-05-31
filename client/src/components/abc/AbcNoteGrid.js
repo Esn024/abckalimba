@@ -36,30 +36,32 @@ const AbcNoteGrid = ({ currentMusicalSectionIndex }) => {
                     {beat.map((note, noteIndex) => {
                       const uniqueNoteId = uniqueBeatId + '-note-' + noteIndex;
                       return (
-                        <TimedNote
-                          key={uniqueNoteId}
-                          id={uniqueNoteId}
-                          note={note}
-                          // when mouse hovers over note, it will display the abcNote that gets played
-                          title={tines[noteIndex].abcNote}
-                          onClick={() => {
-                            // tine-0-key-a
-                            document
-                              .getElementById('tine-' + noteIndex)
-                              .click();
+                        tines && (
+                          <TimedNote
+                            key={uniqueNoteId}
+                            id={uniqueNoteId}
+                            note={note}
+                            // when mouse hovers over note, it will display the abcNote that gets played
+                            title={tines[noteIndex].abcNote}
+                            onClick={() => {
+                              // tine-0-key-a
+                              document
+                                .getElementById('tine-' + noteIndex)
+                                .click();
 
-                            changeOneNote(
-                              currentMusicalSectionIndex,
-                              measureIndex,
-                              beatIndex,
-                              noteIndex,
-                              note,
-                              thumbOneOrTwo
-                            );
-                          }}
-                        >
-                          {tines[noteIndex].abcNote}
-                        </TimedNote>
+                              changeOneNote(
+                                currentMusicalSectionIndex,
+                                measureIndex,
+                                beatIndex,
+                                noteIndex,
+                                note,
+                                thumbOneOrTwo
+                              );
+                            }}
+                          >
+                            {tines[noteIndex].abcNote}
+                          </TimedNote>
+                        )
                       );
                     })}
                   </NoteGridBeat>

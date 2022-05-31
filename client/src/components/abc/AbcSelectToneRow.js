@@ -3,15 +3,26 @@ import styled from 'styled-components';
 import { AppContext } from '../AppContext';
 
 const AbcSelectToneRow = () => {
-  const { tines, setTines, toneRowStrings, setToneRowStrings } =
-    useContext(AppContext);
+  const {
+    tines,
+    setTines,
+    toneRowStrings,
+    setToneRowStrings,
+    toneRowStrToObj,
+    updateTinesAfterTineNumberChange,
+    updateMusicalSectionsAfterTineNumberChange,
+    musicalSections,
+    setMusicalSections,
+  } = useContext(AppContext);
   const [toneRowStr, setToneRowStr] = useState('');
 
   return (
     <>
       <datalist id='tonerows'>
-        {toneRowStrings.map((str) => (
-          <option value={str}>{str}</option>
+        {toneRowStrings.map((str, index) => (
+          <option value={str} key={`tonerow-${index}`}>
+            {str}
+          </option>
         ))}
       </datalist>
       <StyledInput
@@ -23,6 +34,20 @@ const AbcSelectToneRow = () => {
         onChange={(e) => {
           const newToneRowStr = e.target.value;
           setToneRowStr(newToneRowStr);
+          // update the tone row with the selected one, if it's a valid string
+          const newTines = toneRowStrToObj(newToneRowStr);
+          if (newTines) {
+            if (newTines.length !== tines.length) {
+              updateMusicalSectionsAfterTineNumberChange(
+                newTines.length,
+                tines,
+                musicalSections,
+                setMusicalSections
+              );
+            }
+            setTines(newTines);
+            //also update the abc strings...
+          }
         }}
       />
     </>

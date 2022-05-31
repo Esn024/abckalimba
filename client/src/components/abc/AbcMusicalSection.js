@@ -80,7 +80,7 @@ const AbcMusicalSection = ({
         ),
       })
     );
-  }, [tempo, key, musicalSections]);
+  }, [tempo, key, musicalSections, tines]);
 
   // useEffect(() => {
   //   const abc = noteGridToAbc(currentNoteGrid);

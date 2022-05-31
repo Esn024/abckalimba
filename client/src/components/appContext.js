@@ -66,8 +66,118 @@ export const AppProvider = ({ children }) => {
   const [toneRowStrings, setToneRowStrings] = useState([
     '5 tones (c d e f g) [awsed]',
     '6 tones (c d e f g a) [awsedr]',
-    '7 tones (c d e f g a b) [awsedrf]',
+    '7 tones (c d-20 e f+20 g a b) [awsedrf]',
   ]);
+
+  // convert a tone row string into a properly-organized tines object
+  const toneRowStrToObj = (str) => {
+    if (str) {
+      // the below regexp assumes a string input of the sort that the tone rows are stored in in the DB of the site
+      const toneRowStrRegexp =
+        /(^\d+)\stones\s\(([-^_+',a-gA-G\s\d]{2,})\)\s\[([a-z]{2,})\]/;
+      // the below regexp is for capturing info about one abcNote and any tuning adjustment
+      const abcNoteAndCentsRegexp = /([\^_]?[a-gA-G][',]{0,4})(([-+])(\d+))?/;
+
+      const result = str.match(toneRowStrRegexp);
+
+      if (result) {
+        // const numberOfTones = result[1] * 1;
+        const abcNotesAndCentsStr = result[2];
+        const keyboardLettersStr = result[3];
+
+        const keyboardLetters = keyboardLettersStr.split('');
+
+        const tinesArr = abcNotesAndCentsStr.split(' ').map((str, index) => {
+          const result = str.match(abcNoteAndCentsRegexp);
+
+          const keyboardLetter = keyboardLetters[index];
+
+          const abcNote = result[1];
+
+          const tuningPlusOrMinus = result[3];
+          const centsAmount = result[4];
+          const cents = centsAmount
+            ? tuningPlusOrMinus === '+'
+              ? centsAmount * 1
+              : centsAmount * -1
+            : 0;
+
+          return { keyboardLetter, abcNote, cents };
+        });
+
+        // console.log({ tines, tinesArr });
+        return tinesArr;
+      }
+    }
+  };
+
+  const updateMusicalSectionsAfterTineNumberChange = (
+    newNumberOfTines,
+    tines,
+    musicalSections,
+    setMusicalSections
+  ) => {
+    let modifiedMusicalSections = [];
+    let modifiedMeasures = [];
+    let modifiedMeasure = [];
+    let modifiedBeat = [];
+
+    const tinesHaveBeenAdded = newNumberOfTines > tines.length;
+    const numberOfNewTinesAdded = newNumberOfTines - tines.length;
+
+    // also change musicalSections (add or remove the right number of columns in the measures array)
+    // creating a modifiedMusicalSections object with the necessary changes
+    musicalSections.forEach((musicalSection, index) => {
+      musicalSection.measures.forEach((measure) => {
+        measure.forEach((beatRow) => {
+          //if new # of tines is longer than previous one, keep previous data & add the right number of empty values; if shorter, remove some
+          modifiedBeat = tinesHaveBeenAdded
+            ? [...beatRow, ...Array(numberOfNewTinesAdded).fill(0)]
+            : beatRow.slice(0, newNumberOfTines);
+          modifiedMeasure.push(modifiedBeat);
+          // reset
+          modifiedBeat = [];
+        });
+        modifiedMeasures.push(modifiedMeasure);
+        // reset
+        modifiedMeasure = [];
+      });
+      modifiedMusicalSections.push({
+        ...musicalSections[index],
+        measures: modifiedMeasures,
+      });
+      // reset
+      modifiedMeasures = [];
+    });
+
+    // finally, update state with the modified object
+    setMusicalSections(modifiedMusicalSections);
+  };
+
+  const updateTinesAfterTineNumberChange = (
+    newNumberOfTines,
+    tines,
+    setTines
+  ) => {
+    const tinesHaveBeenAdded = newNumberOfTines > tines.length;
+    const numberOfNewTinesAdded = newNumberOfTines - tines.length;
+
+    //if new # of tines is longer than previous one, keep previous data & add the right number of empty values; if shorter, remove some
+    setTines(
+      tinesHaveBeenAdded
+        ? [
+            ...tines,
+            ...Array.from({
+              length: numberOfNewTinesAdded,
+            }).map(() => ({
+              keyboardLetter: '',
+              abcNote: '',
+              cents: 0,
+            })),
+          ]
+        : tines.slice(0, newNumberOfTines)
+    );
+  };
 
   const navigate = useNavigate();
 
@@ -279,61 +389,61 @@ export const AppProvider = ({ children }) => {
 
   //helper function. Convert an ABC note name to scientific notation (midi note name).
   const abcToMidiNoteName = (abcNoteName) => {
-    // if (abcNoteName) {
-    let midiNoteName = '';
-    let noteName = abcNoteName.match(/([a-gA-G])/)[1].toUpperCase();
-    // console.log({ abcNoteName });
-    // console.log({ noteName });
-    let flat = abcNoteName.includes('_');
-    let sharp = abcNoteName.includes('^');
-    midiNoteName = noteName;
-    // for now, the return is always flat notes
-    if (flat) midiNoteName += 'b';
-    if (sharp) {
-      if (noteName === 'A') {
-        midiNoteName = 'Bb';
-      } else if (noteName === 'B') {
-        midiNoteName = 'C';
-      } else if (noteName === 'C') {
-        midiNoteName = 'Db';
-      } else if (noteName === 'D') {
-        midiNoteName = 'Eb';
-      } else if (noteName === 'E') {
-        midiNoteName = 'F';
-      } else if (noteName === 'F') {
-        midiNoteName = 'Gb';
-      } else if (noteName === 'G') {
-        midiNoteName = 'Ab';
+    if (abcNoteName) {
+      let midiNoteName = '';
+      let noteName = abcNoteName.match(/([a-gA-G])/)[1].toUpperCase();
+      // console.log({ abcNoteName });
+      // console.log({ noteName });
+      let flat = abcNoteName.includes('_');
+      let sharp = abcNoteName.includes('^');
+      midiNoteName = noteName;
+      // for now, the return is always flat notes
+      if (flat) midiNoteName += 'b';
+      if (sharp) {
+        if (noteName === 'A') {
+          midiNoteName = 'Bb';
+        } else if (noteName === 'B') {
+          midiNoteName = 'C';
+        } else if (noteName === 'C') {
+          midiNoteName = 'Db';
+        } else if (noteName === 'D') {
+          midiNoteName = 'Eb';
+        } else if (noteName === 'E') {
+          midiNoteName = 'F';
+        } else if (noteName === 'F') {
+          midiNoteName = 'Gb';
+        } else if (noteName === 'G') {
+          midiNoteName = 'Ab';
+        }
       }
+      // figure out the octave
+      let octave = abcNoteName.includes(',,,,')
+        ? '0'
+        : abcNoteName.includes(',,,')
+        ? '1'
+        : abcNoteName.includes(',,')
+        ? '2'
+        : abcNoteName.includes(',')
+        ? '3'
+        : abcNoteName.includes("'''")
+        ? '8'
+        : abcNoteName.includes("''")
+        ? '7'
+        : abcNoteName.includes("'")
+        ? '6'
+        : abcNoteName.match(/([a-g])/)
+        ? '5'
+        : '4';
+      // console.log({ octave });
+      midiNoteName += octave;
+      //examples:
+      // C, = C3
+      // C = C4
+      // c = C5
+      // c' = C6
+      // console.log({ midiNoteName });
+      return midiNoteName;
     }
-    // figure out the octave
-    let octave = abcNoteName.includes(',,,,')
-      ? '0'
-      : abcNoteName.includes(',,,')
-      ? '1'
-      : abcNoteName.includes(',,')
-      ? '2'
-      : abcNoteName.includes(',')
-      ? '3'
-      : abcNoteName.includes("'''")
-      ? '8'
-      : abcNoteName.includes("''")
-      ? '7'
-      : abcNoteName.includes("'")
-      ? '6'
-      : abcNoteName.match(/([a-g])/)
-      ? '5'
-      : '4';
-    // console.log({ octave });
-    midiNoteName += octave;
-    //examples:
-    // C, = C3
-    // C = C4
-    // c = C5
-    // c' = C6
-    // console.log({ midiNoteName });
-    return midiNoteName;
-    // }
   };
 
   //helper function. Convert scientific notation (midi note name) to midi number.
@@ -623,35 +733,23 @@ w:${modifiedDescription}
         const rowId = `musicalSection-${currentMusicalSectionIndex}-measure-${currentMeasure}-beat-${currentBeatInMeasure}`;
 
         const currentRowEl = document.getElementById(rowId);
-        const allMeasuresEl = currentRowEl.parentNode.parentNode;
-        // first, remove green color from any other row in current musical section.
-        const allNodesInMeasure = allMeasuresEl.getElementsByTagName('button');
-        for (let i = 0; i < allNodesInMeasure.length; i++) {
-          allNodesInMeasure[i].classList.remove('active-row');
+
+        if (currentRowEl) {
+          const allMeasuresEl = currentRowEl.parentNode.parentNode;
+          // first, remove green color from any other row in current musical section.
+          const allNodesInMeasure =
+            allMeasuresEl.getElementsByTagName('button');
+          for (let i = 0; i < allNodesInMeasure.length; i++) {
+            allNodesInMeasure[i].classList.remove('active-row');
+          }
+
+          // now add green color to current row
+          const currentRowNodes = currentRowEl.getElementsByTagName('button');
+
+          for (let i = 0; i < currentRowNodes.length; i++) {
+            currentRowNodes[i].classList.add('active-row');
+          }
         }
-
-        // now add green color to current row
-        const currentRowNodes = currentRowEl.getElementsByTagName('button');
-
-        for (let i = 0; i < currentRowNodes.length; i++) {
-          currentRowNodes[i].classList.add('active-row');
-        }
-
-        // for (let i = 0; i < nodes.length; i++) {
-        //   if (nodes[i].nodeName.toLowerCase() == 'div') {
-        //     nodes[i].classList.add('active-tine');
-        //     setTimeout(() => {
-        //       nodes[i].classList.remove('active-tine');
-        //     }, msToChangeColor);
-        //   }
-        // }
-
-        // console.log({ rowId });
-        // rowEl.classList.add('active-tine');
-        // after a time interval, remove the "active-tine" class, thereby removing the color
-        // setTimeout(() => {
-        //   rowEl.classList.remove('active-tine');
-        // }, msToChangeColor);
       }
 
       // move the position of the audio slider
@@ -810,6 +908,8 @@ w:${modifiedDescription}
         setBeatsPerMeasure,
         tines,
         setTines,
+        updateTinesAfterTineNumberChange,
+        updateMusicalSectionsAfterTineNumberChange,
         toneRowStrings,
         setToneRowStrings,
         thumbOneOrTwo,
@@ -824,6 +924,7 @@ w:${modifiedDescription}
         setHideAllSections,
         orderOfSections,
         setOrderOfSections,
+        toneRowStrToObj,
         getRowNumFromIndex,
         replaceOneValueInArray,
         dateFromMs,

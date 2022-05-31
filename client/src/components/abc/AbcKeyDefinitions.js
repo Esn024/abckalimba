@@ -19,9 +19,9 @@ const AbcKeyDefinitions = () => {
   // );
   // setTines(Array.from({ length: numberOfTines }));
 
-  const tineLetterTriggerRegex = `/[a-z]/`;
-  const abcNoteRegex = `[\^_]?[A-Ga-g][,']{0,4}`;
-  const abcCentRegex = `[-]?[0-9]{1,3}\.?[0-9]{1,3}`;
+  const tineLetterTriggerRegex = /[a-z]/;
+  const abcNoteRegex = /[\^_]?[A-Ga-g][,']{0,4}/;
+  const abcCentRegex = /[-]?[0-9]{1,3}\.?[0-9]{1,3}/;
   //replaceOneValueInArray
   return (
     <KeyDefinitions>
