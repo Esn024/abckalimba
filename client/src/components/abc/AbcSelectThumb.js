@@ -15,7 +15,9 @@ const AbcSelectThumb = () => {
         defaultChecked={thumbOneOrTwo === 1}
         onClick={() => setThumbOneOrTwo(1)}
       />
-      <StyledLabel htmlFor='left'>1</StyledLabel>
+      <StyledLabel style={{ color: 'black' }} htmlFor='left'>
+        1
+      </StyledLabel>
       <StyledInput
         type='radio'
         id='right'
@@ -40,6 +42,7 @@ const StyledInput = styled.input`
 
 const StyledLabel = styled.label`
   font-size: var(--font-size-small);
+  color: var(--color-cadmium-red);
 `;
 
 const Text = styled.p`

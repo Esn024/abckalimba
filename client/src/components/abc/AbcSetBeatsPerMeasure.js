@@ -73,6 +73,7 @@ const StyledLabel = styled.label`
   display: flex;
   justify-content: center;
   align-items: center;
+  margin: 0px 5px;
 `;
 
 const StyledInput = styled.input`

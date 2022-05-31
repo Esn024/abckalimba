@@ -138,7 +138,7 @@ const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin: 24px auto;
+  margin: 5px auto;
   height: 660px;
 `;
 
@@ -156,7 +156,7 @@ const Text = styled.p`
 `;
 
 const StyledButton = styled.button`
-  font-size: 12px;
+  font-size: var(--font-size-smaller);
   margin: 10px;
 `;
 

@@ -58,7 +58,7 @@ const AbcNoteGrid = ({ currentMusicalSectionIndex }) => {
                             );
                           }}
                         >
-                          {note}
+                          {tines[noteIndex].abcNote}
                         </TimedNote>
                       );
                     })}
@@ -138,7 +138,7 @@ const TimedNote = styled.button`
   ${({ note }) =>
     note === 0
       ? `
-    color: grey;
+    color: silver;
   `
       : note === 1
       ? `color: black`

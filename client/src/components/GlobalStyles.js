@@ -16,6 +16,7 @@ export default createGlobalStyle`
     --font-size-big: 24px;
     --font-size-medium: 20px;
     --font-size-small: 16px;
+    --font-size-smaller: 12px;
   }
 
   /* http://meyerweb.com/eric/tools/css/reset/

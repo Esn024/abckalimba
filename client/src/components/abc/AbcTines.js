@@ -33,6 +33,8 @@ const Tines = styled.div`
   display: flex;
   align-items: flex-start;
   justify-content: center;
+
+  margin: 8px;
 `;
 
 export default AbcTines;
