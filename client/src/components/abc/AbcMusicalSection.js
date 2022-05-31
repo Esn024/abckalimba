@@ -17,7 +17,7 @@ const AbcMusicalSection = ({
     hideAllSections,
     beatsPerMeasure,
     musicalSections,
-    setMusicalSections,
+    updateDescriptionOfMusicalSection,
     noteGridToAbc,
     singleMusicalSectionToAbc,
     initializeMusic,
@@ -83,14 +83,6 @@ const AbcMusicalSection = ({
     );
   }, [tempo, key, musicalSections, tines]);
 
-  // useEffect(() => {
-  //   const abc = noteGridToAbc(currentNoteGrid);
-  //   const loadMusic = async () => {
-  //     userLoadMusic(abc, idForScoreDiv, synth);
-  //   };
-  //   loadMusic();
-  // }, [currentNoteGrid, idForScoreDiv, synth]);
-
   return (
     <Wrapper
       id={`section-${letterId}`}
@@ -99,17 +91,14 @@ const AbcMusicalSection = ({
       <HorizontalWrapper>
         <Text>Section {letterId}</Text>
         <StyledInput
-          placeholder='notes'
+          placeholder='(optional notes)'
           onChange={(e) => {
             //update description
             const newDescription = e.target.value;
-            let newMusicalSections = [...musicalSections];
-            const newMusicalSection = {
-              ...musicalSections[currentMusicalSectionIndex],
-              description: newDescription,
-            };
-            newMusicalSections[currentMusicalSectionIndex] = newMusicalSection;
-            setMusicalSections(newMusicalSections);
+            updateDescriptionOfMusicalSection(
+              currentMusicalSectionIndex,
+              newDescription
+            );
           }}
         ></StyledInput>
       </HorizontalWrapper>

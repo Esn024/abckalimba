@@ -132,7 +132,7 @@ const TimedNote = styled.button`
   margin: 0;
   padding: 1px 1px;
   font-size: inherit;
-  background: var(--color-very-light-green);
+  /* background: var(--color-very-light-green); */
   border: 1px solid var(--color-dark-grey);
   border-radius: 4px;
 

@@ -180,6 +180,19 @@ export const AppProvider = ({ children }) => {
     );
   };
 
+  const updateDescriptionOfMusicalSection = (
+    currentMusicalSectionIndex,
+    newDescription
+  ) => {
+    let newMusicalSections = [...musicalSections];
+    const newMusicalSection = {
+      ...musicalSections[currentMusicalSectionIndex],
+      description: newDescription,
+    };
+    newMusicalSections[currentMusicalSectionIndex] = newMusicalSection;
+    setMusicalSections(newMusicalSections);
+  };
+
   const navigate = useNavigate();
 
   // return human-readable date from milliseconds since 1970
@@ -911,6 +924,7 @@ w:${modifiedDescription}
         setTines,
         updateTinesAfterTineNumberChange,
         updateMusicalSectionsAfterTineNumberChange,
+        updateDescriptionOfMusicalSection,
         toneRowStrings,
         setToneRowStrings,
         thumbOneOrTwo,
