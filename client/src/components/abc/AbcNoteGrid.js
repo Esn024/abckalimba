@@ -41,8 +41,6 @@ const AbcNoteGrid = ({ currentMusicalSectionIndex }) => {
                             key={uniqueNoteId}
                             id={uniqueNoteId}
                             note={note}
-                            // when mouse hovers over note, it will display the abcNote that gets played
-                            title={tines[noteIndex].abcNote}
                             onClick={() => {
                               // tine-0-key-a
                               document
@@ -137,6 +135,20 @@ const TimedNote = styled.button`
   background: var(--color-very-light-green);
   border: 1px solid var(--color-dark-grey);
   border-radius: 4px;
+
+  &:hover {
+    cursor: pointer;
+    background: var(--color-dark-green);
+    ${({ note }) =>
+      note === 0
+        ? `
+    color: silver;
+  `
+        : note === 1
+        ? `color: black`
+        : `color: var(--color-cadmium-red)`}
+  }
+
   ${({ note }) =>
     note === 0
       ? `

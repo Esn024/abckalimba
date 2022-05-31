@@ -17,6 +17,7 @@ const AbcMusicalSection = ({
     hideAllSections,
     beatsPerMeasure,
     musicalSections,
+    setMusicalSections,
     noteGridToAbc,
     singleMusicalSectionToAbc,
     initializeMusic,
@@ -95,7 +96,23 @@ const AbcMusicalSection = ({
       id={`section-${letterId}`}
       style={{ display: hideAllSections ? 'none' : 'flex' }}
     >
-      <Text>Section {letterId}</Text>
+      <HorizontalWrapper>
+        <Text>Section {letterId}</Text>
+        <StyledInput
+          placeholder='notes'
+          onChange={(e) => {
+            //update description
+            const newDescription = e.target.value;
+            let newMusicalSections = [...musicalSections];
+            const newMusicalSection = {
+              ...musicalSections[currentMusicalSectionIndex],
+              description: newDescription,
+            };
+            newMusicalSections[currentMusicalSectionIndex] = newMusicalSection;
+            setMusicalSections(newMusicalSections);
+          }}
+        ></StyledInput>
+      </HorizontalWrapper>
       <AbcPlaybackControl
         currentMusicalSectionIndex={currentMusicalSectionIndex}
         synth={synth}
@@ -159,7 +176,7 @@ const PlaybackButton = styled(StyledButton)`
 `;
 
 const StyledInput = styled.input`
-  font-size: var(--font-size-small);
+  font-size: var(--font-size-smaller);
 `;
 
 const StyledLabel = styled.label`

@@ -29,7 +29,7 @@ const AbcSetBeatsPerMeasure = () => {
 
             setBeatsPerMeasure(newBeatsPerMeasure);
 
-            console.log({ newBeatsPerMeasure });
+            // console.log({ newBeatsPerMeasure });
 
             // also change musicalSections (add or remove the right number of beat rows in the measures array)
             let modifiedMusicalSections = [];

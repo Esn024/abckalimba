@@ -67,6 +67,7 @@ export const AppProvider = ({ children }) => {
     '5 tones (c d e f g) [awsed]',
     '6 tones (c d e f g a) [awsedr]',
     '7 tones (c d-20 e f+20 g a b) [awsedrf]',
+    '17 tones (^c-40 ^g-40 B-20 ^f-20 A e ^C-40 a A, d+20 E e ^F-20 ^f-20 ^G-40 ^g-40 A) [awsedrftgyhujikol]',
   ]);
 
   // convert a tone row string into a properly-organized tines object
