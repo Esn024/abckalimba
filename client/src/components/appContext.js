@@ -7,6 +7,9 @@ export const AppContext = createContext();
 
 // context provider
 export const AppProvider = ({ children }) => {
+  const validAbcNoteRegex = /[\^_]?[a-gA-G][',]{0,4}/;
+  const validMidiNoteRegex = /[A-G][b#]?[0-8]/;
+
   const [userId, setUserId] = useState(localStorage.getItem('userId'));
   // const [numberOfTines, setNumberOfTines] = useState(3);
   const [audioContext, setAudioContext] = useState(new window.AudioContext());
@@ -307,7 +310,8 @@ export const AppProvider = ({ children }) => {
   };
 
   const userPlayNote = async (abcNoteName, cents) => {
-    if (abcNoteName) {
+    const abcNoteNameIsValid = abcNoteName.match(validAbcNoteRegex);
+    if (abcNoteNameIsValid) {
       // get the midi pitch of the abc note name
       const midiPitch = midiNoteNameToNumber(abcToMidiNoteName(abcNoteName));
       // when input a note name in abc notation, play that note
@@ -378,32 +382,39 @@ export const AppProvider = ({ children }) => {
 
   //helper function. Convert a scientific notation (midi note name) to ABC notation.
   const midiNoteNameToAbc = (midiNoteName) => {
-    let abcNoteName = '';
-    let noteName = midiNoteName.match(/([A-G])/)[1];
-    let octave = midiNoteName.match(/([0-8])/)[1];
-    let flat = midiNoteName.includes('b');
-    //for now, it doesn't output sharps, only flat notes
-    if (flat) abcNoteName += '_';
-    if (octave >= 5) noteName = noteName.toLowerCase();
-    abcNoteName += noteName;
-    if (octave == 0) abcNoteName += ',,,,';
-    if (octave == 1) abcNoteName += ',,,';
-    if (octave == 2) abcNoteName += ',,';
-    if (octave == 3) abcNoteName += ',';
-    if (octave == 6) abcNoteName += "'";
-    if (octave == 7) abcNoteName += "''";
-    if (octave == 8) abcNoteName += "'''";
-    //examples:
-    //C3 = C,
-    //C4 = C
-    //C5 = c
-    //C6 = c'
-    return abcNoteName;
+    const midiNoteNameIsValid = midiNoteName.match(validMidiNoteRegex);
+
+    if (midiNoteNameIsValid) {
+      let abcNoteName = '';
+      let noteName = midiNoteName.match(/([A-G])/)[1];
+      let octave = midiNoteName.match(/([0-8])/)[1];
+      let flat = midiNoteName.includes('b');
+      let sharp = midiNoteName.includes('#');
+
+      if (flat) abcNoteName += '_';
+      if (sharp) abcNoteName += '^';
+      if (octave >= 5) noteName = noteName.toLowerCase();
+      abcNoteName += noteName;
+      if (octave == 0) abcNoteName += ',,,,';
+      if (octave == 1) abcNoteName += ',,,';
+      if (octave == 2) abcNoteName += ',,';
+      if (octave == 3) abcNoteName += ',';
+      if (octave == 6) abcNoteName += "'";
+      if (octave == 7) abcNoteName += "''";
+      if (octave == 8) abcNoteName += "'''";
+      //examples:
+      //C3 = C,
+      //C4 = C
+      //C5 = c
+      //C6 = c'
+      return abcNoteName;
+    }
   };
 
-  //helper function. Convert an ABC note name to scientific notation (midi note name).
+  //helper function. Convert an ABC note name to scientific notation (midi note name). For now, always returns flat notes
   const abcToMidiNoteName = (abcNoteName) => {
-    if (abcNoteName) {
+    const abcNoteNameIsValid = abcNoteName.match(validAbcNoteRegex);
+    if (abcNoteNameIsValid) {
       let midiNoteName = '';
       let noteName = abcNoteName.match(/([a-gA-G])/)[1].toUpperCase();
       // console.log({ abcNoteName });
@@ -462,30 +473,45 @@ export const AppProvider = ({ children }) => {
 
   //helper function. Convert scientific notation (midi note name) to midi number.
   const midiNoteNameToNumber = (midiNoteName) => {
-    let noteName = midiNoteName.match(/([A-G])/)[1];
-    let octave = midiNoteName.match(/([0-8])/)[1];
-    let flat = midiNoteName.includes('b');
-    // first get the midiNumber as if octave was "0"
-    let midiNumber =
-      noteName === 'C'
-        ? 12
-        : noteName === 'D'
-        ? 14
-        : noteName === 'E'
-        ? 16
-        : noteName === 'F'
-        ? 17
-        : noteName === 'G'
-        ? 19
-        : noteName === 'A'
-        ? 21
-        : noteName === 'B'
-        ? 23
-        : null;
-    // check if there's a flat
-    if (flat) midiNumber--;
-    //now return the right midiNumber for the octave
-    return midiNumber + 12 * parseInt(octave);
+    const midiNoteNameIsValid = midiNoteName.match(validMidiNoteRegex);
+
+    if (midiNoteNameIsValid) {
+      let noteName = midiNoteName.match(/([A-G])/)[1];
+      let octave = midiNoteName.match(/([0-8])/)[1];
+      let flat = midiNoteName.includes('b');
+      let sharp = midiNoteName.includes('#');
+      // first get the midiNumber as if octave was "0"
+      let midiNumber =
+        noteName === 'C'
+          ? 12
+          : noteName === 'D'
+          ? 14
+          : noteName === 'E'
+          ? 16
+          : noteName === 'F'
+          ? 17
+          : noteName === 'G'
+          ? 19
+          : noteName === 'A'
+          ? 21
+          : noteName === 'B'
+          ? 23
+          : null;
+      // check if there's a flat
+      if (flat) midiNumber--;
+      // check if there's a sharp
+      if (sharp) midiNumber++;
+      //now return the right midiNumber for the octave
+      return midiNumber + 12 * parseInt(octave);
+    }
+  };
+
+  //convert one ABC note to a midi number
+  const abcToMidiNumber = (abcNoteName) => {
+    const abcNoteNameIsValid = abcNoteName.match(validAbcNoteRegex);
+    if (abcNoteNameIsValid) {
+      return midiNoteNameToNumber(abcToMidiNoteName(abcNoteName));
+    }
   };
 
   //helper function. Convert midi number to scientific notation (midi note name). This uses abcjs's built-in converter
@@ -773,7 +799,7 @@ w:${modifiedDescription}
     return beatCallback;
   };
 
-  const getSequenceCallback = (setAllNoteEvents) => {
+  const getSequenceCallback = (setAllNoteEvents, currentMusicalSection) => {
     // the function for changing events in audio playback. Runs once after the array of notes is created, but just before it is used to create the audio buffer
 
     const sequenceCallback = (tracks) => {
@@ -797,7 +823,7 @@ w:${modifiedDescription}
           const beatNumber = event.start * 8;
 
           // calculate which beat this is within the current measure
-          // const beatInMeasure = beatFromStart - measure * beatsPerMeasure;
+          // const beatInMeasure = beatNumber - measure * beatsPerMeasure;
 
           // MIDI (scientific notation) note name
           const midiNoteName = midiNumberToMidiNoteName(event.pitch);
@@ -805,26 +831,31 @@ w:${modifiedDescription}
           // ABC notation note name
           const abcNoteName = midiNoteNameToAbc(midiNoteName);
 
-          // apply any tuning modifications set by the user
+          // apply any tuning modifications set by the user.
           tines.forEach((tine) => {
-            if (abcNoteName === tine.abcNote) {
+            if (event.pitch === abcToMidiNumber(tine.abcNote)) {
               event.cents = tine.cents;
             }
           });
 
-          // make an array of all note events. Also add a new beat property to each one
-          newAllNoteEvents.push({
+          // make a new object to add to the array of all note events. Also add a new beat property to each one
+          const newObj = {
             ...event,
             // measure,
             beatNumber,
             // beatInMeasure,
             midiNoteName,
             abcNoteName,
-          });
+          };
+
+          // console.log({ newObj });
+
+          newAllNoteEvents.push(newObj);
         });
       });
 
       setAllNoteEvents(newAllNoteEvents);
+      // console.log({ currentMusicalSection });
       // console.log({ newAllNoteEvents });
     };
 

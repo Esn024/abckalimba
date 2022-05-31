@@ -62,7 +62,11 @@ const AbcMusicalSection = ({
       add_classes: true,
     })[0];
 
-    initializeMusic(visualObj, synth, getSequenceCallback(setAllNoteEvents));
+    initializeMusic(
+      visualObj,
+      synth,
+      getSequenceCallback(setAllNoteEvents, currentMusicalSection)
+    );
 
     setTimingCallbacks(
       new abcjs.TimingCallbacks(visualObj, {
