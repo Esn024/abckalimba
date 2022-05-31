@@ -19,28 +19,26 @@ const AbcSetOrderOfSections = () => {
   // pattern={orderOfSectionsRegex}
 
   return (
-    <>
-      <StyledLabel>
-        <Text title='Write the order in which the sections should be played. E.g. "AAABBB", which can also be written as "A3B3". Another example: "ABABCDEDE", aka. "(AB)2C(DE)2".'>
-          Order of Sections:
-        </Text>
-        <StyledInput
-          type='text'
-          id='orderOfSections'
-          value={orderOfSections}
-          pattern={orderOfSectionsRegex}
-          onChange={(e) => {
-            const newOrderOfSections = e.target.value;
-            if (newOrderOfSections.match(orderOfSectionsRegex)) {
-              // console.log('matches', orderOfSectionsRegex);
-            } else {
-              // console.log('no match', orderOfSectionsRegex);
-            }
-            setOrderOfSections(newOrderOfSections);
-          }}
-        />
-      </StyledLabel>
-    </>
+    <StyledLabel>
+      <Text title='Write the order in which the sections should be played. E.g. "AAABBB", which can also be written as "A3B3". Another example: "ABABCDEDE", aka. "(AB)2C(DE)2".'>
+        Order of Sections:
+      </Text>
+      <StyledInput
+        type='text'
+        id='orderOfSections'
+        value={orderOfSections}
+        pattern={orderOfSectionsRegex}
+        onChange={(e) => {
+          const newOrderOfSections = e.target.value;
+          if (newOrderOfSections.match(orderOfSectionsRegex)) {
+            // console.log('matches', orderOfSectionsRegex);
+          } else {
+            // console.log('no match', orderOfSectionsRegex);
+          }
+          setOrderOfSections(newOrderOfSections);
+        }}
+      />
+    </StyledLabel>
   );
 };
 

@@ -63,6 +63,12 @@ export const AppProvider = ({ children }) => {
     },
   ]);
 
+  const [toneRowStrings, setToneRowStrings] = useState([
+    '5 tones (c d e f g) [awsed]',
+    '6 tones (c d e f g a) [awsedr]',
+    '7 tones (c d e f g a b) [awsedrf]',
+  ]);
+
   const navigate = useNavigate();
 
   // return human-readable date from milliseconds since 1970
@@ -804,6 +810,8 @@ w:${modifiedDescription}
         setBeatsPerMeasure,
         tines,
         setTines,
+        toneRowStrings,
+        setToneRowStrings,
         thumbOneOrTwo,
         setThumbOneOrTwo,
         musicalSections,
