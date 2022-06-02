@@ -492,8 +492,45 @@ const getCommentIdsByUser = async (req, res) => {
   }
 };
 
+const getProject = async (req, res) => {
+  const id = req.params.id;
+
+  try {
+    const client = new MongoClient(MONGO_URI, options);
+    await client.connect();
+
+    const db = client.db('abcsynth');
+
+    const query = { projectId: id };
+    const project = await db.collection('projects').findOne(query);
+
+    if (project) {
+      const successMsg = `Found project!`;
+      sendResponse(res, 200, project, successMsg);
+    } else {
+      const errMsg = 'No project was found...';
+      sendResponse(res, 404, null, errMsg);
+    }
+    client.close();
+  } catch (err) {
+    sendResponse(res, 500, req.body, err.message);
+  }
+};
+
 const addProject = async (req, res) => {
-  const { project, username, created } = req.body;
+  const {
+    projectName,
+    projectDescription,
+    projectVisibility,
+    toneRowStr,
+    musicalSections,
+    orderOfSections,
+    tempo,
+    key,
+    beatsPerMeasure,
+    username,
+    created,
+  } = req.body;
 
   try {
     const dbName = 'abcsynth';
@@ -503,7 +540,19 @@ const addProject = async (req, res) => {
     const db = client.db(dbName);
 
     //check for errors
-    const errMsg = project.length === 0 ? 'The project is empty' : '';
+    let errMsg;
+    if (musicalSections.length === 0)
+      errMsg += 'The project has no musical sections. ';
+    if (!toneRowStr) errMsg += 'There is no tone row. ';
+    if (!orderOfSections) errMsg += 'The order of sections is empty. ';
+    if (!tempo) errMsg += 'The tempo is missing. ';
+    if (!key) errMsg += 'The key is missing. ';
+    if (!username) errMsg += 'The username is missing. ';
+    if (!beatsPerMeasure) errMsg += 'The beats per measure are missing. ';
+    if (!created) errMsg += 'The create date is missing. ';
+    if (!projectVisibility.match(/^(public|private|password)$/))
+      errMsg +=
+        'The project visibility is not one of the accepted values (it can be "public", "private" or "password"). ';
 
     if (errMsg.length === 0) {
       // insert new project into DB

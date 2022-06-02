@@ -3,7 +3,7 @@ import styled from 'styled-components';
 
 import abcjs from 'abcjs';
 // import Abcjs from 'react-abcjs';
-import AbcComponent from './abc/AbcComponent1.js';
+import AbcTines from './abc/AbcTines.js';
 import AbcSetNumberOfTines from './abc/AbcSetNumberOfTines';
 import AbcSelectToneRow from './abc/AbcSelectToneRow';
 import AbcKeyDefinitions from './abc/AbcKeyDefinitions.js';
@@ -17,21 +17,29 @@ import AbcSelectThumb from './abc/AbcSelectThumb.js';
 import AbcSetNumberOfMusicalSections from './abc/AbcSetNumberOfMusicalSections.js';
 import AbcMusicalSection from './abc/AbcMusicalSection.js';
 
-import AbcTines from './abc/AbcTines.js';
 import AbcNoteGrid from './abc/AbcNoteGrid.js';
 import AbcFinalPiece from './abc/AbcFinalPiece.js';
+import AbcSetProjectName from './abc/AbcSetProjectName.js';
+import AbcDescription from './abc/AbcDescription.js';
 
 //AbcThumbOneOrTwo
 
 import { AppContext } from './AppContext';
 
 const Home = () => {
-  const { userId, musicalSections, hideAllSections, setHideAllSections } =
-    useContext(AppContext);
+  const {
+    userId,
+    musicalSections,
+    hideAllSections,
+    setHideAllSections,
+    projectName,
+    projectDescription,
+  } = useContext(AppContext);
 
   return (
     <Wrapper>
-      <Text>ABC Test</Text>
+      {projectName && <ProjectName>{projectName}</ProjectName>}
+      {projectDescription && <Description>{projectDescription}</Description>}
       <AbcSetNumberOfTines />
       <AbcSelectToneRow />
       <AbcKeyDefinitions />
@@ -57,6 +65,9 @@ const Home = () => {
         />
       ))}
       <AbcFinalPiece />
+      <AbcSetProjectName />
+      <AbcDescription />
+      <button onClick={() => window.print()}>Print</button>
     </Wrapper>
   );
 };
@@ -75,12 +86,20 @@ const HorizontalWrapper = styled.div`
   align-items: center;
 `;
 
-const Text = styled.p`
+const ProjectName = styled.p`
   color: var(--color-alabama-crimson);
   font-family: var(--font-heading);
-  font-size: var(--font-size-small);
+  font-size: var(--font-size-big);
   text-align: center;
-  margin: 12px 0 0 24px;
+  margin: 8px;
+`;
+
+const Description = styled.p`
+  color: black;
+  font-family: var(--font-heading);
+  font-size: var(--font-size-smaller);
+  text-align: left;
+  margin-bottom: 12px;
 `;
 
 const StyledButton = styled.button`

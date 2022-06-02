@@ -33,6 +33,7 @@ const AbcMusicalSection = ({
     getEventCallback,
     getBeatCallback,
     getSequenceCallback,
+    objToToneRowStr,
   } = useContext(AppContext);
   const [notegridVisible, setNotegridVisible] = useState(true);
   const [scoreVisible, setScoreVisible] = useState(true);
@@ -49,6 +50,8 @@ const AbcMusicalSection = ({
 
   // initialize music
   useEffect(() => {
+    console.log('tonerowStr', objToToneRowStr(tines));
+
     const currentMusicalSection = musicalSections[currentMusicalSectionIndex];
     const abc = singleMusicalSectionToAbc(
       currentMusicalSection,
@@ -149,6 +152,10 @@ const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  border: rgb(150, 52, 102, 1) solid 2px;
+  margin: 0 0 10px;
+  padding: 20px;
+  border-radius: 10px;
 `;
 
 const HorizontalWrapper = styled.div`

@@ -15,6 +15,8 @@ export const AppProvider = ({ children }) => {
   const [audioContext, setAudioContext] = useState(new window.AudioContext());
   const [beatsPerMeasure, setBeatsPerMeasure] = useState(4);
   const [tempo, setTempo] = useState(180);
+  const [projectName, setProjectName] = useState();
+  const [projectDescription, setProjectDescription] = useState();
   const [key, setKey] = useState('C');
   const [orderOfSections, setOrderOfSections] = useState('AA');
 
@@ -112,6 +114,37 @@ export const AppProvider = ({ children }) => {
         // console.log({ tines, tinesArr });
         return tinesArr;
       }
+    }
+  };
+
+  // convert a properly-organized tines object into a tone row string
+  const objToToneRowStr = (tines) => {
+    //TODO check that tines is corrent
+    if (tines) {
+      let abcNotesAndCentsArr = [];
+      let keyboardLettersStr = '';
+      const numberOfTones = tines.length;
+
+      tines.forEach((tine) => {
+        // if empty values, just add "c"
+        keyboardLettersStr +=
+          tine.keyboardLetter.length > 0 ? tine.keyboardLetter : 'c';
+        let abcNoteAndCentsStr = tine.abcNote.match(validAbcNoteRegex)
+          ? tine.abcNote
+          : 'C,,';
+        abcNoteAndCentsStr +=
+          tine.cents > 0
+            ? `+${tine.cents.toString()}`
+            : tine.cents === 0
+            ? ''
+            : tine.cents.toString();
+        abcNotesAndCentsArr.push(abcNoteAndCentsStr);
+      });
+      const allAbcNotesAndCentsStr = abcNotesAndCentsArr.join(' ');
+
+      const finalStr = `${numberOfTones} tones (${allAbcNotesAndCentsStr}) [${keyboardLettersStr}]`;
+
+      return finalStr;
     }
   };
 
@@ -645,7 +678,8 @@ w:${modifiedDescription}
     orderOfSections,
     noteGridToAbc,
     tempo = 180,
-    key = 'C'
+    key = 'C',
+    projectName = ''
   ) => {
     // TODO may need to update the below line later in case this number will be able to change mid-piece
     const beatsPerBar = musicalSections[0].measures[0].length;
@@ -654,6 +688,7 @@ w:${modifiedDescription}
     const musicalSectionsArr = orderOfSections.split('');
 
     let abc = `X:1
+T:${projectName}
 M:${beatsPerBar}/8
 P:${orderOfSections}
 Q:1/8=${tempo}
@@ -966,11 +1001,16 @@ w:${modifiedDescription}
         setTempo,
         key,
         setKey,
+        projectName,
+        setProjectName,
+        projectDescription,
+        setProjectDescription,
         hideAllSections,
         setHideAllSections,
         orderOfSections,
         setOrderOfSections,
         toneRowStrToObj,
+        objToToneRowStr,
         getRowNumFromIndex,
         replaceOneValueInArray,
         dateFromMs,

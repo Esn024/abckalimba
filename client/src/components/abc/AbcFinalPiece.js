@@ -6,6 +6,8 @@ import AbcSetNumberOfMeasuresInSection from './AbcSetNumberOfMeasuresInSection.j
 import AbcNoteGrid from './AbcNoteGrid.js';
 import AbcPlaybackControl from './AbcPlaybackControl.js';
 import AbcSetOrderOfSections from './AbcSetOrderOfSections.js';
+
+import AbcSetProjectName from './AbcSetProjectName.js';
 //
 
 const AbcFinalPiece = () => {
@@ -15,6 +17,8 @@ const AbcFinalPiece = () => {
     beatsPerMeasure,
     musicalSections,
     musicalSectionsToAbc,
+    projectName,
+    setProjectName,
     noteGridToAbc,
     initializeMusic,
     tempo,
@@ -42,7 +46,8 @@ const AbcFinalPiece = () => {
       orderOfSections,
       noteGridToAbc,
       tempo,
-      key
+      key,
+      projectName
     );
 
     const visualObj = abcjs.renderAbc(idForScoreDiv, abc, {
@@ -63,7 +68,7 @@ const AbcFinalPiece = () => {
         beatCallback: getBeatCallback(allNoteEvents, setSliderPosition),
       })
     );
-  }, [tempo, key, musicalSections, orderOfSections, tines]);
+  }, [tempo, key, musicalSections, orderOfSections, tines, projectName]);
 
   return (
     <Wrapper id='final-music-wrapper'>
