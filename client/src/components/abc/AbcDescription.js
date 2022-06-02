@@ -13,10 +13,11 @@ const AbcDescription = () => {
 
   return (
     <>
-      <P>Project description:</P>
+      <P>Project Description:</P>
       <Textarea
         id='projectDescription'
         value={projectDescription}
+        rows='6'
         onChange={(e) => {
           const newDescription = sanitizeDescriptionStr(e.target.value);
           setProjectDescription(newDescription);
@@ -30,9 +31,9 @@ const P = styled.p`
   margin-bottom: 8px;
 `;
 const Textarea = styled.textarea`
+  width: 250px;
   font-size: var(--font-size-small);
   color: black;
-  margin-right: 8px;
 `;
 
 export default AbcDescription;

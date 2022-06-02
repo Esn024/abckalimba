@@ -25,45 +25,40 @@ const AbcSetNumberOfTines = () => {
   }, [tines]);
 
   return (
-    <>
-      <StyledLabel>
-        <Text>Modify Number of Tones:</Text>
-        <StyledInput
-          type='number'
-          id='quantity'
-          name='quantity'
-          min='3'
-          max='21'
-          value={numberOfTines}
-          onChange={(e) => {
-            const newNumberOfTines = e.target.value * 1;
+    <StyledLabel>
+      <Text>Modify Number of Tones:</Text>
+      <StyledInput
+        type='number'
+        id='quantity'
+        name='quantity'
+        min='3'
+        max='21'
+        value={numberOfTines}
+        onChange={(e) => {
+          const newNumberOfTines = e.target.value * 1;
 
-            if (tines.length !== newNumberOfTines) {
-              setNumberOfTines(newNumberOfTines);
+          if (tines.length !== newNumberOfTines) {
+            setNumberOfTines(newNumberOfTines);
 
-              updateMusicalSectionsAfterTineNumberChange(
-                newNumberOfTines,
-                tines,
-                musicalSections,
-                setMusicalSections
-              );
+            updateMusicalSectionsAfterTineNumberChange(
+              newNumberOfTines,
+              tines,
+              musicalSections,
+              setMusicalSections
+            );
 
-              updateTinesAfterTineNumberChange(
-                newNumberOfTines,
-                tines,
-                setTines
-              );
-            }
-          }}
-        />
-      </StyledLabel>
-    </>
+            updateTinesAfterTineNumberChange(newNumberOfTines, tines, setTines);
+          }
+        }}
+      />
+    </StyledLabel>
   );
 };
 
 const StyledLabel = styled.label`
   display: flex;
   justify-content: center;
+  margin-top: 8px;
 `;
 
 const StyledInput = styled.input`

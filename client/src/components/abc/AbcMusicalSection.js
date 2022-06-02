@@ -164,7 +164,7 @@ const HorizontalWrapper = styled.div`
 `;
 
 const StyledButton = styled.button`
-  font-size: 12px;
+  font-size: var(--font-size-smaller);
 `;
 
 const PlaybackButton = styled(StyledButton)`

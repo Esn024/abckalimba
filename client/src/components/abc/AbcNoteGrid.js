@@ -1,7 +1,6 @@
 import React, { useContext, useState } from 'react';
 import styled from 'styled-components';
 import { AppContext } from '../AppContext';
-
 //clickOnNoteButton(keyboardLetter, abcNote)
 
 const AbcNoteGrid = ({ currentMusicalSectionIndex }) => {
@@ -14,63 +13,80 @@ const AbcNoteGrid = ({ currentMusicalSectionIndex }) => {
     musicalSections,
     changeOneNote,
     thumbOneOrTwo,
+    saveImageById,
+    projectName,
+    indexToAlphabetLetter,
   } = useContext(AppContext);
   // const rowBeatsTines = [];
 
   return (
-    <div>
-      {musicalSections[currentMusicalSectionIndex].measures.map(
-        (measure, measureIndex) => {
-          const uniqueMeasureId =
-            'musicalSection-' +
-            currentMusicalSectionIndex +
-            '-measure-' +
-            measureIndex;
+    <>
+      <div id={'musicalSection-' + currentMusicalSectionIndex}>
+        {musicalSections[currentMusicalSectionIndex].measures.map(
+          (measure, measureIndex) => {
+            const uniqueMeasureId =
+              'musicalSection-' +
+              currentMusicalSectionIndex +
+              '-measure-' +
+              measureIndex;
 
-          return (
-            <NoteGridMeasure key={uniqueMeasureId} id={uniqueMeasureId}>
-              {measure.map((beat, beatIndex) => {
-                const uniqueBeatId = uniqueMeasureId + '-beat-' + beatIndex;
-                return (
-                  <NoteGridBeat key={uniqueBeatId} id={uniqueBeatId}>
-                    {beat.map((note, noteIndex) => {
-                      const uniqueNoteId = uniqueBeatId + '-note-' + noteIndex;
-                      return (
-                        tines && (
-                          <TimedNote
-                            key={uniqueNoteId}
-                            id={uniqueNoteId}
-                            note={note}
-                            onClick={() => {
-                              // tine-0-key-a
-                              document
-                                .getElementById('tine-' + noteIndex)
-                                .click();
+            return (
+              <NoteGridMeasure key={uniqueMeasureId} id={uniqueMeasureId}>
+                {measure.map((beat, beatIndex) => {
+                  const uniqueBeatId = uniqueMeasureId + '-beat-' + beatIndex;
+                  return (
+                    <NoteGridBeat key={uniqueBeatId} id={uniqueBeatId}>
+                      {beat.map((note, noteIndex) => {
+                        const uniqueNoteId =
+                          uniqueBeatId + '-note-' + noteIndex;
+                        return (
+                          tines && (
+                            <TimedNote
+                              key={uniqueNoteId}
+                              id={uniqueNoteId}
+                              note={note}
+                              onClick={() => {
+                                // tine-0-key-a
+                                document
+                                  .getElementById('tine-' + noteIndex)
+                                  .click();
 
-                              changeOneNote(
-                                currentMusicalSectionIndex,
-                                measureIndex,
-                                beatIndex,
-                                noteIndex,
-                                note,
-                                thumbOneOrTwo
-                              );
-                            }}
-                          >
-                            {tines[noteIndex].abcNote}
-                          </TimedNote>
-                        )
-                      );
-                    })}
-                  </NoteGridBeat>
-                );
-              })}
-              <ColoredLine />
-            </NoteGridMeasure>
-          );
-        }
-      )}
-    </div>
+                                changeOneNote(
+                                  currentMusicalSectionIndex,
+                                  measureIndex,
+                                  beatIndex,
+                                  noteIndex,
+                                  note,
+                                  thumbOneOrTwo
+                                );
+                              }}
+                            >
+                              {tines[noteIndex].abcNote}
+                            </TimedNote>
+                          )
+                        );
+                      })}
+                    </NoteGridBeat>
+                  );
+                })}
+                <ColoredLine />
+              </NoteGridMeasure>
+            );
+          }
+        )}
+      </div>
+      <StyledButton
+        onClick={() => {
+          const idOfDiv = `musicalSection-${currentMusicalSectionIndex}`;
+          const filename = `${
+            projectName ?? 'Untitled'
+          } - Section ${indexToAlphabetLetter(currentMusicalSectionIndex)}`;
+          saveImageById(idOfDiv, filename);
+        }}
+      >
+        Save music grid as image
+      </StyledButton>
+    </>
   );
   //   return (
   //     <NoteGrid id='note-grid'>
@@ -162,6 +178,10 @@ const TimedNote = styled.button`
 const Text = styled.p`
   font-size: var(--font-size-small);
   color: black;
+`;
+
+const StyledButton = styled.button`
+  font-size: var(--font-size-smaller);
 `;
 
 export default AbcNoteGrid;

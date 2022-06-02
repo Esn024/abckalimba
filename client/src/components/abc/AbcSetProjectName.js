@@ -10,7 +10,7 @@ const AbcSetProjectName = () => {
 
   return (
     <>
-      <Text>Project name:</Text>
+      <Text>Project Name:</Text>
       <StyledLabel>
         <StyledInput
           type='text'
@@ -36,7 +36,7 @@ const StyledLabel = styled.label`
 `;
 
 const StyledInput = styled.input`
-  width: 100%;
+  width: 250px;
   text-align: center;
   margin: 8px;
 `;
@@ -44,7 +44,7 @@ const StyledInput = styled.input`
 const Text = styled.p`
   font-size: var(--font-size-small);
   color: black;
-  margin: 8px;
+  margin-top: 8px;
 `;
 
 export default AbcSetProjectName;

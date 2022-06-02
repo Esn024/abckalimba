@@ -3,6 +3,7 @@ import styled from 'styled-components';
 
 import abcjs from 'abcjs';
 // import Abcjs from 'react-abcjs';
+import { saveAsPng, saveAsJpeg } from 'save-html-as-image';
 import AbcTines from './abc/AbcTines.js';
 import AbcSetNumberOfTines from './abc/AbcSetNumberOfTines';
 import AbcSelectToneRow from './abc/AbcSelectToneRow';
@@ -34,6 +35,7 @@ const Home = () => {
     setHideAllSections,
     projectName,
     projectDescription,
+    printDivById,
   } = useContext(AppContext);
 
   return (
@@ -67,7 +69,12 @@ const Home = () => {
       <AbcFinalPiece />
       <AbcSetProjectName />
       <AbcDescription />
-      <button onClick={() => window.print()}>Print</button>
+      <StyledButton2 onClick={() => printDivById('final-score')}>
+        Save project
+      </StyledButton2>
+      <StyledButton2 onClick={() => printDivById('final-score')}>
+        Print music score
+      </StyledButton2>
     </Wrapper>
   );
 };
@@ -105,6 +112,11 @@ const Description = styled.p`
 const StyledButton = styled.button`
   font-size: var(--font-size-smaller);
   margin: 10px;
+`;
+
+const StyledButton2 = styled(StyledButton)`
+  font-size: var(--font-size-small);
+  margin: 10px 0 0 0;
 `;
 
 export default Home;

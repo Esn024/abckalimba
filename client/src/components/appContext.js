@@ -2,6 +2,7 @@ import React, { createContext, useReducer, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 import abcjs from 'abcjs';
+import { saveAsPng, saveAsJpeg } from 'save-html-as-image';
 
 export const AppContext = createContext();
 
@@ -49,7 +50,7 @@ export const AppProvider = ({ children }) => {
   const [musicalSections, setMusicalSections] = useState([
     {
       letterId: 'A',
-      description: 'blah blah',
+      description: '',
       numberOfMeasures: 2,
       measures: [
         [
@@ -979,6 +980,32 @@ w:${modifiedDescription}
     setMusicIsPlaying(newMusicIsPlaying);
   };
 
+  const printDivById = (divId) => {
+    //abcjs-rest
+    const divContents = document.getElementById(divId).innerHTML;
+    let a = window.open('', '', 'height=500, width=500');
+    // add custom CSS to make sure that the musical rests have a low opacity
+    a.document.write(`<html><head>
+    <style>
+    .abcjs-rest {
+      opacity: 0.1;
+    }
+    </style></head>
+    <body>${divContents}</body></html>`);
+    a.document.close();
+    a.print();
+  };
+
+  //0 is A, 1 is B, etc.
+  const indexToAlphabetLetter = (indexNumber) => {
+    return String.fromCharCode(indexNumber + 65);
+  };
+
+  const saveImageById = (nodeId, filename) => {
+    const node = document.getElementById(nodeId);
+    saveAsPng(node, { filename: filename, printDate: true });
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -1035,6 +1062,9 @@ w:${modifiedDescription}
         getEventCallback,
         getBeatCallback,
         getSequenceCallback,
+        printDivById,
+        saveImageById,
+        indexToAlphabetLetter,
       }}
     >
       {children}
