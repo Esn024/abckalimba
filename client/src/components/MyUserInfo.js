@@ -16,14 +16,12 @@ const MyUserInfo = () => {
   const {
     userId,
     setUserId,
+    currentUser,
     createNewUser,
     updateUser,
     deleteUser,
     dateFromMs,
   } = useContext(AppContext);
-
-  const [currentUser] =
-    useCurrentUser(userId); /* Return user details from API call */
 
   return (
     <Wrapper>

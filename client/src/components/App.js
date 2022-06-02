@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import GlobalStyles from './GlobalStyles';
 import { AppProvider } from './AppContext'; //Add the Context Provider to the entire application

@@ -50,7 +50,7 @@ const AbcMusicalSection = ({
 
   // initialize music
   useEffect(() => {
-    console.log('tonerowStr', objToToneRowStr(tines));
+    // console.log('tonerowStr', objToToneRowStr(tines));
 
     const currentMusicalSection = musicalSections[currentMusicalSectionIndex];
     const abc = singleMusicalSectionToAbc(

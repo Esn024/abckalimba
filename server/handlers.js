@@ -518,6 +518,7 @@ const getProject = async (req, res) => {
 };
 
 const addProject = async (req, res) => {
+  // console.log(req.body);
   const {
     projectName,
     projectDescription,
@@ -540,9 +541,8 @@ const addProject = async (req, res) => {
     const db = client.db(dbName);
 
     //check for errors
-    let errMsg;
-    if (musicalSections.length === 0)
-      errMsg += 'The project has no musical sections. ';
+    let errMsg = '';
+    if (!musicalSections) errMsg += 'The project has no musical sections. ';
     if (!toneRowStr) errMsg += 'There is no tone row. ';
     if (!orderOfSections) errMsg += 'The order of sections is empty. ';
     if (!tempo) errMsg += 'The tempo is missing. ';
@@ -550,14 +550,17 @@ const addProject = async (req, res) => {
     if (!username) errMsg += 'The username is missing. ';
     if (!beatsPerMeasure) errMsg += 'The beats per measure are missing. ';
     if (!created) errMsg += 'The create date is missing. ';
-    if (!projectVisibility.match(/^(public|private|password)$/))
-      errMsg +=
-        'The project visibility is not one of the accepted values (it can be "public", "private" or "password"). ';
+    if (
+      !projectVisibility ||
+      !projectVisibility.match(/^(public|private|password)$/)
+    )
+      errMsg += `The project visibility is not one of the accepted values (it can be "public", "private" or "password"). Instead, it is ${projectVisibility}`;
 
     if (errMsg.length === 0) {
       // insert new project into DB
       const newProject = {
         _id: uuidv4(),
+        projectId: 1,
         ...req.body,
       };
       const insertedProject = await db
@@ -603,4 +606,6 @@ module.exports = {
   deleteComment,
   getCommentIdsForProject,
   getCommentIdsByUser,
+  getProject,
+  addProject,
 };

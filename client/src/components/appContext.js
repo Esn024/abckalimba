@@ -4,6 +4,8 @@ import { v4 as uuidv4 } from 'uuid';
 import abcjs from 'abcjs';
 import { saveAsPng, saveAsJpeg } from 'save-html-as-image';
 
+import useCurrentUser from '../hooks/use-current-user.hook.js';
+
 export const AppContext = createContext();
 
 // context provider
@@ -13,11 +15,16 @@ export const AppProvider = ({ children }) => {
 
   const [userId, setUserId] = useState(localStorage.getItem('userId'));
   // const [numberOfTines, setNumberOfTines] = useState(3);
+
+  const [currentUser] =
+    useCurrentUser(userId); /* Return user details from API call */
+
   const [audioContext, setAudioContext] = useState(new window.AudioContext());
   const [beatsPerMeasure, setBeatsPerMeasure] = useState(4);
   const [tempo, setTempo] = useState(180);
   const [projectName, setProjectName] = useState();
   const [projectDescription, setProjectDescription] = useState();
+  const [projectVisibility, setProjectVisibility] = useState('private');
   const [key, setKey] = useState('C');
   const [orderOfSections, setOrderOfSections] = useState('AA');
 
@@ -1006,11 +1013,61 @@ w:${modifiedDescription}
     saveAsPng(node, { filename: filename, printDate: true });
   };
 
+  const saveNewProject = (
+    projectName,
+    projectDescription,
+    projectVisibility,
+    toneRowStr,
+    musicalSections,
+    orderOfSections,
+    tempo,
+    key,
+    beatsPerMeasure,
+    username
+  ) => {
+    // console.log({ formData });
+    // console.log({ toneRowStr });
+    const created = Date.now();
+    fetch('/api/projects', {
+      method: 'POST',
+      body: JSON.stringify({
+        projectName: projectName,
+        projectDescription: projectDescription,
+        projectVisibility: projectVisibility,
+        toneRowStr: toneRowStr,
+        musicalSections: musicalSections,
+        orderOfSections: orderOfSections,
+        tempo: tempo,
+        key: key,
+        beatsPerMeasure: beatsPerMeasure,
+        username: username,
+        created: created,
+      }),
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+    })
+      .then((res) => res.json())
+      .then((json) => {
+        // console.log(json);
+        const { status, message, data } = json;
+
+        if (status == 200) {
+          console.log(message);
+        } else {
+          // TODO remove console log
+          console.log('There was an error', { status, message, data });
+        }
+      });
+  };
+
   return (
     <AppContext.Provider
       value={{
         userId,
         setUserId,
+        currentUser,
         beatsPerMeasure,
         setBeatsPerMeasure,
         tines,
@@ -1036,6 +1093,8 @@ w:${modifiedDescription}
         setHideAllSections,
         orderOfSections,
         setOrderOfSections,
+        projectVisibility,
+        setProjectVisibility,
         toneRowStrToObj,
         objToToneRowStr,
         getRowNumFromIndex,
@@ -1065,6 +1124,7 @@ w:${modifiedDescription}
         printDivById,
         saveImageById,
         indexToAlphabetLetter,
+        saveNewProject,
       }}
     >
       {children}

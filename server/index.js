@@ -19,6 +19,8 @@ const {
   updateComment,
   deleteComment,
   getCommentIdsByUser,
+  getProject,
+  addProject,
 } = require('./handlers');
 
 express()
@@ -56,6 +58,10 @@ express()
   .delete('/api/comments/:id', deleteComment)
   .get('/api/projects/:projectId/comments', getCommentIdsForProject)
   .get('/api/users/:username/comments', getCommentIdsByUser)
+
+  //projects
+  .get('/api/projects/:id', getProject)
+  .post('/api/projects', addProject)
 
   .listen(PORT, () => {
     console.info(`Server listening on ${PORT}`);

@@ -22,6 +22,7 @@ import AbcNoteGrid from './abc/AbcNoteGrid.js';
 import AbcFinalPiece from './abc/AbcFinalPiece.js';
 import AbcSetProjectName from './abc/AbcSetProjectName.js';
 import AbcDescription from './abc/AbcDescription.js';
+import AbcProjectVisibility from './abc/AbcProjectVisibility.js';
 
 //AbcThumbOneOrTwo
 
@@ -30,12 +31,21 @@ import { AppContext } from './AppContext';
 const Home = () => {
   const {
     userId,
+    tines,
     musicalSections,
     hideAllSections,
     setHideAllSections,
     projectName,
     projectDescription,
     printDivById,
+    currentUser,
+    saveNewProject,
+    projectVisibility,
+    orderOfSections,
+    tempo,
+    key,
+    beatsPerMeasure,
+    objToToneRowStr,
   } = useContext(AppContext);
 
   return (
@@ -69,7 +79,23 @@ const Home = () => {
       <AbcFinalPiece />
       <AbcSetProjectName />
       <AbcDescription />
-      <StyledButton2 onClick={() => printDivById('final-score')}>
+      <AbcProjectVisibility />
+      <StyledButton2
+        onClick={() =>
+          saveNewProject(
+            projectName,
+            projectDescription,
+            projectVisibility,
+            objToToneRowStr(tines),
+            musicalSections,
+            orderOfSections,
+            tempo,
+            key,
+            beatsPerMeasure,
+            currentUser.username
+          )
+        }
+      >
         Save project
       </StyledButton2>
       <StyledButton2 onClick={() => printDivById('final-score')}>

@@ -2,13 +2,9 @@ import React, { useContext } from 'react';
 import styled from 'styled-components';
 import { AppContext } from './AppContext';
 import { NavLink } from 'react-router-dom';
-import useCurrentUser from '../hooks/use-current-user.hook.js';
 
 const Header = () => {
-  const { userId } = useContext(AppContext);
-  const [currentUser] =
-    useCurrentUser(userId); /* Return user details from API call */
-
+  const { currentUser } = useContext(AppContext);
   return (
     <HeaderElement>
       <Link to='/'>
