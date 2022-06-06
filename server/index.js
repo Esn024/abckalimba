@@ -19,6 +19,15 @@ const {
   updateComment,
   deleteComment,
   getCommentIdsByUser,
+  getPublicProjectsForList,
+  getPublicProjectsByUsername,
+  getPublicProjectByProjectId,
+  getPrivateProject,
+  addProject,
+  getToneRows,
+  getToneRow,
+  getAllProjectsByUserId,
+  test123,
 } = require('./handlers');
 
 express()
@@ -40,14 +49,15 @@ express()
 
   // REST endpoints
   .get('/test', getTestData)
+  .get('/test123', test123)
 
   // users
   .get('/api/users', getUsers)
   .get('/api/users/:username', getUserPublicInfo)
   .get('/api/users/id/:id', getUserAllInfo)
   .post('/api/users', addUser)
-  .put('/api/users/:username', updateUser)
-  .delete('/api/users/:username', deleteUser)
+  .put('/api/users/id/:id', updateUser)
+  .delete('/api/users/id/:id', deleteUser)
 
   // comments
   .get('/api/comments/:id', getComment)
@@ -56,6 +66,18 @@ express()
   .delete('/api/comments/:id', deleteComment)
   .get('/api/projects/:projectId/comments', getCommentIdsForProject)
   .get('/api/users/:username/comments', getCommentIdsByUser)
+
+  //projects
+  .get('/api/projects', getPublicProjectsForList)
+  .get('/api/projects/:id', getPublicProjectByProjectId)
+  .get('/api/private-projects/:id/:created', getPrivateProject)
+  .post('/api/projects', addProject)
+  .get('/api/users/:username/projects', getPublicProjectsByUsername)
+  .get('/api/users/id/:id/projects', getAllProjectsByUserId)
+
+  // tone rows
+  .get('/api/tonerows', getToneRows)
+  .get('/api/tonerows/:id', getToneRow)
 
   .listen(PORT, () => {
     console.info(`Server listening on ${PORT}`);

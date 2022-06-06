@@ -1,61 +1,148 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import styled from 'styled-components';
 
 import abcjs from 'abcjs';
 // import Abcjs from 'react-abcjs';
-import AbcComponent from './abc/AbcComponent1.js';
+import { saveAsPng, saveAsJpeg } from 'save-html-as-image';
+import AbcTines from './abc/AbcTines.js';
+import AbcSetNumberOfTines from './abc/AbcSetNumberOfTines';
+import AbcSelectToneRow from './abc/AbcSelectToneRow';
+import AbcKeyDefinitions from './abc/AbcKeyDefinitions.js';
+
+import AbcSetBeatsPerMeasure from './abc/AbcSetBeatsPerMeasure';
+import AbcSetTempo from './abc/AbcSetTempo';
+import AbcSetOrderOfSections from './abc/AbcSetOrderOfSections';
+import AbcSetKey from './abc/AbcSetKey';
+import AbcSelectTune from './abc/AbcSelectTune.js';
+import AbcSelectThumb from './abc/AbcSelectThumb.js';
+import AbcSetNumberOfMusicalSections from './abc/AbcSetNumberOfMusicalSections.js';
+import AbcMusicalSection from './abc/AbcMusicalSection.js';
+
+import AbcNoteGrid from './abc/AbcNoteGrid.js';
+import AbcFinalPiece from './abc/AbcFinalPiece.js';
+import AbcSetProjectName from './abc/AbcSetProjectName.js';
+import AbcDescription from './abc/AbcDescription.js';
+import AbcProjectVisibility from './abc/AbcProjectVisibility.js';
+
+//AbcThumbOneOrTwo
+
+import { AppContext } from './AppContext';
 
 const Home = () => {
-  // useEffect(() => {
-  //   console.log({ midi });
-  // }, [midi]);
-
-  const abc1 = `T: Cooley's
-    M: 4/4
-    L: 1/8
-    R: reel
-    K: Emin
-    |:D2|EB{c}BA B2 EB|~B2 AB dBAG|FDAD BDAD|FDAD dAFD|
-    EBBA B2 EB|B2 AB defg|afe^c dBAF|DEFD E2:|
-    |:gf|eB B2 efge|eB B2 gedB|A2 FA DAFA|A2 FA defg|
-    eB B2 eBgB|eB B2 defg|afe^c dBAF|DEFD E2:|`;
-
-  const abc2 = `
-  T: Example
-  M: 4/4
-  K: G
-  |:Gccc dedB|dedB dedB|c2ec B2dB|c2A2 A2BA|`;
-
-  //var midi = abcjs.synth.getMidiFile(visualObj[0], { midiOutputType: "encoded" });
-  const midi = abcjs.synth.getMidiFile(abc2, {
-    chordsOff: true,
-    midiOutputType: 'binary',
-    bpm: 100,
-  });
-
-  console.log(midi);
+  const {
+    userId,
+    tines,
+    musicalSections,
+    hideAllSections,
+    setHideAllSections,
+    projectName,
+    projectDescription,
+    printDivById,
+    currentUser,
+    saveNewProject,
+    projectVisibility,
+    orderOfSections,
+    tempo,
+    key,
+    beatsPerMeasure,
+    objToToneRowStr,
+  } = useContext(AppContext);
 
   return (
     <Wrapper>
-      <Text>ABC Test</Text>
-      <AbcComponent abc={abc2} />
+      {projectName && <ProjectName>{projectName}</ProjectName>}
+      {projectDescription && <Description>{projectDescription}</Description>}
+      <AbcSetNumberOfTines />
+      <AbcSelectToneRow />
+      <AbcKeyDefinitions />
+      <AbcTines />
+      <HorizontalWrapper>
+        <AbcSetNumberOfMusicalSections />
+        <AbcSetBeatsPerMeasure />
+        <AbcSetTempo />
+        {/* <AbcSetKey /> // TODO, no sense in adding this in until the abc notes are actually modified based on what the key is */}
+      </HorizontalWrapper>
+      <HorizontalWrapper>
+        <AbcSelectThumb />
+        <StyledButton onClick={() => setHideAllSections(!hideAllSections)}>
+          {hideAllSections ? 'Unhide' : 'Hide'} all sections
+        </StyledButton>
+      </HorizontalWrapper>
+      {musicalSections.map((section, i) => (
+        <AbcMusicalSection
+          key={i}
+          currentMusicalSectionIndex={i}
+          letterId={section.letterId}
+          numberOfMeasures={section.numberOfMeasures}
+        />
+      ))}
+      <AbcFinalPiece />
+      <AbcSetProjectName />
+      <AbcDescription />
+      <AbcProjectVisibility />
+      <StyledButton2
+        onClick={() =>
+          saveNewProject(
+            projectName,
+            projectDescription,
+            projectVisibility,
+            objToToneRowStr(tines),
+            musicalSections,
+            orderOfSections,
+            tempo,
+            key,
+            beatsPerMeasure,
+            currentUser.username
+          )
+        }
+      >
+        Save project
+      </StyledButton2>
+      <StyledButton2 onClick={() => printDivById('final-score')}>
+        Print music score
+      </StyledButton2>
     </Wrapper>
   );
 };
 
 // display flex makes it not work
 const Wrapper = styled.div`
-  /* display: flex; */
-  margin: 24px auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 5px auto;
   height: 660px;
 `;
 
-const Text = styled.p`
+const HorizontalWrapper = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+const ProjectName = styled.p`
   color: var(--color-alabama-crimson);
   font-family: var(--font-heading);
-  font-size: 36px;
+  font-size: var(--font-size-big);
   text-align: center;
-  margin: 12px 0 0 24px;
+  margin: 8px;
+`;
+
+const Description = styled.p`
+  color: black;
+  font-family: var(--font-heading);
+  font-size: var(--font-size-smaller);
+  text-align: left;
+  margin-bottom: 12px;
+`;
+
+const StyledButton = styled.button`
+  font-size: var(--font-size-smaller);
+  margin: 10px;
+`;
+
+const StyledButton2 = styled(StyledButton)`
+  font-size: var(--font-size-small);
+  margin: 10px 0 0 0;
 `;
 
 export default Home;
