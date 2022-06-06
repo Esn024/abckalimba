@@ -225,7 +225,7 @@ const getUserPublicInfo = async (req, res) => {
 
     if (user) {
       // return all user info other than the private stuff - ID and email
-      const userPublicInfo = Object.assign({}, { ...user });
+      const userPublicInfo = { ...user };
       delete userPublicInfo._id;
       delete userPublicInfo.email;
 
@@ -673,8 +673,12 @@ const getPublicProjectByProjectId = async (req, res) => {
     const project = await db.collection('projects').findOne(query);
 
     if (project) {
+      // return all project info other than the _id field
+      const projectPublicInfo = { ...project };
+      delete projectPublicInfo._id;
+
       const successMsg = `Found project!`;
-      sendResponse(res, 200, project, successMsg);
+      sendResponse(res, 200, projectPublicInfo, successMsg);
     } else {
       const errMsg = 'No project was found...';
       sendResponse(res, 404, null, errMsg);
