@@ -68,17 +68,17 @@ const test123 = async () => {
   const db = client.db(dbName);
 
   const x = await getHighestValue(db, 'projects', 'projectId');
-  console.log({ x });
+  // console.log({ x });
 };
 
 // See if a tone row string is already in the database
 const checkIfToneRowExists = async (db, toneRowStr) => {
-  console.log('checkIfToneRowExists');
+  // console.log('checkIfToneRowExists');
   const toneRow = await db
     .collection('tonerows')
     .findOne({ toneRowStr: toneRowStr });
 
-  console.log({ toneRow });
+  // console.log({ toneRow });
   return toneRow ? true : false;
 };
 
@@ -793,7 +793,7 @@ const addProject = async (req, res) => {
         'projects',
         'projectId'
       );
-      console.log({ highestProjectId });
+      // console.log({ highestProjectId });
       const newProjectId = highestProjectId + 1;
 
       // insert new project into DB
@@ -826,11 +826,11 @@ const addProject = async (req, res) => {
           // Check if the tone row already exists in the database
           const toneRowExists = await checkIfToneRowExists(db, toneRowStr);
 
-          console.log('after toneRowExists');
-          console.log({ toneRowExists });
+          // console.log('after toneRowExists');
+          // console.log({ toneRowExists });
 
           if (toneRowExists) {
-            console.log('tone row exists');
+            // console.log('tone row exists');
             // if it exists, add the projectID to array of projects using the tone row
             const updateToneRowWithProject = await db
               .collection('tonerows')
@@ -856,7 +856,7 @@ const addProject = async (req, res) => {
           } else {
             // If it doesn't exist, add it in.
             // insert new project into DB
-            console.log('new tone row');
+            // console.log('new tone row');
 
             // make a new tone row ID, increment by 1 from previous highest tone row ID
             const highestToneRowId = await getHighestValue(
@@ -864,7 +864,7 @@ const addProject = async (req, res) => {
               'tonerows',
               'toneRowId'
             );
-            console.log({ highestToneRowId });
+            // console.log({ highestToneRowId });
             const newToneRowId = highestToneRowId + 1;
 
             const newToneRow = {
@@ -990,7 +990,7 @@ const updateProject = async (req, res) => {
         let oldToneRowResp;
 
         if (projectUpdated) {
-          console.log('project updated');
+          // console.log('project updated');
           let msg = `Project ${projectId} updated. `;
 
           projectHttpResp = {
@@ -1009,12 +1009,12 @@ const updateProject = async (req, res) => {
           const toneRow = await db.collection('tonerows').findOne(tQuery);
 
           if (toneRow) {
-            console.log('tone row exists');
+            // console.log('tone row exists');
 
             //check if project is in the tone row's projectIds array
             const toneRowHasProjectId = toneRow.projectIds.includes(projectId);
 
-            console.log({ toneRowHasProjectId });
+            // console.log({ toneRowHasProjectId });
             //If it's there, and project is now private, remove it from there.
             if (toneRowHasProjectId) {
               if (projectVisibility === 'private') {
@@ -1069,7 +1069,7 @@ const updateProject = async (req, res) => {
             // If tone row doesn't exist, and project is now public, create the tone row & add projectId into its projectIds array.
 
             // insert new project into DB
-            console.log('new tone row');
+            // console.log('new tone row');
 
             // make a new tone row ID, increment by 1 from previous highest tone row ID
             const highestToneRowId = await getHighestValue(
@@ -1077,7 +1077,7 @@ const updateProject = async (req, res) => {
               'tonerows',
               'toneRowId'
             );
-            console.log({ highestToneRowId });
+            // console.log({ highestToneRowId });
             const newToneRowId = highestToneRowId + 1;
 
             const newToneRow = {
