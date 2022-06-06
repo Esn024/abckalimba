@@ -1110,6 +1110,7 @@ w:${modifiedDescription}
   return (
     <AppContext.Provider
       value={{
+        setAudioContext,
         userId,
         setUserId,
         currentUser,

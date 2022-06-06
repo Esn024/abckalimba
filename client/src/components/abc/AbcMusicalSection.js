@@ -34,6 +34,7 @@ const AbcMusicalSection = ({
     getBeatCallback,
     getSequenceCallback,
     objToToneRowStr,
+    project,
   } = useContext(AppContext);
   const [notegridVisible, setNotegridVisible] = useState(true);
   const [scoreVisible, setScoreVisible] = useState(true);
@@ -88,7 +89,7 @@ const AbcMusicalSection = ({
         ),
       })
     );
-  }, [tempo, key, musicalSections, tines]);
+  }, [tempo, key, musicalSections, tines, project]);
 
   return (
     <Wrapper

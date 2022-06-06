@@ -27,7 +27,7 @@ const usePublicProjects = (username = null) => {
     return () => {
       setPublicProjects(null);
     };
-  }, []);
+  }, [username]);
 
   return [publicProjects, setPublicProjects];
 };
