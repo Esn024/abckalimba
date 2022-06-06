@@ -22,8 +22,8 @@ export const AppProvider = ({ children }) => {
   const [audioContext, setAudioContext] = useState(new window.AudioContext());
   const [beatsPerMeasure, setBeatsPerMeasure] = useState(4);
   const [tempo, setTempo] = useState(180);
-  const [projectName, setProjectName] = useState();
-  const [projectDescription, setProjectDescription] = useState();
+  const [projectName, setProjectName] = useState('');
+  const [projectDescription, setProjectDescription] = useState('');
   const [projectVisibility, setProjectVisibility] = useState('private');
   const [key, setKey] = useState('C');
   const [orderOfSections, setOrderOfSections] = useState('AA');
@@ -1014,8 +1014,8 @@ w:${modifiedDescription}
   };
 
   const saveNewProject = (
-    projectName,
-    projectDescription,
+    projectName = '',
+    projectDescription = '',
     projectVisibility,
     toneRowStr,
     musicalSections,
@@ -1053,7 +1053,7 @@ w:${modifiedDescription}
         // console.log(json);
         const { status, message, data } = json;
 
-        if (status == 200) {
+        if (status == 207) {
           console.log(message);
         } else {
           // TODO remove console log
