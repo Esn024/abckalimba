@@ -1,27 +1,29 @@
 import React, { useState, useEffect, useContext, useRef } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
-import useCurrentUser from '../hooks/use-current-user.hook.js';
+import useLocalCurrentUser from '../hooks/use-local-current-user.hook.js';
 
 import { AppContext } from './AppContext';
 
 const MyUserInfo = () => {
   const {
-    register,
-    handleSubmit,
-    watch,
-    formState: { errors },
-  } = useForm();
-  const {
     userId,
-    setUserId,
     currentUser,
     createNewUser,
     updateUser,
     deleteUser,
     dateFromMs,
+    deepEqual,
   } = useContext(AppContext);
+
+  const [localCurrentUser, setLocalCurrentUser] =
+    useLocalCurrentUser(currentUser);
+
+  const userHasUnsavedInfo = !deepEqual(localCurrentUser, currentUser);
+
+  console.log({ localCurrentUser });
+  console.log({ currentUser });
+  console.log(deepEqual(localCurrentUser, currentUser));
 
   return (
     <Wrapper>
@@ -30,45 +32,80 @@ const MyUserInfo = () => {
           Account created on: {dateFromMs(currentUser.created)}
         </SmallerText>
       )}
+      {currentUser?.modified && (
+        <SmallerText>
+          Account modified on: {dateFromMs(currentUser.modified)}
+        </SmallerText>
+      )}
       <SmallerText>
         {!userId
           ? 'Please fill out the required information below.'
-          : 'You can edit your user info below.'}
+          : 'You can edit your user info below.'}{' '}
+        {userHasUnsavedInfo && (
+          <ColoredText>You have unsaved changes.</ColoredText>
+        )}
       </SmallerText>
-      <form
-        onSubmit={
-          !userId ? handleSubmit(createNewUser) : handleSubmit(updateUser)
-        }
-      >
+      <form>
         <input
           type='text'
           placeholder='Username'
-          defaultValue={currentUser && currentUser.username}
-          {...register('username', { required: true, maxLength: 30 })}
+          value={localCurrentUser ? localCurrentUser.username : ''}
+          onChange={(ev) => {
+            setLocalCurrentUser({
+              ...localCurrentUser,
+              username: ev.target.value,
+            });
+          }}
         />
-        {errors.username && <span>This field is required</span>}
 
         <input
           type='email'
           placeholder='Email'
-          defaultValue={currentUser && currentUser.email}
-          {...register('email', { required: true })}
+          value={localCurrentUser ? localCurrentUser.email : ''}
+          onChange={(ev) => {
+            setLocalCurrentUser({
+              ...localCurrentUser,
+              email: ev.target.value,
+            });
+          }}
         />
-        {errors.email && <span>This field is required</span>}
 
         <textarea
-          defaultValue={currentUser && currentUser.about}
-          {...register('about')}
+          value={localCurrentUser ? localCurrentUser.about : ''}
           placeholder='A few words about yourself (optional)'
+          onChange={(ev) => {
+            setLocalCurrentUser({
+              ...localCurrentUser,
+              about: ev.target.value,
+            });
+          }}
         ></textarea>
 
-        <input type='submit' value='Submit' />
+        <input
+          type='submit'
+          value={userId ? 'Submit Changes' : 'Register'}
+          // disable button if required fields are empty or invalid, or if existing user has not made any changes to their existing data
+          disabled={
+            (userId && !userHasUnsavedInfo) ||
+            localCurrentUser?.username === '' ||
+            !localCurrentUser?.email?.includes('@')
+          }
+          onClick={(ev) => {
+            ev.preventDefault();
+            !userId
+              ? createNewUser(localCurrentUser)
+              : updateUser(localCurrentUser);
+          }}
+        />
 
         {userId && (
           <input
             type='submit'
             value='Delete User'
-            onClick={() => deleteUser(userId)}
+            onClick={(ev) => {
+              ev.preventDefault();
+              deleteUser(userId);
+            }}
           />
         )}
       </form>
@@ -97,6 +134,10 @@ const Wrapper = styled.div`
     width: 100%;
     margin: 5px;
   }
+`;
+
+const ColoredText = styled.span`
+  color: var(--color-dark-green);
 `;
 
 const SmallerText = styled.p`

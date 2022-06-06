@@ -1,10 +1,16 @@
-import React, { createContext, useReducer, useState } from 'react';
+import React, {
+  createContext,
+  useReducer,
+  useState,
+  useEffect,
+  useContext,
+} from 'react';
 import { useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 import abcjs from 'abcjs';
 import { saveAsPng, saveAsJpeg } from 'save-html-as-image';
 
-import useCurrentUser from '../hooks/use-current-user.hook.js';
+// import useCurrentUser from '../hooks/use-local-current-user.hook.js';
 
 export const AppContext = createContext();
 
@@ -13,11 +19,34 @@ export const AppProvider = ({ children }) => {
   const validAbcNoteRegex = /[\^_]?[a-gA-G][',]{0,4}/;
   const validMidiNoteRegex = /[A-G][b#]?[0-8]/;
 
+  // this determines who the user is
+  // TODO could be improved
   const [userId, setUserId] = useState(localStorage.getItem('userId'));
-  // const [numberOfTines, setNumberOfTines] = useState(3);
 
-  const [currentUser] =
-    useCurrentUser(userId); /* Return user details from API call */
+  const [currentUser, setCurrentUser] = useState(null);
+
+  // set the current user if the userID is present in localstorage
+  useEffect(() => {
+    // fetch user info
+    const fetchCurrentUser = async (userId) => {
+      const response = await fetch(`/api/users/id/${userId}`);
+      const resJSON = await response.json();
+      const user = resJSON.data;
+
+      // update the current user
+      setCurrentUser(user);
+    };
+
+    // if there is a user id, run the fetchCurrentUser function
+    if (userId) {
+      fetchCurrentUser(userId);
+    }
+
+    // cleanup
+    return () => {
+      setCurrentUser(null);
+    };
+  }, [userId]);
 
   const [audioContext, setAudioContext] = useState(new window.AudioContext());
   const [beatsPerMeasure, setBeatsPerMeasure] = useState(4);
@@ -245,6 +274,17 @@ export const AppProvider = ({ children }) => {
     return date.toString();
   };
 
+  // test if two different objects have the same properties and values. From https://stackoverflow.com/a/32922084
+  const deepEqual = (x, y) => {
+    const ok = Object.keys,
+      tx = typeof x,
+      ty = typeof y;
+    return x && y && tx === 'object' && tx === ty
+      ? ok(x).length === ok(y).length &&
+          ok(x).every((key) => deepEqual(x[key], y[key]))
+      : x === y;
+  };
+
   //create new user
   //have this as an onsubmit on create new user form. "form" is the useRef reference to the form from which user data is being submitted
   const createNewUser = (formData) => {
@@ -279,11 +319,12 @@ export const AppProvider = ({ children }) => {
 
   // handle update user (send properly-formatted PUT request to api/users/id/:id)
   const updateUser = (formData) => {
-    console.log({ formData });
+    // console.log({ formData });
+    const replacementUserData = { ...formData, modified: Date.now() };
 
     fetch(`/api/users/id/${userId}`, {
       method: 'PUT',
-      body: JSON.stringify({ ...formData, modified: Date.now() }),
+      body: JSON.stringify(replacementUserData),
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
@@ -296,7 +337,10 @@ export const AppProvider = ({ children }) => {
         if (status === 202) {
           // Display confirmation message that user info was updated.
           // TODO change this to something other than alert
-          alert(`Successfully changed user info for ${formData.username}`);
+          console.log(
+            `Successfully changed user info for ${formData.username}`
+          );
+          setCurrentUser(replacementUserData);
         } else {
           // if it didn't go through, show an error.
           throw new Error({ status, message, data });
@@ -1068,6 +1112,7 @@ w:${modifiedDescription}
         userId,
         setUserId,
         currentUser,
+        setCurrentUser,
         beatsPerMeasure,
         setBeatsPerMeasure,
         tines,
@@ -1100,6 +1145,7 @@ w:${modifiedDescription}
         getRowNumFromIndex,
         replaceOneValueInArray,
         dateFromMs,
+        deepEqual,
         createNewUser,
         updateUser,
         deleteUser,
