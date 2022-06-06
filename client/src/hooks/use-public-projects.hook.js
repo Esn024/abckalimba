@@ -1,14 +1,17 @@
 import { useState, useEffect } from 'react';
 
-//custom hook for getting info for list of public projects
-const usePublicProjects = () => {
+//custom hook for getting info for list of public projects. If there is a username, get it just for that username
+const usePublicProjects = (username = null) => {
   const [publicProjects, setPublicProjects] = useState(null);
 
   useEffect(() => {
     // fetch public projects
     const fetchPublicProjects = async () => {
       // console.log('fetching public projects');
-      const response = await fetch(`/api/projects`);
+      // console.log({ username });
+      const response = !username
+        ? await fetch(`/api/projects`)
+        : await fetch(`/api/users/${username}/projects`);
       const resJSON = await response.json();
       const projects = resJSON.data;
 

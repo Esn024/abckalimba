@@ -1200,8 +1200,8 @@ const getPublicProjectsByUsername = async (req, res) => {
     const projectsArr = await db.collection('projects').find(query).toArray();
 
     const finalProjectsArr = projectsArr.map(
-      ({ projectName, toneRowStr, created }) => {
-        return { projectName, toneRowStr, username, created };
+      ({ projectName, toneRowStr, created, projectId }) => {
+        return { projectName, toneRowStr, username, created, projectId };
       }
     );
 

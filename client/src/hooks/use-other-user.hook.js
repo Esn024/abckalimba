@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-//custom hook for getting info on a user that isn't yourself
+//custom hook for getting public info of a user
 const useOtherUser = (username) => {
   const [otherUser, setOtherUser] = useState(null);
 
@@ -11,14 +11,8 @@ const useOtherUser = (username) => {
       const resJSON = await response.json();
       const user = resJSON.data;
 
-      // create a new object that removes the email field (don't want to publically display emails for other users)
-      const userPublicInfo = {
-        username,
-        projectIds: user.projectIds,
-      };
-
       // update the other user
-      setOtherUser(userPublicInfo);
+      setOtherUser(user);
     };
 
     // if there is a username, run the fetchOtherUser function
