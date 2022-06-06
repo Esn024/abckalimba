@@ -19,11 +19,14 @@ const MyUserInfo = () => {
   const [localCurrentUser, setLocalCurrentUser] =
     useLocalCurrentUser(currentUser);
 
-  const userHasUnsavedInfo = !deepEqual(localCurrentUser, currentUser);
+  const userHasUnsavedInfo =
+    currentUser &&
+    localCurrentUser &&
+    !deepEqual(localCurrentUser, currentUser);
 
-  console.log({ localCurrentUser });
-  console.log({ currentUser });
-  console.log(deepEqual(localCurrentUser, currentUser));
+  // console.log({ localCurrentUser });
+  // console.log({ currentUser });
+  // console.log(deepEqual(localCurrentUser, currentUser));
 
   return (
     <Wrapper>
@@ -104,7 +107,10 @@ const MyUserInfo = () => {
             value='Delete User'
             onClick={(ev) => {
               ev.preventDefault();
-              deleteUser(userId);
+              const text = 'Are you sure you want to delete this account?';
+              if (window.confirm(text) == true) {
+                deleteUser(userId);
+              }
             }}
           />
         )}

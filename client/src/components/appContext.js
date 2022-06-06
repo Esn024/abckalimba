@@ -271,7 +271,8 @@ export const AppProvider = ({ children }) => {
   // return human-readable date from milliseconds since 1970
   const dateFromMs = (ms) => {
     const date = new Date(ms);
-    return date.toString();
+    const str = date.toString();
+    return str.substr(0, 24);
   };
 
   // test if two different objects have the same properties and values. From https://stackoverflow.com/a/32922084

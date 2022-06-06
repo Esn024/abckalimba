@@ -23,15 +23,18 @@ const testData = require(testDataFilepath);
 const checkForUserErrors = async (db, email, username, oldUsername = null) => {
   let errMsg = '';
 
+  // username can only include English letters, numbers, _ or -
   const usernameInvalid = !username.match(/^[a-zA-Z0-9_-]{1,30}$/);
   if (usernameInvalid) {
     errMsg += `Sorry, username can only consist of English letters, numbers, _ - symbols, and must be no longer than 30 characters. `;
   } else {
     // only do duplicate username check if this is for a new registration, or if the username is being changed
     if (username !== oldUsername) {
+      const caseInsensitiveRegex = new RegExp(`^${username}$`, 'i');
+
       const usernameTaken = await db
         .collection('users')
-        .findOne({ username: username });
+        .findOne({ username: { $regex: caseInsensitiveRegex } });
       if (usernameTaken) errMsg += `Username ${username} is already taken. `;
     }
   }
@@ -188,6 +191,7 @@ const getTestData = (req, res) => {
   }
 };
 
+//get public info about users
 const getUsers = async (req, res) => {
   try {
     const client = new MongoClient(MONGO_URI, options);
@@ -196,10 +200,13 @@ const getUsers = async (req, res) => {
     const db = client.db('abcsynth');
 
     const usersArr = await db.collection('users').find().toArray();
+    const finalUsersArr = usersArr.map((u) => {
+      return { username: u.username, created: u.created, modified: u.modified };
+    });
 
     if (usersArr) {
       const successMsg = `Found ${usersArr.length} users.`;
-      sendResponse(res, 200, usersArr, successMsg);
+      sendResponse(res, 200, finalUsersArr, successMsg);
     } else {
       const errMsg = 'Oops! No users were found!';
       sendResponse(res, 404, null, errMsg);
@@ -220,7 +227,9 @@ const getUserPublicInfo = async (req, res) => {
 
     const db = client.db('abcsynth');
 
-    const query = { username };
+    const caseInsensitiveRegex = new RegExp(`^${username}$`, 'i');
+
+    const query = { username: caseInsensitiveRegex };
     const user = await db.collection('users').findOne(query);
 
     if (user) {
@@ -333,9 +342,10 @@ const deleteUser = async (req, res) => {
       };
 
       // delete all projects by that user
+      const pQuery = { username: user.username };
       const projectsDeleted = await db
         .collection('projects')
-        .deleteMany(rQuery);
+        .deleteMany(pQuery);
       let projectsDeletedHttpResp;
       if (projectsDeleted) {
         projectsDeletedHttpResp = {
@@ -343,6 +353,8 @@ const deleteUser = async (req, res) => {
           message: `All projects by username ${user.username} have been deleted.`,
         };
       }
+
+      //TODO also remove any public projects from any tone rows that they are in
 
       sendResponse(
         res,
@@ -642,8 +654,8 @@ const getPublicProjectsForList = async (req, res) => {
       .toArray();
 
     const finalProjectsArr = projectsArr.map(
-      ({ projectName, toneRowStr, username, created }) => {
-        return { projectName, toneRowStr, username, created };
+      ({ projectName, toneRowStr, username, created, projectId }) => {
+        return { projectName, toneRowStr, username, created, projectId };
       }
     );
 

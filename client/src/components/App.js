@@ -7,6 +7,10 @@ import Header from './Header';
 import Home from './Home';
 import MyUserInfo from './MyUserInfo';
 import Comp2 from './Comp2';
+import PublicProjects from './PublicProjects';
+import Users from './Users';
+import ToneRows from './ToneRows';
+//
 
 function App() {
   return (
@@ -20,6 +24,9 @@ function App() {
             <Route path='/registration' element={<MyUserInfo />} />
             <Route path='/myuserinfo' element={<MyUserInfo />} />
             <Route path='/comp2/:id' element={<Comp2 />} />
+            <Route path='/projects' element={<PublicProjects />} />
+            <Route path='/users' element={<Users />} />
+            <Route path='/tonerows' element={<ToneRows />} />
           </Routes>
         </AppProvider>
       </BrowserRouter>

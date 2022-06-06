@@ -10,15 +10,22 @@ const Header = () => {
       <Link to='/'>
         <h1>abcKalimbaSynth</h1>
       </Link>
-      {currentUser ? (
-        <SmallerText>
-          Welcome, <Link to='/myuserinfo'>{currentUser.username}</Link>!
-        </SmallerText>
-      ) : (
-        <div>
-          <Link to='/registration'>Register for a new account!</Link>
-        </div>
-      )}
+      <HorizontalWrapper>
+        <SiteLinks>
+          <Link to='/users'>Users</Link>
+          <Link to='/projects'>Projects</Link>
+          <Link to='/tonerows'>Rows</Link>
+        </SiteLinks>
+        {currentUser ? (
+          <SmallerText>
+            Welcome, <Link to='/myuserinfo'>{currentUser.username}</Link>!
+          </SmallerText>
+        ) : (
+          <div>
+            <Link to='/registration'>Register for a new account!</Link>
+          </div>
+        )}
+      </HorizontalWrapper>
     </HeaderElement>
   );
 };
@@ -47,6 +54,18 @@ const SmallerText = styled.p`
 const Link = styled(NavLink)`
   text-decoration: none;
   color: var(--color-alabama-crimson);
+`;
+
+const HorizontalWrapper = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+const SiteLinks = styled.div`
+  margin: 0 40px;
+  a {
+    margin: 0 10px;
+  }
 `;
 
 export default Header;
