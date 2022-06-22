@@ -8,7 +8,7 @@ import React, {
 import { useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 import abcjs from 'abcjs';
-import { saveAsPng, saveAsJpeg } from 'save-html-as-image';
+import { saveAsPng } from 'save-html-as-image';
 
 // import useCurrentUser from '../hooks/use-local-current-user.hook.js';
 
@@ -272,7 +272,7 @@ export const AppProvider = ({ children }) => {
   const dateFromMs = (ms) => {
     const date = new Date(ms);
     const str = date.toString();
-    return str.substr(0, 24);
+    return str.substring(0, 24);
   };
 
   // test if two different objects have the same properties and values. From https://stackoverflow.com/a/32922084
@@ -426,12 +426,14 @@ export const AppProvider = ({ children }) => {
         await audioContext.resume();
         // In theory the AC shouldn't start suspended because it is being initialized in a click handler, but iOS seems to anyway.
 
+        // console.log('PUBLIC_URI', `${process.env.PUBLIC_URL}/soundfonts`);
+
         await synth.init({
           audioContext: audioContext,
           visualObj: visualObj,
           options: {
             sequenceCallback: sequenceCallbackOneNote,
-            soundFontUrl: 'soundfonts',
+            soundFontUrl: `${process.env.PUBLIC_URL}/soundfonts`,
             onEnded: () => {
               //console.log("playback ended")
             },
@@ -961,6 +963,8 @@ w:${modifiedDescription}
 
     // let allNoteEvents = [];
 
+    // console.log('PUBLIC_URI', `${process.env.PUBLIC_URL}/soundfonts`);
+
     try {
       // const synth = new abcjs.synth.CreateSynth();
 
@@ -973,7 +977,7 @@ w:${modifiedDescription}
         visualObj: visualObj,
         options: {
           sequenceCallback: sequenceCallback,
-          soundFontUrl: 'soundfonts',
+          soundFontUrl: `${process.env.PUBLIC_URL}/soundfonts`,
           onEnded: () => {
             //console.log("playback ended")
           },
@@ -1173,6 +1177,7 @@ w:${modifiedDescription}
         saveImageById,
         indexToAlphabetLetter,
         saveNewProject,
+        validAbcNoteRegex,
       }}
     >
       {children}
