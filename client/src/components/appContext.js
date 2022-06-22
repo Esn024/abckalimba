@@ -337,7 +337,7 @@ export const AppProvider = ({ children }) => {
         // check that the request got successfully through to server
         if (status === 202) {
           // Display confirmation message that user info was updated.
-          // TODO change this to something other than alert
+          // TODO remove console log?
           console.log(
             `Successfully changed user info for ${formData.username}`
           );
