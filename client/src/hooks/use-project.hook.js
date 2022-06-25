@@ -63,9 +63,7 @@ const useProject = (projectId = null, created = null, currentUserId = null) => {
     };
 
     // if there is a projectId, run the fetchOtherUser function
-    if (projectId) {
-      fetchProject(projectId, created);
-    }
+    fetchProject(projectId, created);
 
     // cleanup
     return () => {

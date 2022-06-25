@@ -963,7 +963,7 @@ const updateProject = async (req, res) => {
       !projectVisibility ||
       !projectVisibility.match(/^(public|private|password)$/)
     )
-      errMsg += `The project visibility is not one of the accepted values (it can be "public", "private" or "password"). Instead, it is ${projectVisibility}`;
+      errMsg += `The project visibility is not one of the accepted values (it can be "public", "private" or "password"). Instead, it is "${projectVisibility}"`;
 
     // check that current user has permission to update the project
     const userHasProjectRights = await checkIfUserHasProjectRights(
