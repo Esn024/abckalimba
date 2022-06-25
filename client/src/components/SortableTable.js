@@ -1,23 +1,18 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { NavLink } from 'react-router-dom';
 
-import useUsers from '../hooks/use-users.hook.js';
 import useArrayOfObjectsSortedByField from '../hooks/use-array-of-objects-sorted-by-field.hook.js';
 
-import { AppContext } from './AppContext';
-
-//tableTemplate should be formatted like so:
-//[{keyForTable, headingName, cellDataContent}, {...}, {...}]
-const SortableTable = (
+// a reusable template for a sortable table
+// TODO still has a bug - when clicked for the first time, sorting doesn't work as it should
+const SortableTable = ({
   tableName,
   objArr,
   tableColumnsTemplate,
   defaultKeyToSortBy,
-  defaultSortDirection = 1
-) => {
-  // const { dateFromMs } = useContext(AppContext);
-  // const [users, setUsers] = useUsers();
+  defaultSortDirection = 1,
+}) => {
   const [fieldToSort, setFieldToSort] = useState(defaultKeyToSortBy);
   const [sortDirection, setSortDirection] = useState(defaultSortDirection);
   const [sortedArray] = useArrayOfObjectsSortedByField(
@@ -50,11 +45,12 @@ const SortableTable = (
               {tableColumnsTemplate.map((columnTemplate, i) => {
                 return (
                   <th
-                    onClick={() => setSort(columnTemplate.keyForTable)}
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => setSort(columnTemplate.keyForColumn)}
                     key={'th' + i}
                   >
                     {columnTemplate.headingName}{' '}
-                    {displayArrow(columnTemplate.keyForTable)}
+                    {displayArrow(columnTemplate.keyForColumn)}
                   </th>
                 );
               })}
@@ -65,19 +61,30 @@ const SortableTable = (
               return (
                 <tr key={'tr' + rowIndex}>
                   {tableColumnsTemplate.map((columnTemplate, columnIndex) => {
+                    // optional functions to create the cell data: cellDataLink (URL format), cellDataText (a simple string), cellDataContent (when something more complex is needed). All are optional. cellDataContent has priority, if it is present.
+
+                    const link = columnTemplate.cellDataLink
+                      ? columnTemplate.cellDataLink(rowData)
+                      : null;
+
+                    const text = columnTemplate.cellDataText
+                      ? columnTemplate.cellDataText(rowData)
+                      : null;
+
+                    const content = columnTemplate.cellDataContent ? (
+                      columnTemplate.cellDataContent(rowData)
+                    ) : link ? (
+                      <Link to={link}>{text}</Link>
+                    ) : (
+                      text
+                    );
+
                     return (
                       <td key={'tr' + rowIndex + 'td' + columnIndex}>
-                        {columnTemplate.cellDataContent(rowData)}
+                        {content}
                       </td>
                     );
                   })}
-                  {/* //cellDataText */}
-                  {/* <td>
-                    <Link to={`/user/${k.username.toLowerCase()}`}>
-                      {k.username}
-                    </Link>
-                  </td>
-                  <td>{dateFromMs(k.created)}</td> */}
                 </tr>
               );
             })}
