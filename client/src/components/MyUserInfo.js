@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import useLocalCurrentUser from '../hooks/use-local-current-user.hook.js';
 
 import { AppContext } from './AppContext';
+import Projects from './Projects';
 
 const MyUserInfo = () => {
   const {
@@ -115,6 +116,7 @@ const MyUserInfo = () => {
           />
         )}
       </form>
+      <Projects userId={userId} username={null} />
     </Wrapper>
   );
 };

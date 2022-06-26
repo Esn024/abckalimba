@@ -37,21 +37,23 @@ const SortableTable = ({
 
   return (
     <Wrapper>
-      <h2>{tableName}</h2>
+      {tableName && <h2>{tableName}</h2>}
       {sortedArray ? (
         <StyledTable>
           <thead>
             <tr>
               {tableColumnsTemplate.map((columnTemplate, i) => {
                 return (
-                  <th
-                    style={{ cursor: 'pointer' }}
-                    onClick={() => setSort(columnTemplate.keyForColumn)}
-                    key={'th' + i}
-                  >
-                    {columnTemplate.headingName}{' '}
-                    {displayArrow(columnTemplate.keyForColumn)}
-                  </th>
+                  columnTemplate.headingName && (
+                    <th
+                      style={{ cursor: 'pointer' }}
+                      onClick={() => setSort(columnTemplate.keyForColumn)}
+                      key={'th' + i}
+                    >
+                      {columnTemplate.headingName}{' '}
+                      {displayArrow(columnTemplate.keyForColumn)}
+                    </th>
+                  )
                 );
               })}
             </tr>
@@ -80,9 +82,11 @@ const SortableTable = ({
                     );
 
                     return (
-                      <td key={'tr' + rowIndex + 'td' + columnIndex}>
-                        {content}
-                      </td>
+                      columnTemplate.headingName && (
+                        <td key={'tr' + rowIndex + 'td' + columnIndex}>
+                          {content}
+                        </td>
+                      )
                     );
                   })}
                 </tr>

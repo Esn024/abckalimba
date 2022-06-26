@@ -8,7 +8,7 @@ import Home from './Home';
 import About from './About';
 import MyUserInfo from './MyUserInfo';
 import Comp2 from './Comp2';
-import PublicProjects from './PublicProjects';
+import Projects from './Projects';
 import Users from './Users';
 import User from './User';
 import Project from './Project';
@@ -28,7 +28,7 @@ function App() {
             <Route path='/myuserinfo' element={<MyUserInfo />} />
             <Route path='/about' element={<About />} />
             {/* <Route path='/comp2/:id' element={<Comp2 />} /> */}
-            <Route path='/projects' element={<PublicProjects />} />
+            <Route path='/projects' element={<Projects />} />
             <Route path='/users' element={<Users />} />
             <Route path='/tonerows' element={<ToneRows />} />
             <Route path='/user/:lowercaseusername' element={<User />} />
