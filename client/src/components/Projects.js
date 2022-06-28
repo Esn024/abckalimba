@@ -15,9 +15,7 @@ const Projects = ({ userId, username }) => {
 
   return (
     <SortableTable
-      tableName={
-        username ? null : userId ? 'All My Projects' : 'Public Projects'
-      }
+      tableName={username ? null : userId ? 'Your Projects' : 'Public Projects'}
       objArr={projects}
       tableColumnsTemplate={[
         {
@@ -27,7 +25,10 @@ const Projects = ({ userId, username }) => {
             return p.projectName ? p.projectName : 'Untitled';
           },
           cellDataLink(p) {
-            return `/project/${p.projectId}`;
+            // if userId is included, link to the myprojects URL
+            return userId
+              ? `/myprojects/${p.projectId}`
+              : `/projects/${p.projectId}`;
           },
         },
         !username &&
@@ -38,7 +39,7 @@ const Projects = ({ userId, username }) => {
               return p.username;
             },
             cellDataLink(p) {
-              return `/user/${p.username.toLowerCase()}`;
+              return `/users/${p.username.toLowerCase()}`;
             },
           },
         {

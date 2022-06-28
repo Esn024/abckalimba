@@ -702,9 +702,9 @@ const getPublicProjectByProjectId = async (req, res) => {
 };
 
 //to get data for a private project (also works for public), you need to have the projectId & the created date, plus you need to submit data showing that you have the rights for it
-const getPrivateProject = async (req, res) => {
+const getMyProject = async (req, res) => {
   const projectId = req.params.id * 1;
-  const created = req.params.created * 1;
+  // const created = req.params.created * 1;
   const { currentUserId } = req.body;
 
   try {
@@ -713,7 +713,7 @@ const getPrivateProject = async (req, res) => {
 
     const db = client.db('abcsynth');
 
-    const query = { projectId: projectId, created: created };
+    const query = { projectId: projectId };
     const project = await db.collection('projects').findOne(query);
 
     if (project) {
@@ -1284,5 +1284,5 @@ module.exports = {
   getPublicProjectsByUsername,
   getAllProjectsByUserId,
   test123,
-  getPrivateProject,
+  getMyProject,
 };

@@ -6,14 +6,14 @@ const useProject = (projectId = null, created = null, currentUserId = null) => {
 
   useEffect(() => {
     // fetch user info
-    const fetchProject = async (projectId, created) => {
+    const fetchProject = async (projectId, currentUserId) => {
       let resJSON;
 
       if (projectId) {
-        const response = !created
+        const response = !currentUserId
           ? await fetch(`/api/projects/${projectId}`)
-          : await fetch(`/api/private-projects/${projectId}/${created}`, {
-              method: 'GET',
+          : await fetch(`/api/myprojects/${projectId}`, {
+              method: 'POST',
               body: JSON.stringify({ currentUserId }),
               headers: {
                 Accept: 'application/json',
@@ -63,7 +63,7 @@ const useProject = (projectId = null, created = null, currentUserId = null) => {
     };
 
     // if there is a projectId, run the fetchOtherUser function
-    fetchProject(projectId, created);
+    fetchProject(projectId, currentUserId);
 
     // cleanup
     return () => {

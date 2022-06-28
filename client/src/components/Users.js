@@ -22,7 +22,7 @@ const Users = () => {
             return u.username;
           },
           cellDataLink(u) {
-            return `/user/${u.username.toLowerCase()}`;
+            return `/users/${u.username.toLowerCase()}`;
           },
         },
         {

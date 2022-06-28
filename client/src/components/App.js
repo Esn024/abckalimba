@@ -31,12 +31,9 @@ function App() {
             <Route path='/projects' element={<Projects />} />
             <Route path='/users' element={<Users />} />
             <Route path='/tonerows' element={<ToneRows />} />
-            <Route path='/user/:lowercaseusername' element={<User />} />
-            <Route path='/project/:projectid' element={<Project />} />
-            <Route
-              path='/private-project/:projectid/:created'
-              element={<Project />}
-            />
+            <Route path='/users/:lowercaseusername' element={<User />} />
+            <Route path='/projects/:projectid' element={<Project />} />
+            <Route path='/myprojects/:projectid' element={<Project />} />
           </Routes>
         </AppProvider>
       </BrowserRouter>

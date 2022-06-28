@@ -66,7 +66,16 @@ const Project = () => {
     setProjectVisibility,
   } = useContext(AppContext);
 
-  const [project, setProject] = useProject(projectid, created, userId);
+  // check if the path starts with /myproject/
+  const myProject =
+    window.location.pathname.match(/^\/([a-z]+)\//)[1] === 'myprojects';
+
+  //if it is "myProject", it will load a project to be edited by current user with all permissions, assuming current user has permission to edit it; otherwise, it will attempt to load it as a public project, which can be forked
+  const [project, setProject] = useProject(
+    projectid,
+    null,
+    myProject ? userId : null
+  );
 
   // update values in AppContext when project changes to a different one
   useEffect(() => {
@@ -155,7 +164,11 @@ const Project = () => {
 
   return (
     <Wrapper>
-      {projectName && <ProjectName>{projectName}</ProjectName>}
+      {projectName && (
+        <ProjectName>
+          {projectName} - {myProject ? 'My Project' : 'Another Project'}
+        </ProjectName>
+      )}
       {projectDescription && <Description>{projectDescription}</Description>}
       <AbcSetNumberOfTines />
       <AbcSelectToneRow />
@@ -184,24 +197,26 @@ const Project = () => {
       <AbcFinalPiece />
       <AbcSetProjectName />
       <AbcDescription />
-      <AbcProjectVisibility />
+      {myProject && <AbcProjectVisibility />}
       <StyledButton2
-        onClick={() =>
-          saveNewProject(
-            projectName,
-            projectDescription,
-            projectVisibility,
-            objToToneRowStr(tines),
-            musicalSections,
-            orderOfSections,
-            tempo,
-            key,
-            beatsPerMeasure,
-            currentUser.username
-          )
-        }
+        onClick={() => {
+          myProject
+            ? console.log('myproject')
+            : saveNewProject(
+                projectName,
+                projectDescription,
+                projectVisibility,
+                objToToneRowStr(tines),
+                musicalSections,
+                orderOfSections,
+                tempo,
+                key,
+                beatsPerMeasure,
+                currentUser.username
+              );
+        }}
       >
-        Save project
+        {myProject ? 'Update' : 'Save'} project
       </StyledButton2>
       <StyledButton2 onClick={() => printDivById('final-score')}>
         Print music score

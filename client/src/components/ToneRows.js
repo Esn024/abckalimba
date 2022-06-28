@@ -24,9 +24,10 @@ const ToneRows = () => {
           cellDataText(t) {
             return t.toneRowStr;
           },
-          cellDataLink(t) {
-            return `/tonerow/${t.toneRowId}`;
-          },
+          // TODO create ToneRow component
+          // cellDataLink(t) {
+          //   return `/tonerows/${t.toneRowId}`;
+          // },
         },
         {
           keyForColumn: 'projectIds',
@@ -35,7 +36,7 @@ const ToneRows = () => {
             return t.projectIds.map((id, index) => {
               return (
                 <span key={index}>
-                  <Link to={`/project/${id}`}>{id}</Link>{' '}
+                  <Link to={`/projects/${id}`}>{id}</Link>{' '}
                 </span>
               );
             });
