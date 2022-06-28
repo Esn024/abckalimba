@@ -32,7 +32,7 @@ import AbcProjectVisibility from './abc/AbcProjectVisibility.js';
 import { AppContext } from './AppContext';
 
 const Project = () => {
-  const { projectid, created } = useParams();
+  const { projectid } = useParams();
 
   const {
     userId,
@@ -45,6 +45,7 @@ const Project = () => {
     printDivById,
     currentUser,
     saveNewProject,
+    updateProject,
     projectVisibility,
     orderOfSections,
     tempo,
@@ -198,11 +199,27 @@ const Project = () => {
       <AbcSetProjectName />
       <AbcDescription />
       {myProject && <AbcProjectVisibility />}
+      {project && (
+        <Description>
+          Project last updated on{' '}
+          {dateFromMs(project.modified || project.created)}
+        </Description>
+      )}
       <StyledButton2
         onClick={() => {
+          const privateProjectId = project._id;
+          const username = currentUser.username;
+          const created = project.created;
+          const modified = project.modified;
+
+          // console.log({ privateProjectId, username, created, modified });
+
           myProject
-            ? console.log('myproject')
-            : saveNewProject(
+            ? updateProject(
+                setProject,
+                project._id,
+                projectid,
+                userId,
                 projectName,
                 projectDescription,
                 projectVisibility,
@@ -212,7 +229,21 @@ const Project = () => {
                 tempo,
                 key,
                 beatsPerMeasure,
-                currentUser.username
+                username,
+                created
+              )
+            : saveNewProject(
+                setProject,
+                projectName,
+                projectDescription,
+                projectVisibility,
+                objToToneRowStr(tines),
+                musicalSections,
+                orderOfSections,
+                tempo,
+                key,
+                beatsPerMeasure,
+                username
               );
         }}
       >

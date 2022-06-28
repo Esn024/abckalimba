@@ -654,8 +654,22 @@ const getPublicProjectsForList = async (req, res) => {
       .toArray();
 
     const finalProjectsArr = projectsArr.map(
-      ({ projectName, toneRowStr, username, created, projectId }) => {
-        return { projectName, toneRowStr, username, created, projectId };
+      ({
+        projectName,
+        toneRowStr,
+        username,
+        created,
+        modified = null,
+        projectId,
+      }) => {
+        return {
+          projectName,
+          toneRowStr,
+          username,
+          created,
+          modified,
+          projectId,
+        };
       }
     );
 
@@ -920,9 +934,11 @@ const addProject = async (req, res) => {
 };
 
 const updateProject = async (req, res) => {
-  const projectId = req.params.projectid;
+  const projectId = req.params.projectid * 1;
   const currentUserId = req.params.userid;
 
+  console.log('update project server');
+  console.log({ projectId });
   // console.log(req.body);
   const {
     privateProjectId, //_id
@@ -939,6 +955,25 @@ const updateProject = async (req, res) => {
     created,
     modified,
   } = req.body;
+
+  const updatedValues = {
+    _id: privateProjectId,
+    projectId,
+    projectName,
+    projectDescription,
+    projectVisibility,
+    toneRowStr,
+    musicalSections,
+    orderOfSections,
+    tempo,
+    key,
+    beatsPerMeasure,
+    username,
+    created,
+    modified,
+  };
+
+  console.log({ modified });
 
   try {
     const dbName = 'abcsynth';
@@ -975,12 +1010,16 @@ const updateProject = async (req, res) => {
       errMsg += 'User does not have permission to update this project. ';
 
     if (errMsg.length === 0) {
+      console.log('no err msg');
+
       // find the original project
       const pQuery = { projectId: projectId };
       const projectOriginal = await db.collection('projects').findOne(pQuery);
 
       if (projectOriginal) {
-        const newValues = { $set: { _id: privateProjectId, ...req.body } };
+        console.log('found original');
+
+        const newValues = { $set: { ...updatedValues } };
         const projectUpdated = await db
           .collection('projects')
           .updateOne(pQuery, newValues);
@@ -1117,11 +1156,18 @@ const updateProject = async (req, res) => {
         } else {
           sendResponse(
             res,
-            404,
+            400,
             null,
-            `No project with ID ${projectId} was found.`
+            `The project with ID ${projectId} was not updated.`
           );
         }
+      } else {
+        sendResponse(
+          res,
+          404,
+          null,
+          `No project with ID ${projectId} was found.`
+        );
       }
     } else {
       sendResponse(res, 400, req.body, errMsg);
@@ -1200,8 +1246,15 @@ const getPublicProjectsByUsername = async (req, res) => {
     const projectsArr = await db.collection('projects').find(query).toArray();
 
     const finalProjectsArr = projectsArr.map(
-      ({ projectName, toneRowStr, created, projectId }) => {
-        return { projectName, toneRowStr, username, created, projectId };
+      ({ projectName, toneRowStr, created, modified = null, projectId }) => {
+        return {
+          projectName,
+          toneRowStr,
+          username,
+          created,
+          modified,
+          projectId,
+        };
       }
     );
 
@@ -1236,12 +1289,20 @@ const getAllProjectsByUserId = async (req, res) => {
     const query2 = { username };
     const projectsArr = await db.collection('projects').find(query2).toArray();
     const finalProjectsArr = projectsArr.map(
-      ({ projectId, projectName, toneRowStr, created, projectVisibility }) => {
+      ({
+        projectId,
+        projectName,
+        toneRowStr,
+        created,
+        modified = null,
+        projectVisibility,
+      }) => {
         return {
           projectId,
           projectName,
           toneRowStr,
           created,
+          modified,
           projectVisibility,
         };
       }

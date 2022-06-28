@@ -272,7 +272,7 @@ export const AppProvider = ({ children }) => {
   const dateFromMs = (ms) => {
     const date = new Date(ms);
     const str = date.toString();
-    return str.substring(0, 24);
+    return ms ? str.substring(0, 24) : '';
   };
 
   // test if two different objects have the same properties and values. From https://stackoverflow.com/a/32922084
@@ -1063,6 +1063,7 @@ w:${modifiedDescription}
   };
 
   const saveNewProject = (
+    setProject,
     projectName = '',
     projectDescription = '',
     projectVisibility,
@@ -1104,6 +1105,90 @@ w:${modifiedDescription}
 
         if (status == 207) {
           console.log(message);
+          setProject({
+            projectName,
+            projectDescription,
+            projectVisibility,
+            toneRowStr,
+            musicalSections,
+            orderOfSections,
+            tempo,
+            key,
+            beatsPerMeasure,
+            username,
+            created,
+          });
+        } else {
+          // TODO remove console log
+          console.log('There was an error', { status, message, data });
+        }
+      });
+  };
+
+  const updateProject = (
+    setProject,
+    privateProjectId,
+    projectId,
+    userId,
+    projectName = '',
+    projectDescription = '',
+    projectVisibility,
+    toneRowStr,
+    musicalSections,
+    orderOfSections,
+    tempo,
+    key,
+    beatsPerMeasure,
+    username,
+    created
+  ) => {
+    // console.log('update project client');
+    // console.log({ toneRowStr });
+    const modified = Date.now();
+    fetch(`/api/projects/update/${projectId}/${userId}`, {
+      method: 'PUT',
+      body: JSON.stringify({
+        privateProjectId: privateProjectId,
+        projectId: projectId,
+        projectName: projectName,
+        projectDescription: projectDescription,
+        projectVisibility: projectVisibility,
+        toneRowStr: toneRowStr,
+        musicalSections: musicalSections,
+        orderOfSections: orderOfSections,
+        tempo: tempo,
+        key: key,
+        beatsPerMeasure: beatsPerMeasure,
+        username: username,
+        created: created,
+        modified: modified,
+      }),
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+    })
+      .then((res) => res.json())
+      .then((json) => {
+        // console.log(json);
+        const { status, message, data } = json;
+
+        if (status == 207) {
+          console.log(message);
+          setProject({
+            projectName,
+            projectDescription,
+            projectVisibility,
+            toneRowStr,
+            musicalSections,
+            orderOfSections,
+            tempo,
+            key,
+            beatsPerMeasure,
+            username,
+            created,
+            modified,
+          });
         } else {
           // TODO remove console log
           console.log('There was an error', { status, message, data });
@@ -1177,6 +1262,7 @@ w:${modifiedDescription}
         saveImageById,
         indexToAlphabetLetter,
         saveNewProject,
+        updateProject,
         validAbcNoteRegex,
       }}
     >

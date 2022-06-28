@@ -32,6 +32,7 @@ const AbcProjectVisibility = () => {
 const Wrapper = styled.div`
   display: flex;
   align-items: center;
+  margin-bottom: 8px;
 `;
 
 const StyledInput = styled.input`

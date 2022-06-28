@@ -56,6 +56,13 @@ const Projects = ({ userId, username }) => {
             return dateFromMs(p.created);
           },
         },
+        {
+          keyForColumn: 'modified',
+          headingName: 'Last Modified',
+          cellDataText(p) {
+            return dateFromMs(p.modified);
+          },
+        },
         !!userId && {
           keyForColumn: 'projectVisibility',
           headingName: 'Project Visibility',
