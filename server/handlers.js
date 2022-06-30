@@ -20,7 +20,13 @@ const testDataFilepath = './data/testData.json';
 // importing data of companies and items (products) from JSON files
 const testData = require(testDataFilepath);
 
-const checkForUserErrors = async (db, email, username, oldUsername = null) => {
+const checkForUserErrors = async (
+  db,
+  email,
+  username,
+  password,
+  oldUsername = null
+) => {
   let errMsg = '';
 
   // username can only include English letters, numbers, _ or -
@@ -41,6 +47,10 @@ const checkForUserErrors = async (db, email, username, oldUsername = null) => {
 
   const emailValid = email.includes('@');
   if (!emailValid) errMsg += `Entered email is not valid. `;
+
+  // TODO make a more rigorous check for valid passwords
+  const passwordValid = password !== '';
+  if (!passwordValid) errMsg += `Entered password is not valid. `;
 
   return errMsg;
 };
@@ -201,7 +211,12 @@ const getUsers = async (req, res) => {
 
     const usersArr = await db.collection('users').find().toArray();
     const finalUsersArr = usersArr.map((u) => {
-      return { username: u.username, created: u.created, modified: u.modified };
+      return {
+        username: u.username,
+        created: u.created,
+        modified: u.modified,
+        lastSignIn: u.lastSignIn,
+      };
     });
 
     if (usersArr) {
@@ -276,8 +291,50 @@ const getUserAllInfo = async (req, res) => {
   }
 };
 
+// get the unique ID for a user from database, based on entered username and password. This ID will then be set in client's localStorage
+// TODO check if there are too many signin attempts too quickly. Include array of last 10 sign in attempts in DB?
+const signInUser = async (req, res) => {
+  const username = req.params.username;
+  const { password } = req.body;
+
+  try {
+    const client = new MongoClient(MONGO_URI, options);
+    await client.connect();
+
+    const db = client.db('abcsynth');
+
+    const query = { username, password };
+    const user = await db.collection('users').findOne(query);
+
+    if (user) {
+      let successMsg = `Found user! `;
+
+      const newSignInDate = Date.now();
+
+      const newValues = { $set: { ...user, lastSignIn: newSignInDate } };
+      const userUpdated = await db
+        .collection('users')
+        .updateOne({ _id: user._id }, newValues);
+
+      if (userUpdated) {
+        successMsg += `Updated last sign in time to ${newSignInDate}.`;
+        sendResponse(res, 202, user._id, successMsg);
+      } else {
+        successMsg += 'Could not update last sign in time.';
+        sendResponse(res, 200, user._id, successMsg);
+      }
+    } else {
+      const errMsg = 'No user was found...';
+      sendResponse(res, 404, null, errMsg);
+    }
+    client.close();
+  } catch (err) {
+    sendResponse(res, 500, req.body, err.message);
+  }
+};
+
 const addUser = async (req, res) => {
-  const { username, email, projectIds, created } = req.body;
+  const { username, email, password, projectIds, created } = req.body;
 
   try {
     const dbName = 'abcsynth';
@@ -287,7 +344,7 @@ const addUser = async (req, res) => {
     const db = client.db(dbName);
 
     //checks
-    const errMsg = await checkForUserErrors(db, email, username);
+    const errMsg = await checkForUserErrors(db, email, username, password);
 
     if (errMsg.length === 0) {
       // insert new user into DB
@@ -374,7 +431,7 @@ const deleteUser = async (req, res) => {
 
 const updateUser = async (req, res) => {
   const id = req.params.id;
-  const { username, email, projectIds, modified, about } = req.body;
+  const { username, email, password, projectIds, modified, about } = req.body;
 
   let successMsg = '';
 
@@ -390,7 +447,13 @@ const updateUser = async (req, res) => {
     if (userOriginal) {
       const oldUsername = userOriginal.username;
       //tests
-      const errMsg = await checkForUserErrors(db, email, username, oldUsername);
+      const errMsg = await checkForUserErrors(
+        db,
+        email,
+        username,
+        password,
+        oldUsername
+      );
 
       if (errMsg.length === 0) {
         const newValues = { $set: { _id: userOriginal._id, ...req.body } };
@@ -1326,6 +1389,7 @@ module.exports = {
   getTestData,
   getUsers,
   getUserPublicInfo,
+  signInUser,
   getUserAllInfo,
   addUser,
   deleteUser,

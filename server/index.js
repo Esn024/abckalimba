@@ -10,6 +10,7 @@ const {
   getUsers,
   getUserPublicInfo,
   getUserAllInfo,
+  signInUser,
   addUser,
   updateUser,
   deleteUser,
@@ -55,6 +56,7 @@ express()
   // users
   .get('/api/users', getUsers)
   .get('/api/users/:username', getUserPublicInfo)
+  .put('/api/users/signin/:username', signInUser)
   .get('/api/users/id/:id', getUserAllInfo)
   .post('/api/users', addUser)
   .put('/api/users/id/:id', updateUser)

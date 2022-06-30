@@ -10,6 +10,7 @@ const MyUserInfo = () => {
   const {
     userId,
     currentUser,
+    handleSignIn,
     createNewUser,
     updateUser,
     deleteUser,
@@ -76,12 +77,7 @@ const MyUserInfo = () => {
             disabled={signInPassword === '' || signInUsername === ''}
             onClick={(ev) => {
               ev.preventDefault();
-              const currentUserToSubmit = { ...localCurrentUser };
-              delete currentUserToSubmit.password2;
-
-              !userId
-                ? createNewUser(currentUserToSubmit)
-                : updateUser(currentUserToSubmit);
+              handleSignIn(signInUsername, signInPassword);
             }}
           />
         </Wrapper>

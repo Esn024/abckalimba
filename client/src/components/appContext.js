@@ -286,6 +286,45 @@ export const AppProvider = ({ children }) => {
       : x === y;
   };
 
+  //try to sign in as user upon entering username and password
+  const handleSignIn = (username, password) => {
+    // console.log({ formData });
+
+    fetch(`/api/users/signin/${username}`, {
+      method: 'PUT',
+      body: JSON.stringify({ password }),
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+    })
+      .then((res) => res.json())
+      .then((json) => {
+        // console.log(json);
+        const { status, message, data } = json;
+
+        if (status == 200 || status == 202) {
+          setUserId(data);
+          // add it to localStorage
+          localStorage.setItem('userId', data);
+
+          // return to homepage
+          navigate('/');
+        } else {
+          // TODO remove console log
+          console.log('There was an error', { status, message, data });
+        }
+      });
+  };
+
+  const handleSignOut = () => {
+    setUserId(null);
+    localStorage.removeItem('userId');
+    setCurrentUser(null);
+    // go to home page
+    navigate('/');
+  };
+
   //create new user
   //have this as an onsubmit on create new user form. "form" is the useRef reference to the form from which user data is being submitted
   const createNewUser = (formData) => {
@@ -1238,6 +1277,8 @@ w:${modifiedDescription}
         dateFromMs,
         deepEqual,
         createNewUser,
+        handleSignIn,
+        handleSignOut,
         updateUser,
         deleteUser,
         permissionToEditProject,

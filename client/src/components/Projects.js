@@ -10,7 +10,7 @@ import SortableTable from './SortableTable';
 // if username passed in, it gets that user's public projects
 // if neither is passed in, it gets all public projects
 const Projects = ({ userId, username }) => {
-  const { dateFromMs } = useContext(AppContext);
+  const { dateFromMs, currentUser } = useContext(AppContext);
   const [projects, setProjects] = useProjects(username, userId);
 
   return (
@@ -27,6 +27,8 @@ const Projects = ({ userId, username }) => {
           cellDataLink(p) {
             // if userId is included, link to the myprojects URL
             return userId
+              ? `/myprojects/${p.projectId}`
+              : currentUser.username === p.username
               ? `/myprojects/${p.projectId}`
               : `/projects/${p.projectId}`;
           },

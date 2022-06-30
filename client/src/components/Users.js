@@ -27,9 +27,16 @@ const Users = () => {
         },
         {
           keyForTable: 'created',
-          headingName: 'Created',
+          headingName: 'Registered',
           cellDataText(u) {
             return dateFromMs(u.created);
+          },
+        },
+        {
+          keyForTable: 'lastSignIn',
+          headingName: 'Last Sign In',
+          cellDataText(u) {
+            return dateFromMs(u.lastSignIn);
           },
         },
       ]}
