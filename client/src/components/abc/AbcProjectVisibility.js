@@ -12,7 +12,7 @@ const AbcProjectVisibility = () => {
         id='visibilityPublic'
         name='visibility'
         value='public'
-        defaultChecked={projectVisibility === 'public'}
+        checked={projectVisibility === 'public'}
         onClick={() => setProjectVisibility('public')}
       />
       <StyledLabel htmlFor='public'>Public</StyledLabel>
@@ -21,7 +21,7 @@ const AbcProjectVisibility = () => {
         id='visibilityPrivate'
         name='visibility'
         value='private'
-        defaultChecked={projectVisibility === 'private'}
+        checked={projectVisibility === 'private'}
         onClick={() => setProjectVisibility('private')}
       />
       <StyledLabel htmlFor='visibilityPrivate'>Private</StyledLabel>

@@ -217,7 +217,7 @@ const Project = () => {
           myProject
             ? updateProject(
                 setProject,
-                project._id,
+                privateProjectId,
                 projectid,
                 userId,
                 projectName,
