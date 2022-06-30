@@ -91,7 +91,7 @@ express()
   .get('/api/tonerows/:id', getToneRow)
 
   // All other GET requests not handled before will return our React app
-  .get('*', (req, res) => {
+  .get('/*', (req, res) => {
     res.sendFile(path.join(__dirname, 'build', 'index.html'));
   })
 
