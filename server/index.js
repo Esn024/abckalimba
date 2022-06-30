@@ -50,6 +50,9 @@ express()
   .use(express.urlencoded({ extended: false }))
   .use('/', express.static(__dirname + '/'))
 
+  // serves all our static files from the build directory
+  .use(express.static(path.join(__dirname, 'build')))
+
   // Have Node serve the files for our built React app
   // .use(express.static(path.resolve(__dirname, '../client/build')))
 
@@ -88,9 +91,9 @@ express()
   .get('/api/tonerows/:id', getToneRow)
 
   // All other GET requests not handled before will return our React app
-  // .get('*', (req, res) => {
-  //   res.sendFile(path.resolve(__dirname, '../client/build', 'index.html'));
-  // })
+  .get('/*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'build', 'index.html'));
+  })
 
   .listen(PORT, () => {
     console.info(`Server listening on ${PORT}`);
