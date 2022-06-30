@@ -6,7 +6,11 @@ const useLocalCurrentUser = (currentUser) => {
 
   useEffect(() => {
     // update the local current user
-    setLocalCurrentUser({ ...currentUser });
+    setLocalCurrentUser({
+      ...currentUser,
+      password: currentUser?.password ?? '',
+      password2: currentUser?.password ?? '',
+    });
 
     // cleanup
     return () => {

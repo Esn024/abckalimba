@@ -20,7 +20,13 @@ const testDataFilepath = './data/testData.json';
 // importing data of companies and items (products) from JSON files
 const testData = require(testDataFilepath);
 
-const checkForUserErrors = async (db, email, username, oldUsername = null) => {
+const checkForUserErrors = async (
+  db,
+  email,
+  username,
+  password,
+  oldUsername = null
+) => {
   let errMsg = '';
 
   // username can only include English letters, numbers, _ or -
@@ -41,6 +47,10 @@ const checkForUserErrors = async (db, email, username, oldUsername = null) => {
 
   const emailValid = email.includes('@');
   if (!emailValid) errMsg += `Entered email is not valid. `;
+
+  // TODO make a more rigorous check for valid passwords
+  const passwordValid = password !== '';
+  if (!passwordValid) errMsg += `Entered password is not valid. `;
 
   return errMsg;
 };
@@ -201,7 +211,12 @@ const getUsers = async (req, res) => {
 
     const usersArr = await db.collection('users').find().toArray();
     const finalUsersArr = usersArr.map((u) => {
-      return { username: u.username, created: u.created, modified: u.modified };
+      return {
+        username: u.username,
+        created: u.created,
+        modified: u.modified,
+        lastSignIn: u.lastSignIn,
+      };
     });
 
     if (usersArr) {
@@ -276,8 +291,50 @@ const getUserAllInfo = async (req, res) => {
   }
 };
 
+// get the unique ID for a user from database, based on entered username and password. This ID will then be set in client's localStorage
+// TODO check if there are too many signin attempts too quickly. Include array of last 10 sign in attempts in DB?
+const signInUser = async (req, res) => {
+  const username = req.params.username;
+  const { password } = req.body;
+
+  try {
+    const client = new MongoClient(MONGO_URI, options);
+    await client.connect();
+
+    const db = client.db('abcsynth');
+
+    const query = { username, password };
+    const user = await db.collection('users').findOne(query);
+
+    if (user) {
+      let successMsg = `Found user! `;
+
+      const newSignInDate = Date.now();
+
+      const newValues = { $set: { ...user, lastSignIn: newSignInDate } };
+      const userUpdated = await db
+        .collection('users')
+        .updateOne({ _id: user._id }, newValues);
+
+      if (userUpdated) {
+        successMsg += `Updated last sign in time to ${newSignInDate}.`;
+        sendResponse(res, 202, user._id, successMsg);
+      } else {
+        successMsg += 'Could not update last sign in time.';
+        sendResponse(res, 200, user._id, successMsg);
+      }
+    } else {
+      const errMsg = 'No user was found...';
+      sendResponse(res, 404, null, errMsg);
+    }
+    client.close();
+  } catch (err) {
+    sendResponse(res, 500, req.body, err.message);
+  }
+};
+
 const addUser = async (req, res) => {
-  const { username, email, projectIds, created } = req.body;
+  const { username, email, password, projectIds, created } = req.body;
 
   try {
     const dbName = 'abcsynth';
@@ -287,7 +344,7 @@ const addUser = async (req, res) => {
     const db = client.db(dbName);
 
     //checks
-    const errMsg = await checkForUserErrors(db, email, username);
+    const errMsg = await checkForUserErrors(db, email, username, password);
 
     if (errMsg.length === 0) {
       // insert new user into DB
@@ -374,7 +431,7 @@ const deleteUser = async (req, res) => {
 
 const updateUser = async (req, res) => {
   const id = req.params.id;
-  const { username, email, projectIds, modified, about } = req.body;
+  const { username, email, password, projectIds, modified, about } = req.body;
 
   let successMsg = '';
 
@@ -390,7 +447,13 @@ const updateUser = async (req, res) => {
     if (userOriginal) {
       const oldUsername = userOriginal.username;
       //tests
-      const errMsg = await checkForUserErrors(db, email, username, oldUsername);
+      const errMsg = await checkForUserErrors(
+        db,
+        email,
+        username,
+        password,
+        oldUsername
+      );
 
       if (errMsg.length === 0) {
         const newValues = { $set: { _id: userOriginal._id, ...req.body } };
@@ -654,8 +717,22 @@ const getPublicProjectsForList = async (req, res) => {
       .toArray();
 
     const finalProjectsArr = projectsArr.map(
-      ({ projectName, toneRowStr, username, created, projectId }) => {
-        return { projectName, toneRowStr, username, created, projectId };
+      ({
+        projectName,
+        toneRowStr,
+        username,
+        created,
+        modified = null,
+        projectId,
+      }) => {
+        return {
+          projectName,
+          toneRowStr,
+          username,
+          created,
+          modified,
+          projectId,
+        };
       }
     );
 
@@ -702,9 +779,9 @@ const getPublicProjectByProjectId = async (req, res) => {
 };
 
 //to get data for a private project (also works for public), you need to have the projectId & the created date, plus you need to submit data showing that you have the rights for it
-const getPrivateProject = async (req, res) => {
+const getMyProject = async (req, res) => {
   const projectId = req.params.id * 1;
-  const created = req.params.created * 1;
+  // const created = req.params.created * 1;
   const { currentUserId } = req.body;
 
   try {
@@ -713,7 +790,7 @@ const getPrivateProject = async (req, res) => {
 
     const db = client.db('abcsynth');
 
-    const query = { projectId: projectId, created: created };
+    const query = { projectId: projectId };
     const project = await db.collection('projects').findOne(query);
 
     if (project) {
@@ -920,9 +997,11 @@ const addProject = async (req, res) => {
 };
 
 const updateProject = async (req, res) => {
-  const projectId = req.params.projectid;
+  const projectId = req.params.projectid * 1;
   const currentUserId = req.params.userid;
 
+  console.log('update project server');
+  console.log({ projectId });
   // console.log(req.body);
   const {
     privateProjectId, //_id
@@ -939,6 +1018,25 @@ const updateProject = async (req, res) => {
     created,
     modified,
   } = req.body;
+
+  const updatedValues = {
+    _id: privateProjectId,
+    projectId,
+    projectName,
+    projectDescription,
+    projectVisibility,
+    toneRowStr,
+    musicalSections,
+    orderOfSections,
+    tempo,
+    key,
+    beatsPerMeasure,
+    username,
+    created,
+    modified,
+  };
+
+  console.log({ modified });
 
   try {
     const dbName = 'abcsynth';
@@ -963,7 +1061,7 @@ const updateProject = async (req, res) => {
       !projectVisibility ||
       !projectVisibility.match(/^(public|private|password)$/)
     )
-      errMsg += `The project visibility is not one of the accepted values (it can be "public", "private" or "password"). Instead, it is ${projectVisibility}`;
+      errMsg += `The project visibility is not one of the accepted values (it can be "public", "private" or "password"). Instead, it is "${projectVisibility}"`;
 
     // check that current user has permission to update the project
     const userHasProjectRights = await checkIfUserHasProjectRights(
@@ -975,12 +1073,16 @@ const updateProject = async (req, res) => {
       errMsg += 'User does not have permission to update this project. ';
 
     if (errMsg.length === 0) {
+      console.log('no err msg');
+
       // find the original project
       const pQuery = { projectId: projectId };
       const projectOriginal = await db.collection('projects').findOne(pQuery);
 
       if (projectOriginal) {
-        const newValues = { $set: { _id: privateProjectId, ...req.body } };
+        console.log('found original');
+
+        const newValues = { $set: { ...updatedValues } };
         const projectUpdated = await db
           .collection('projects')
           .updateOne(pQuery, newValues);
@@ -1117,11 +1219,18 @@ const updateProject = async (req, res) => {
         } else {
           sendResponse(
             res,
-            404,
+            400,
             null,
-            `No project with ID ${projectId} was found.`
+            `The project with ID ${projectId} was not updated.`
           );
         }
+      } else {
+        sendResponse(
+          res,
+          404,
+          null,
+          `No project with ID ${projectId} was found.`
+        );
       }
     } else {
       sendResponse(res, 400, req.body, errMsg);
@@ -1200,8 +1309,15 @@ const getPublicProjectsByUsername = async (req, res) => {
     const projectsArr = await db.collection('projects').find(query).toArray();
 
     const finalProjectsArr = projectsArr.map(
-      ({ projectName, toneRowStr, created, projectId }) => {
-        return { projectName, toneRowStr, username, created, projectId };
+      ({ projectName, toneRowStr, created, modified = null, projectId }) => {
+        return {
+          projectName,
+          toneRowStr,
+          username,
+          created,
+          modified,
+          projectId,
+        };
       }
     );
 
@@ -1236,12 +1352,20 @@ const getAllProjectsByUserId = async (req, res) => {
     const query2 = { username };
     const projectsArr = await db.collection('projects').find(query2).toArray();
     const finalProjectsArr = projectsArr.map(
-      ({ projectId, projectName, toneRowStr, created, projectVisibility }) => {
+      ({
+        projectId,
+        projectName,
+        toneRowStr,
+        created,
+        modified = null,
+        projectVisibility,
+      }) => {
         return {
           projectId,
           projectName,
           toneRowStr,
           created,
+          modified,
           projectVisibility,
         };
       }
@@ -1265,6 +1389,7 @@ module.exports = {
   getTestData,
   getUsers,
   getUserPublicInfo,
+  signInUser,
   getUserAllInfo,
   addUser,
   deleteUser,
@@ -1284,5 +1409,5 @@ module.exports = {
   getPublicProjectsByUsername,
   getAllProjectsByUserId,
   test123,
-  getPrivateProject,
+  getMyProject,
 };

@@ -6,13 +6,15 @@ const AbcProjectVisibility = () => {
   const { projectVisibility, setProjectVisibility } = useContext(AppContext);
   return (
     <Wrapper>
-      <Text>Project Visibility:</Text>
+      <Text title='Select whether you want your project to be visible to everyone who visits the website, or just to you (your private projects are listed in your user info page). This setting can be changed at any time.'>
+        Project Visibility:
+      </Text>
       <StyledInput
         type='radio'
         id='visibilityPublic'
         name='visibility'
         value='public'
-        defaultChecked={projectVisibility === 'public'}
+        checked={projectVisibility === 'public'}
         onClick={() => setProjectVisibility('public')}
       />
       <StyledLabel htmlFor='public'>Public</StyledLabel>
@@ -21,7 +23,7 @@ const AbcProjectVisibility = () => {
         id='visibilityPrivate'
         name='visibility'
         value='private'
-        defaultChecked={projectVisibility === 'private'}
+        checked={projectVisibility === 'private'}
         onClick={() => setProjectVisibility('private')}
       />
       <StyledLabel htmlFor='visibilityPrivate'>Private</StyledLabel>
@@ -32,6 +34,7 @@ const AbcProjectVisibility = () => {
 const Wrapper = styled.div`
   display: flex;
   align-items: center;
+  margin-bottom: 8px;
 `;
 
 const StyledInput = styled.input`

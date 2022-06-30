@@ -13,16 +13,24 @@ const AbcDescription = () => {
 
   return (
     <>
-      <P>Project Description:</P>
-      <Textarea
-        id='projectDescription'
-        value={projectDescription}
-        rows='6'
-        onChange={(e) => {
-          const newDescription = sanitizeDescriptionStr(e.target.value);
-          setProjectDescription(newDescription);
+      <P title='Enter in a project descripton. It will appear at the top of the page.'>
+        Project Description:
+      </P>
+      <div
+        style={{
+          height: '800px', // dirty fix for textarea height bug in Chrome
         }}
-      />
+      >
+        <Textarea
+          id='projectDescription'
+          value={projectDescription}
+          rows='6'
+          onChange={(e) => {
+            const newDescription = sanitizeDescriptionStr(e.target.value);
+            setProjectDescription(newDescription);
+          }}
+        />
+      </div>
     </>
   );
 };
@@ -32,6 +40,8 @@ const P = styled.p`
 `;
 const Textarea = styled.textarea`
   width: 250px;
+  height: 100px;
+  display: block;
   font-size: var(--font-size-small);
   color: black;
 `;

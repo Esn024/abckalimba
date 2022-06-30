@@ -3,8 +3,12 @@ import styled from 'styled-components';
 import { AppContext } from '../AppContext';
 
 const AbcTine = ({ abcNote, keyboardLetter, cents, tineIndex }) => {
-  const { userPlayNote, abcToMidiNoteName, midiNoteNameToNumber } =
-    useContext(AppContext);
+  const {
+    userPlayNote,
+    abcToMidiNoteName,
+    midiNoteNameToNumber,
+    validAbcNoteRegex,
+  } = useContext(AppContext);
 
   const tineEl = useRef(null);
 
@@ -28,7 +32,8 @@ const AbcTine = ({ abcNote, keyboardLetter, cents, tineIndex }) => {
   }, [keyboardLetter]);
 
   //height of tine in CSS depends on how low note pitch is.
-  const tineHeight = abcNote
+  // console.log('match', abcNote, abcNote.match(validAbcNoteRegex));
+  const tineHeight = abcNote.match(validAbcNoteRegex)
     ? 150 - midiNoteNameToNumber(abcToMidiNoteName(abcNote))
     : 80;
 

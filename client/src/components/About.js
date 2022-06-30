@@ -19,6 +19,24 @@ const About = () => {
         music, and save your music as either a public project (visible to all)
         or a private one (visible to just you).
       </p>
+      <p>
+        If anything is unclear, you can hover your mouse for a few seconds over
+        a setting description, and a more detailed explanation will pop up.
+      </p>
+      <p>
+        To enter the names of the notes, use{' '}
+        <a href='https://abcnotation.com/wiki/abc:standard:v2.1'>
+          ABC notation
+        </a>
+        . Basically, write "c" for middle C (C4 in scientific music notation),
+        and "C" for the note an octave below. To go down octaves, add commas (C,
+        C,, C,,, and so on); to go up, add single-quote marks (c' c'' c''' and
+        so on). ^c is C-sharp, and _c is C-flat.
+      </p>
+      <p>
+        In the background, this site uses Paul Rosen's{' '}
+        <a href='https://paulrosen.github.io/abcjs/'>ABCJS</a>.
+      </p>
     </Wrapper>
   );
 };
@@ -34,6 +52,7 @@ const Wrapper = styled.div`
 
   p {
     margin: 20px 0 0 0;
+    margin-left: 0;
   }
 `;
 

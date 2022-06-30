@@ -1,12 +1,9 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useEffect, useContext } from 'react';
 import { NavLink, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 
 import useProject from '../hooks/use-project.hook.js';
 
-import abcjs from 'abcjs';
-// import Abcjs from 'react-abcjs';
-import { saveAsPng, saveAsJpeg } from 'save-html-as-image';
 import AbcTines from './abc/AbcTines.js';
 import AbcSetNumberOfTines from './abc/AbcSetNumberOfTines';
 import AbcSelectToneRow from './abc/AbcSelectToneRow';
@@ -14,14 +11,11 @@ import AbcKeyDefinitions from './abc/AbcKeyDefinitions.js';
 
 import AbcSetBeatsPerMeasure from './abc/AbcSetBeatsPerMeasure';
 import AbcSetTempo from './abc/AbcSetTempo';
-import AbcSetOrderOfSections from './abc/AbcSetOrderOfSections';
-import AbcSetKey from './abc/AbcSetKey';
-import AbcSelectTune from './abc/AbcSelectTune.js';
+// import AbcSetKey from './abc/AbcSetKey';
 import AbcSelectThumb from './abc/AbcSelectThumb.js';
 import AbcSetNumberOfMusicalSections from './abc/AbcSetNumberOfMusicalSections.js';
 import AbcMusicalSection from './abc/AbcMusicalSection.js';
 
-import AbcNoteGrid from './abc/AbcNoteGrid.js';
 import AbcFinalPiece from './abc/AbcFinalPiece.js';
 import AbcSetProjectName from './abc/AbcSetProjectName.js';
 import AbcDescription from './abc/AbcDescription.js';
@@ -32,7 +26,7 @@ import AbcProjectVisibility from './abc/AbcProjectVisibility.js';
 import { AppContext } from './AppContext';
 
 const Project = () => {
-  const { projectid, created } = useParams();
+  const { projectid } = useParams();
 
   const {
     userId,
@@ -45,6 +39,8 @@ const Project = () => {
     printDivById,
     currentUser,
     saveNewProject,
+    updateProject,
+    forkProject,
     projectVisibility,
     orderOfSections,
     tempo,
@@ -66,7 +62,16 @@ const Project = () => {
     setProjectVisibility,
   } = useContext(AppContext);
 
-  const [project, setProject] = useProject(projectid, created, userId);
+  // check if the path starts with /myproject/
+  const myProject =
+    window.location.pathname.match(/^\/([a-z]+)\//)[1] === 'myprojects';
+
+  //if it is "myProject", it will load a project to be edited by current user with all permissions, assuming current user has permission to edit it; otherwise, it will attempt to load it as a public project, which can be forked
+  const [project, setProject] = useProject(
+    projectid,
+    null,
+    myProject ? userId : null
+  );
 
   // update values in AppContext when project changes to a different one
   useEffect(() => {
@@ -155,7 +160,31 @@ const Project = () => {
 
   return (
     <Wrapper>
-      {projectName && <ProjectName>{projectName}</ProjectName>}
+      {projectName && (
+        <ProjectName>
+          {projectName} - {myProject ? 'My Project' : 'Another Project'}
+        </ProjectName>
+      )}
+      {project && (
+        <>
+          <Description>
+            {'Created by '}
+            <Link to={`/users/${project.username.toLowerCase()}`}>
+              {project.username}
+            </Link>
+            {` on ${dateFromMs(project.created)}`}
+            {project.forkedFromId && (
+              <>
+                {'. Forked from project '}
+                <Link to={`/projects/${project.forkedFromId}`}>
+                  {project.forkedFromId}
+                </Link>
+                {'.'}
+              </>
+            )}
+          </Description>
+        </>
+      )}
       {projectDescription && <Description>{projectDescription}</Description>}
       <AbcSetNumberOfTines />
       <AbcSelectToneRow />
@@ -184,25 +213,95 @@ const Project = () => {
       <AbcFinalPiece />
       <AbcSetProjectName />
       <AbcDescription />
-      <AbcProjectVisibility />
+      {myProject && <AbcProjectVisibility />}
+      {project && (
+        <Description>
+          Project last updated on{' '}
+          {dateFromMs(project.modified || project.created)}
+        </Description>
+      )}
       <StyledButton2
-        onClick={() =>
-          saveNewProject(
-            projectName,
-            projectDescription,
-            projectVisibility,
-            objToToneRowStr(tines),
-            musicalSections,
-            orderOfSections,
-            tempo,
-            key,
-            beatsPerMeasure,
-            currentUser.username
-          )
-        }
+        onClick={() => {
+          const privateProjectId = project._id;
+          const username = currentUser.username;
+          const created = project.created;
+          const modified = project.modified;
+
+          // console.log({ privateProjectId, username, created, modified });
+
+          myProject // if updating
+            ? updateProject(
+                setProject,
+                privateProjectId,
+                projectid,
+                userId,
+                projectName,
+                projectDescription,
+                projectVisibility,
+                objToToneRowStr(tines),
+                musicalSections,
+                orderOfSections,
+                tempo,
+                key,
+                beatsPerMeasure,
+                username,
+                created
+              )
+            : project && !myProject // if forking
+            ? forkProject(
+                setProject,
+                projectName,
+                projectDescription,
+                'private', //when forking, save it as private by default
+                objToToneRowStr(tines),
+                musicalSections,
+                orderOfSections,
+                tempo,
+                key,
+                beatsPerMeasure,
+                username,
+                projectid
+              )
+            : saveNewProject(
+                setProject,
+                projectName,
+                projectDescription,
+                projectVisibility,
+                objToToneRowStr(tines),
+                musicalSections,
+                orderOfSections,
+                tempo,
+                key,
+                beatsPerMeasure,
+                username,
+                projectid
+              );
+        }}
       >
-        Save project
+        {myProject ? 'Update' : project ? 'Fork' : 'Save'} project
       </StyledButton2>
+      {myProject && (
+        <StyledButton2
+          onClick={() => {
+            forkProject(
+              setProject,
+              projectName,
+              projectDescription,
+              'private', //when forking, save it as private by default
+              objToToneRowStr(tines),
+              musicalSections,
+              orderOfSections,
+              tempo,
+              key,
+              beatsPerMeasure,
+              currentUser.username,
+              projectid
+            );
+          }}
+        >
+          Fork project
+        </StyledButton2>
+      )}
       <StyledButton2 onClick={() => printDivById('final-score')}>
         Print music score
       </StyledButton2>
@@ -248,6 +347,11 @@ const StyledButton = styled.button`
 const StyledButton2 = styled(StyledButton)`
   font-size: var(--font-size-small);
   margin: 10px 0 0 0;
+`;
+
+const Link = styled(NavLink)`
+  text-decoration: none;
+  color: var(--color-alabama-crimson);
 `;
 
 export default Project;

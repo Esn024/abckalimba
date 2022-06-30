@@ -1,14 +1,8 @@
-import React, {
-  createContext,
-  useReducer,
-  useState,
-  useEffect,
-  useContext,
-} from 'react';
+import React, { createContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { v4 as uuidv4 } from 'uuid';
+// import { v4 as uuidv4 } from 'uuid';
 import abcjs from 'abcjs';
-import { saveAsPng, saveAsJpeg } from 'save-html-as-image';
+import { saveAsPng } from 'save-html-as-image';
 
 // import useCurrentUser from '../hooks/use-local-current-user.hook.js';
 
@@ -272,7 +266,7 @@ export const AppProvider = ({ children }) => {
   const dateFromMs = (ms) => {
     const date = new Date(ms);
     const str = date.toString();
-    return str.substr(0, 24);
+    return ms ? str.substring(0, 24) : '';
   };
 
   // test if two different objects have the same properties and values. From https://stackoverflow.com/a/32922084
@@ -284,6 +278,45 @@ export const AppProvider = ({ children }) => {
       ? ok(x).length === ok(y).length &&
           ok(x).every((key) => deepEqual(x[key], y[key]))
       : x === y;
+  };
+
+  //try to sign in as user upon entering username and password
+  const handleSignIn = (username, password) => {
+    // console.log({ formData });
+
+    fetch(`/api/users/signin/${username}`, {
+      method: 'PUT',
+      body: JSON.stringify({ password }),
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+    })
+      .then((res) => res.json())
+      .then((json) => {
+        // console.log(json);
+        const { status, message, data } = json;
+
+        if (status == 200 || status == 202) {
+          setUserId(data);
+          // add it to localStorage
+          localStorage.setItem('userId', data);
+
+          // return to homepage
+          navigate('/');
+        } else {
+          // TODO remove console log
+          console.log('There was an error', { status, message, data });
+        }
+      });
+  };
+
+  const handleSignOut = () => {
+    setUserId(null);
+    localStorage.removeItem('userId');
+    setCurrentUser(null);
+    // go to home page
+    navigate('/');
   };
 
   //create new user
@@ -337,7 +370,7 @@ export const AppProvider = ({ children }) => {
         // check that the request got successfully through to server
         if (status === 202) {
           // Display confirmation message that user info was updated.
-          // TODO change this to something other than alert
+          // TODO remove console log?
           console.log(
             `Successfully changed user info for ${formData.username}`
           );
@@ -426,12 +459,14 @@ export const AppProvider = ({ children }) => {
         await audioContext.resume();
         // In theory the AC shouldn't start suspended because it is being initialized in a click handler, but iOS seems to anyway.
 
+        // console.log('PUBLIC_URI', `${process.env.PUBLIC_URL}/soundfonts`);
+
         await synth.init({
           audioContext: audioContext,
           visualObj: visualObj,
           options: {
             sequenceCallback: sequenceCallbackOneNote,
-            soundFontUrl: 'soundfonts',
+            soundFontUrl: `${process.env.PUBLIC_URL}/soundfonts`,
             onEnded: () => {
               //console.log("playback ended")
             },
@@ -961,6 +996,8 @@ w:${modifiedDescription}
 
     // let allNoteEvents = [];
 
+    // console.log('PUBLIC_URI', `${process.env.PUBLIC_URL}/soundfonts`);
+
     try {
       // const synth = new abcjs.synth.CreateSynth();
 
@@ -973,7 +1010,7 @@ w:${modifiedDescription}
         visualObj: visualObj,
         options: {
           sequenceCallback: sequenceCallback,
-          soundFontUrl: 'soundfonts',
+          soundFontUrl: `${process.env.PUBLIC_URL}/soundfonts`,
           onEnded: () => {
             //console.log("playback ended")
           },
@@ -1059,6 +1096,7 @@ w:${modifiedDescription}
   };
 
   const saveNewProject = (
+    setProject,
     projectName = '',
     projectDescription = '',
     projectVisibility,
@@ -1068,7 +1106,8 @@ w:${modifiedDescription}
     tempo,
     key,
     beatsPerMeasure,
-    username
+    username,
+    forkedFromId = null // ID of the project it is forked from, if any
   ) => {
     // console.log({ formData });
     // console.log({ toneRowStr });
@@ -1087,6 +1126,7 @@ w:${modifiedDescription}
         beatsPerMeasure: beatsPerMeasure,
         username: username,
         created: created,
+        forkedFromId: forkedFromId,
       }),
       headers: {
         Accept: 'application/json',
@@ -1100,6 +1140,125 @@ w:${modifiedDescription}
 
         if (status == 207) {
           console.log(message);
+          // console.log(data);
+          setProject({
+            projectName,
+            projectDescription,
+            projectVisibility,
+            toneRowStr,
+            musicalSections,
+            orderOfSections,
+            tempo,
+            key,
+            beatsPerMeasure,
+            username,
+            created,
+            forkedFromId,
+          });
+          navigate(`/myprojects/${data[0].data.projectId}`);
+          // scroll to top of page
+          window.scrollTo(0, 0);
+        } else {
+          // TODO remove console log
+          console.log('There was an error', { status, message, data });
+        }
+      });
+  };
+
+  const forkProject = (
+    setProject,
+    projectName,
+    projectDescription,
+    projectVisibility,
+    toneRowStr,
+    musicalSections,
+    orderOfSections,
+    tempo,
+    key,
+    beatsPerMeasure,
+    username,
+    forkedFromId
+  ) => {
+    saveNewProject(
+      setProject,
+      projectName,
+      projectDescription,
+      projectVisibility,
+      toneRowStr,
+      musicalSections,
+      orderOfSections,
+      tempo,
+      key,
+      beatsPerMeasure,
+      username,
+      forkedFromId
+    );
+  };
+
+  const updateProject = (
+    setProject,
+    privateProjectId,
+    projectId,
+    userId,
+    projectName = '',
+    projectDescription = '',
+    projectVisibility,
+    toneRowStr,
+    musicalSections,
+    orderOfSections,
+    tempo,
+    key,
+    beatsPerMeasure,
+    username,
+    created
+  ) => {
+    // console.log('update project client');
+    // console.log({ toneRowStr });
+    const modified = Date.now();
+    fetch(`/api/projects/update/${projectId}/${userId}`, {
+      method: 'PUT',
+      body: JSON.stringify({
+        privateProjectId: privateProjectId,
+        projectId: projectId,
+        projectName: projectName,
+        projectDescription: projectDescription,
+        projectVisibility: projectVisibility,
+        toneRowStr: toneRowStr,
+        musicalSections: musicalSections,
+        orderOfSections: orderOfSections,
+        tempo: tempo,
+        key: key,
+        beatsPerMeasure: beatsPerMeasure,
+        username: username,
+        created: created,
+        modified: modified,
+      }),
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+    })
+      .then((res) => res.json())
+      .then((json) => {
+        // console.log(json);
+        const { status, message, data } = json;
+
+        if (status == 207) {
+          console.log(message);
+          setProject({
+            projectName,
+            projectDescription,
+            projectVisibility,
+            toneRowStr,
+            musicalSections,
+            orderOfSections,
+            tempo,
+            key,
+            beatsPerMeasure,
+            username,
+            created,
+            modified,
+          });
         } else {
           // TODO remove console log
           console.log('There was an error', { status, message, data });
@@ -1149,6 +1308,8 @@ w:${modifiedDescription}
         dateFromMs,
         deepEqual,
         createNewUser,
+        handleSignIn,
+        handleSignOut,
         updateUser,
         deleteUser,
         permissionToEditProject,
@@ -1173,6 +1334,9 @@ w:${modifiedDescription}
         saveImageById,
         indexToAlphabetLetter,
         saveNewProject,
+        updateProject,
+        forkProject,
+        validAbcNoteRegex,
       }}
     >
       {children}

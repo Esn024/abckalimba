@@ -10,6 +10,7 @@ const {
   getUsers,
   getUserPublicInfo,
   getUserAllInfo,
+  signInUser,
   addUser,
   updateUser,
   deleteUser,
@@ -22,8 +23,9 @@ const {
   getPublicProjectsForList,
   getPublicProjectsByUsername,
   getPublicProjectByProjectId,
-  getPrivateProject,
+  getMyProject,
   addProject,
+  updateProject,
   getToneRows,
   getToneRow,
   getAllProjectsByUserId,
@@ -54,6 +56,7 @@ express()
   // users
   .get('/api/users', getUsers)
   .get('/api/users/:username', getUserPublicInfo)
+  .put('/api/users/signin/:username', signInUser)
   .get('/api/users/id/:id', getUserAllInfo)
   .post('/api/users', addUser)
   .put('/api/users/id/:id', updateUser)
@@ -70,8 +73,9 @@ express()
   //projects
   .get('/api/projects', getPublicProjectsForList)
   .get('/api/projects/:id', getPublicProjectByProjectId)
-  .get('/api/private-projects/:id/:created', getPrivateProject)
+  .post('/api/myprojects/:id', getMyProject)
   .post('/api/projects', addProject)
+  .put('/api/projects/update/:projectid/:userid', updateProject)
   .get('/api/users/:username/projects', getPublicProjectsByUsername)
   .get('/api/users/id/:id/projects', getAllProjectsByUserId)
 

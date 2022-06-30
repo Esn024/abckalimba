@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import GlobalStyles from './GlobalStyles';
 import { AppProvider } from './AppContext'; //Add the Context Provider to the entire application
@@ -7,13 +7,11 @@ import Header from './Header';
 import Home from './Home';
 import About from './About';
 import MyUserInfo from './MyUserInfo';
-import Comp2 from './Comp2';
-import PublicProjects from './PublicProjects';
+import Projects from './Projects';
 import Users from './Users';
 import User from './User';
 import Project from './Project';
 import ToneRows from './ToneRows';
-//
 
 function App() {
   return (
@@ -28,15 +26,12 @@ function App() {
             <Route path='/myuserinfo' element={<MyUserInfo />} />
             <Route path='/about' element={<About />} />
             {/* <Route path='/comp2/:id' element={<Comp2 />} /> */}
-            <Route path='/projects' element={<PublicProjects />} />
+            <Route path='/projects' element={<Projects />} />
             <Route path='/users' element={<Users />} />
             <Route path='/tonerows' element={<ToneRows />} />
-            <Route path='/user/:lowercaseusername' element={<User />} />
-            <Route path='/project/:projectid' element={<Project />} />
-            <Route
-              path='/private-project/:projectid/:created'
-              element={<Project />}
-            />
+            <Route path='/users/:lowercaseusername' element={<User />} />
+            <Route path='/projects/:projectid' element={<Project />} />
+            <Route path='/myprojects/:projectid' element={<Project />} />
           </Routes>
         </AppProvider>
       </BrowserRouter>
