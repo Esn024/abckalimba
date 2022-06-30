@@ -1,5 +1,6 @@
 'use strict';
 
+const path = require('path');
 const express = require('express');
 const morgan = require('morgan');
 
@@ -49,6 +50,9 @@ express()
   .use(express.urlencoded({ extended: false }))
   .use('/', express.static(__dirname + '/'))
 
+  // Have Node serve the files for our built React app
+  // .use(express.static(path.resolve(__dirname, '../client/build')))
+
   // REST endpoints
   .get('/test', getTestData)
   .get('/test123', test123)
@@ -82,6 +86,11 @@ express()
   // tone rows
   .get('/api/tonerows', getToneRows)
   .get('/api/tonerows/:id', getToneRow)
+
+  // All other GET requests not handled before will return our React app
+  // .get('*', (req, res) => {
+  //   res.sendFile(path.resolve(__dirname, '../client/build', 'index.html'));
+  // })
 
   .listen(PORT, () => {
     console.info(`Server listening on ${PORT}`);

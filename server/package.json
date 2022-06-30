@@ -5,7 +5,8 @@
   "license": "",
   "scripts": {
     "dev": "nodemon index.js",
-    "start": "node index.js"
+    "start": "node index.js",
+    "build": "cd ../client && yarn install && yarn run build"
   },
   "dependencies": {
     "dotenv": "^16.0.1",
@@ -14,5 +15,8 @@
     "morgan": "^1.10.0",
     "nodemon": "^2.0.16",
     "uuid": "^8.3.2"
+  },
+  "engines": {
+    "node": "14.18.0"
   }
 }
