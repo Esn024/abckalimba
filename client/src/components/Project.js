@@ -46,6 +46,7 @@ const Project = () => {
     currentUser,
     saveNewProject,
     updateProject,
+    forkProject,
     projectVisibility,
     orderOfSections,
     tempo,
@@ -170,6 +171,26 @@ const Project = () => {
           {projectName} - {myProject ? 'My Project' : 'Another Project'}
         </ProjectName>
       )}
+      {project && (
+        <>
+          <Description>
+            {'Created by '}
+            <Link to={`/users/${project.username.toLowerCase()}`}>
+              {project.username}
+            </Link>
+            {` on ${dateFromMs(project.created)}`}
+            {project.forkedFromId && (
+              <>
+                {'. Forked from project '}
+                <Link to={`/projects/${project.forkedFromId}`}>
+                  {project.forkedFromId}
+                </Link>
+                {'.'}
+              </>
+            )}
+          </Description>
+        </>
+      )}
       {projectDescription && <Description>{projectDescription}</Description>}
       <AbcSetNumberOfTines />
       <AbcSelectToneRow />
@@ -214,7 +235,7 @@ const Project = () => {
 
           // console.log({ privateProjectId, username, created, modified });
 
-          myProject
+          myProject // if updating
             ? updateProject(
                 setProject,
                 privateProjectId,
@@ -232,6 +253,21 @@ const Project = () => {
                 username,
                 created
               )
+            : project && !myProject // if forking
+            ? forkProject(
+                setProject,
+                projectName,
+                projectDescription,
+                'private', //when forking, save it as private by default
+                objToToneRowStr(tines),
+                musicalSections,
+                orderOfSections,
+                tempo,
+                key,
+                beatsPerMeasure,
+                username,
+                projectid
+              )
             : saveNewProject(
                 setProject,
                 projectName,
@@ -243,12 +279,35 @@ const Project = () => {
                 tempo,
                 key,
                 beatsPerMeasure,
-                username
+                username,
+                projectid
               );
         }}
       >
-        {myProject ? 'Update' : 'Save'} project
+        {myProject ? 'Update' : project ? 'Fork' : 'Save'} project
       </StyledButton2>
+      {myProject && (
+        <StyledButton2
+          onClick={() => {
+            forkProject(
+              setProject,
+              projectName,
+              projectDescription,
+              'private', //when forking, save it as private by default
+              objToToneRowStr(tines),
+              musicalSections,
+              orderOfSections,
+              tempo,
+              key,
+              beatsPerMeasure,
+              currentUser.username,
+              projectid
+            );
+          }}
+        >
+          Fork project
+        </StyledButton2>
+      )}
       <StyledButton2 onClick={() => printDivById('final-score')}>
         Print music score
       </StyledButton2>
@@ -294,6 +353,11 @@ const StyledButton = styled.button`
 const StyledButton2 = styled(StyledButton)`
   font-size: var(--font-size-small);
   margin: 10px 0 0 0;
+`;
+
+const Link = styled(NavLink)`
+  text-decoration: none;
+  color: var(--color-alabama-crimson);
 `;
 
 export default Project;

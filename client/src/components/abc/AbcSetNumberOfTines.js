@@ -26,7 +26,7 @@ const AbcSetNumberOfTines = () => {
 
   return (
     <StyledLabel>
-      <Text>Modify Number of Tones:</Text>
+      <Text>Number of Tones:</Text>
       <StyledInput
         type='number'
         id='quantity'

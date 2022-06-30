@@ -26,9 +26,7 @@ const Projects = ({ userId, username }) => {
           },
           cellDataLink(p) {
             // if userId is included, link to the myprojects URL
-            return userId
-              ? `/myprojects/${p.projectId}`
-              : currentUser.username === p.username
+            return userId || currentUser?.username === p.username
               ? `/myprojects/${p.projectId}`
               : `/projects/${p.projectId}`;
           },

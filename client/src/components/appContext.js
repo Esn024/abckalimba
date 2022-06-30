@@ -1112,7 +1112,8 @@ w:${modifiedDescription}
     tempo,
     key,
     beatsPerMeasure,
-    username
+    username,
+    forkedFromId = null // ID of the project it is forked from, if any
   ) => {
     // console.log({ formData });
     // console.log({ toneRowStr });
@@ -1131,6 +1132,7 @@ w:${modifiedDescription}
         beatsPerMeasure: beatsPerMeasure,
         username: username,
         created: created,
+        forkedFromId: forkedFromId,
       }),
       headers: {
         Accept: 'application/json',
@@ -1144,6 +1146,7 @@ w:${modifiedDescription}
 
         if (status == 207) {
           console.log(message);
+          // console.log(data);
           setProject({
             projectName,
             projectDescription,
@@ -1156,12 +1159,46 @@ w:${modifiedDescription}
             beatsPerMeasure,
             username,
             created,
+            forkedFromId,
           });
+          navigate(`/myprojects/${data[0].data.projectId}`);
+          // scroll to top of page
+          window.scrollTo(0, 0);
         } else {
           // TODO remove console log
           console.log('There was an error', { status, message, data });
         }
       });
+  };
+
+  const forkProject = (
+    setProject,
+    projectName,
+    projectDescription,
+    projectVisibility,
+    toneRowStr,
+    musicalSections,
+    orderOfSections,
+    tempo,
+    key,
+    beatsPerMeasure,
+    username,
+    forkedFromId
+  ) => {
+    saveNewProject(
+      setProject,
+      projectName,
+      projectDescription,
+      projectVisibility,
+      toneRowStr,
+      musicalSections,
+      orderOfSections,
+      tempo,
+      key,
+      beatsPerMeasure,
+      username,
+      forkedFromId
+    );
   };
 
   const updateProject = (
@@ -1304,6 +1341,7 @@ w:${modifiedDescription}
         indexToAlphabetLetter,
         saveNewProject,
         updateProject,
+        forkProject,
         validAbcNoteRegex,
       }}
     >
