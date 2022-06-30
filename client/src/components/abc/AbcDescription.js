@@ -16,7 +16,11 @@ const AbcDescription = () => {
       <P title='Enter in a project descripton. It will appear at the top of the page.'>
         Project Description:
       </P>
-      <div style={{ height: '800px' }}>
+      <div
+        style={{
+          height: '800px', // dirty fix for textarea height bug in Chrome
+        }}
+      >
         <Textarea
           id='projectDescription'
           value={projectDescription}
