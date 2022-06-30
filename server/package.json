@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "nodemon index.js",
     "start": "node index.js",
-    "build": "cd ../client && yarn install && yarn run build"
+    "build": "cd client && yarn install && yarn run build"
   },
   "dependencies": {
     "dotenv": "^16.0.1",
