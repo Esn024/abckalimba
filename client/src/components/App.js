@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import GlobalStyles from './GlobalStyles';
 import { AppProvider } from './AppContext'; //Add the Context Provider to the entire application
@@ -7,13 +7,11 @@ import Header from './Header';
 import Home from './Home';
 import About from './About';
 import MyUserInfo from './MyUserInfo';
-import Comp2 from './Comp2';
 import Projects from './Projects';
 import Users from './Users';
 import User from './User';
 import Project from './Project';
 import ToneRows from './ToneRows';
-//
 
 function App() {
   return (

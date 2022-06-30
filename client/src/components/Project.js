@@ -1,12 +1,9 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useEffect, useContext } from 'react';
 import { NavLink, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 
 import useProject from '../hooks/use-project.hook.js';
 
-import abcjs from 'abcjs';
-// import Abcjs from 'react-abcjs';
-import { saveAsPng, saveAsJpeg } from 'save-html-as-image';
 import AbcTines from './abc/AbcTines.js';
 import AbcSetNumberOfTines from './abc/AbcSetNumberOfTines';
 import AbcSelectToneRow from './abc/AbcSelectToneRow';
@@ -14,14 +11,11 @@ import AbcKeyDefinitions from './abc/AbcKeyDefinitions.js';
 
 import AbcSetBeatsPerMeasure from './abc/AbcSetBeatsPerMeasure';
 import AbcSetTempo from './abc/AbcSetTempo';
-import AbcSetOrderOfSections from './abc/AbcSetOrderOfSections';
-import AbcSetKey from './abc/AbcSetKey';
-import AbcSelectTune from './abc/AbcSelectTune.js';
+// import AbcSetKey from './abc/AbcSetKey';
 import AbcSelectThumb from './abc/AbcSelectThumb.js';
 import AbcSetNumberOfMusicalSections from './abc/AbcSetNumberOfMusicalSections.js';
 import AbcMusicalSection from './abc/AbcMusicalSection.js';
 
-import AbcNoteGrid from './abc/AbcNoteGrid.js';
 import AbcFinalPiece from './abc/AbcFinalPiece.js';
 import AbcSetProjectName from './abc/AbcSetProjectName.js';
 import AbcDescription from './abc/AbcDescription.js';

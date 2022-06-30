@@ -1,12 +1,6 @@
-import React, {
-  createContext,
-  useReducer,
-  useState,
-  useEffect,
-  useContext,
-} from 'react';
+import React, { createContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { v4 as uuidv4 } from 'uuid';
+// import { v4 as uuidv4 } from 'uuid';
 import abcjs from 'abcjs';
 import { saveAsPng } from 'save-html-as-image';
 

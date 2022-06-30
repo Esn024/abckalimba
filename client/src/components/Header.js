@@ -1,10 +1,10 @@
 import React, { useContext } from 'react';
 import styled from 'styled-components';
 import { AppContext } from './AppContext';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 
 const Header = () => {
-  const { currentUser, setCurrentUser, handleSignOut } = useContext(AppContext);
+  const { currentUser, handleSignOut } = useContext(AppContext);
 
   return (
     <HeaderElement>

@@ -1,6 +1,5 @@
-import React, { useState, useEffect, useContext, useRef } from 'react';
+import React, { useState, useContext } from 'react';
 import styled from 'styled-components';
-import { useNavigate } from 'react-router-dom';
 import useLocalCurrentUser from '../hooks/use-local-current-user.hook.js';
 
 import { AppContext } from './AppContext';
@@ -185,7 +184,7 @@ const MyUserInfo = () => {
             onClick={(ev) => {
               ev.preventDefault();
               const text = 'Are you sure you want to delete this account?';
-              if (window.confirm(text) == true) {
+              if (window.confirm(text) === true) {
                 deleteUser(userId);
               }
             }}
