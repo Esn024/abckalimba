@@ -34,7 +34,9 @@ const About = () => {
         so on). ^c is C-sharp, and _c is C-flat.
       </p>
       <p>
-        In the background, this site uses Paul Rosen's{' '}
+        The source code for this website can be found{' '}
+        <a href='https://github.com/Esn024/abc-kalimba-synth'>on GitHub</a>. In
+        the background, this site uses Paul Rosen's{' '}
         <a href='https://paulrosen.github.io/abcjs/'>ABCJS</a>.
       </p>
     </Wrapper>
