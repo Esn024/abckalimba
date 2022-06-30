@@ -20,10 +20,20 @@ const MyUserInfo = () => {
   const [localCurrentUser, setLocalCurrentUser] =
     useLocalCurrentUser(currentUser);
 
+  const [signInUsername, setSignInUsername] = useState('');
+  const [signInPassword, setSignInPassword] = useState('');
+
   const userHasUnsavedInfo =
     currentUser &&
     localCurrentUser &&
-    !deepEqual(localCurrentUser, currentUser);
+    !deepEqual(localCurrentUser, {
+      ...currentUser,
+      password2: localCurrentUser.password2,
+    });
+
+  const passwordsMatch = localCurrentUser
+    ? localCurrentUser.password === localCurrentUser.password2
+    : true;
 
   // console.log({ localCurrentUser });
   // console.log({ currentUser });
@@ -41,9 +51,44 @@ const MyUserInfo = () => {
           Account modified on: {dateFromMs(currentUser.modified)}
         </SmallerText>
       )}
+      {!userId && (
+        <Wrapper>
+          <input
+            type='text'
+            placeholder='Username'
+            value={signInUsername}
+            onChange={(ev) => {
+              setSignInUsername(ev.target.value);
+            }}
+          />
+          <input
+            type='password'
+            placeholder='Password'
+            value={signInPassword}
+            onChange={(ev) => {
+              setSignInPassword(ev.target.value);
+            }}
+          />
+          <InputButton
+            type='submit'
+            value='Sign In'
+            // disable button if required fields are empty
+            disabled={signInPassword === '' || signInUsername === ''}
+            onClick={(ev) => {
+              ev.preventDefault();
+              const currentUserToSubmit = { ...localCurrentUser };
+              delete currentUserToSubmit.password2;
+
+              !userId
+                ? createNewUser(currentUserToSubmit)
+                : updateUser(currentUserToSubmit);
+            }}
+          />
+        </Wrapper>
+      )}
       <SmallerText>
         {!userId
-          ? 'Please fill out the required information below.'
+          ? 'Or, please fill out the required information below to register a new account:'
           : 'You can edit your user info below.'}{' '}
         {userHasUnsavedInfo && (
           <ColoredText>You have unsaved changes.</ColoredText>
@@ -74,6 +119,36 @@ const MyUserInfo = () => {
           }}
         />
 
+        <input
+          type='password'
+          placeholder='Password'
+          value={localCurrentUser ? localCurrentUser.password : ''}
+          style={{
+            boxShadow: passwordsMatch ? '' : '0 0 3px red',
+          }}
+          onChange={(ev) => {
+            setLocalCurrentUser({
+              ...localCurrentUser,
+              password: ev.target.value,
+            });
+          }}
+        />
+
+        <input
+          type='password'
+          placeholder='Repeat Password'
+          value={localCurrentUser ? localCurrentUser.password2 : ''}
+          style={{
+            boxShadow: passwordsMatch ? '' : '0 0 3px red',
+          }}
+          onChange={(ev) => {
+            setLocalCurrentUser({
+              ...localCurrentUser,
+              password2: ev.target.value,
+            });
+          }}
+        />
+
         <textarea
           value={localCurrentUser ? localCurrentUser.about : ''}
           placeholder='A few words about yourself (optional)'
@@ -84,21 +159,26 @@ const MyUserInfo = () => {
             });
           }}
         ></textarea>
-
-        <input
+        {!passwordsMatch && <ErrorText>Passwords don't match.</ErrorText>}
+        <InputButton
           type='submit'
           value={userId ? 'Submit Changes' : 'Register'}
-          // disable button if required fields are empty or invalid, or if existing user has not made any changes to their existing data
+          // disable button if required fields are empty or invalid, or if existing user has not made any changes to their existing data, or if password is empty, or if passwords don't match
           disabled={
             (userId && !userHasUnsavedInfo) ||
             localCurrentUser?.username === '' ||
-            !localCurrentUser?.email?.includes('@')
+            !localCurrentUser?.email?.includes('@') ||
+            localCurrentUser.password === '' ||
+            !passwordsMatch
           }
           onClick={(ev) => {
             ev.preventDefault();
+            const currentUserToSubmit = { ...localCurrentUser };
+            delete currentUserToSubmit.password2;
+
             !userId
-              ? createNewUser(localCurrentUser)
-              : updateUser(localCurrentUser);
+              ? createNewUser(currentUserToSubmit)
+              : updateUser(currentUserToSubmit);
           }}
         />
 
@@ -116,7 +196,7 @@ const MyUserInfo = () => {
           />
         )}
       </form>
-      <Projects userId={userId} username={null} />
+      {currentUser && <Projects userId={userId} username={null} />}
     </Wrapper>
   );
 };
@@ -139,13 +219,17 @@ const Wrapper = styled.div`
     padding: 12px;
   }
   input {
-    width: 100%;
-    margin: 5px;
+    width: 190px;
+    margin: 5px 0;
   }
 `;
 
 const ColoredText = styled.span`
   color: var(--color-dark-green);
+`;
+
+const ErrorText = styled.span`
+  color: var(--color-cadmium-red);
 `;
 
 const SmallerText = styled.p`
@@ -154,6 +238,12 @@ const SmallerText = styled.p`
   font-size: var(--font-size-small);
   text-align: center;
   margin-bottom: 12px;
+`;
+
+const InputButton = styled.input`
+  height: 24px;
+  width: 195px;
+  margin: 0;
 `;
 
 export default MyUserInfo;

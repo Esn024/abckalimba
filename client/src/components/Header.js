@@ -4,7 +4,13 @@ import { AppContext } from './AppContext';
 import { NavLink } from 'react-router-dom';
 
 const Header = () => {
-  const { currentUser } = useContext(AppContext);
+  const { currentUser, setCurrentUser } = useContext(AppContext);
+
+  const handleSignOut = () => {
+    localStorage.removeItem('userId');
+    setCurrentUser(null);
+  };
+
   return (
     <HeaderElement>
       <Link to='/'>
@@ -20,10 +26,13 @@ const Header = () => {
         {currentUser ? (
           <SmallerText>
             Welcome, <Link to='/myuserinfo'>{currentUser.username}</Link>!
+            <SignOutButton onClick={() => handleSignOut()}>
+              (sign out)
+            </SignOutButton>
           </SmallerText>
         ) : (
           <div>
-            <Link to='/registration'>Register for a new account!</Link>
+            <Link to='/registration'>Sign In / Register</Link>
           </div>
         )}
       </HorizontalWrapper>
@@ -67,6 +76,14 @@ const SiteLinks = styled.div`
   a {
     margin: 0 10px;
   }
+`;
+
+const SignOutButton = styled.button`
+  font-size: var(--font-size-smaller);
+  margin-left: 8px;
+  border: 0;
+  background: none;
+  cursor: pointer;
 `;
 
 export default Header;

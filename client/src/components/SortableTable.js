@@ -95,7 +95,7 @@ const SortableTable = ({
           </tbody>
         </StyledTable>
       ) : (
-        <p>Loading</p>
+        <p>...</p>
       )}
     </Wrapper>
   );
