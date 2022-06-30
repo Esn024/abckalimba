@@ -16,15 +16,17 @@ const AbcDescription = () => {
       <P title='Enter in a project descripton. It will appear at the top of the page.'>
         Project Description:
       </P>
-      <Textarea
-        id='projectDescription'
-        value={projectDescription}
-        rows='6'
-        onChange={(e) => {
-          const newDescription = sanitizeDescriptionStr(e.target.value);
-          setProjectDescription(newDescription);
-        }}
-      />
+      <div style={{ height: '800px' }}>
+        <Textarea
+          id='projectDescription'
+          value={projectDescription}
+          rows='6'
+          onChange={(e) => {
+            const newDescription = sanitizeDescriptionStr(e.target.value);
+            setProjectDescription(newDescription);
+          }}
+        />
+      </div>
     </>
   );
 };
@@ -34,6 +36,8 @@ const P = styled.p`
 `;
 const Textarea = styled.textarea`
   width: 250px;
+  height: 100px;
+  display: block;
   font-size: var(--font-size-small);
   color: black;
 `;
