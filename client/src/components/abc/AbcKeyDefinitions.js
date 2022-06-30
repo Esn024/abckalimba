@@ -22,13 +22,24 @@ const AbcKeyDefinitions = () => {
   const tineLetterTriggerRegex = /[a-z]/;
   const abcNoteRegex = /[\^_]?[A-Ga-g][,']{0,4}/;
   const abcCentRegex = /[-]?[0-9]{1,3}\.?[0-9]{1,3}/;
-  //replaceOneValueInArray
+
+  const keyBoardKeysHelpText =
+    'When you press these letters on your computer keyboard, the note below it will sound. Alternately, you can also click on the vertical bars below with the mouse, or touch them (if using a touch screen).';
+  const musicalTonesHelpText = `Type in the notes you wish to play, using ABC notation. Basically, write "c" for middle C (C4 in scientific music notation), and "C" for the note an octave below. To go down octaves, add commas (C, C,, C,,, and so on); to go up, add single-quote marks (c' c'' c''' and so on). ^c is C-sharp, and _c is C-flat.`;
+  const tuningHelpText = `Enter in any custom tuning modifications, in cents (this will affect audio playback). 100 cents is equal to one semitone. For example, typing in "-100" will make a C sound like a B.`;
+
   return (
     <KeyDefinitions>
       <DefDescriptions>
-        <DefDescription>Keyboard Keys:</DefDescription>
-        <DefDescription>Musical Tones:</DefDescription>
-        <DefDescription>Tuning (in cents):</DefDescription>
+        <DefDescription title={keyBoardKeysHelpText}>
+          Keyboard Keys:
+        </DefDescription>
+        <DefDescription title={musicalTonesHelpText}>
+          Musical Tones:
+        </DefDescription>
+        <DefDescription title={tuningHelpText}>
+          Tuning (in cents):
+        </DefDescription>
       </DefDescriptions>
       {tines &&
         tines.map((tine, index) => {

@@ -13,7 +13,9 @@ const AbcDescription = () => {
 
   return (
     <>
-      <P>Project Description:</P>
+      <P title='Enter in a project descripton. It will appear at the top of the page.'>
+        Project Description:
+      </P>
       <Textarea
         id='projectDescription'
         value={projectDescription}

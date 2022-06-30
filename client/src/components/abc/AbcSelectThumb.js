@@ -6,7 +6,9 @@ const AbcSelectThumb = () => {
   const { thumbOneOrTwo, setThumbOneOrTwo } = useContext(AppContext);
   return (
     <Wrapper>
-      <Text>Hand (left or right):</Text>
+      <Text title='Select which hand the notes you click on will be played by. This affects whether the colour of the note in the notegrid will be black or red, and whether the noteheads in the sheet music will point up or down. Although this is optional (you can just keep it on one setting if you want), it is easier to read music from the notation or note grid if this information is included.'>
+        Hand (left or right):
+      </Text>
       <StyledInput
         type='radio'
         id='left'

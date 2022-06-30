@@ -8,7 +8,9 @@ const AbcSetTempo = () => {
   return (
     <>
       <StyledLabel>
-        <Text>Tempo:</Text>
+        <Text title='Change the speed of the music playback, in beats per minute (one beat = one row in the note grid, or one eigth note in the sheet music).'>
+          Tempo:
+        </Text>
         <StyledInput
           type='number'
           id='tempo'

@@ -6,7 +6,9 @@ const AbcProjectVisibility = () => {
   const { projectVisibility, setProjectVisibility } = useContext(AppContext);
   return (
     <Wrapper>
-      <Text>Project Visibility:</Text>
+      <Text title='Select whether you want your project to be visible to everyone who visits the website, or just to you (your private projects are listed in your user info page). This setting can be changed at any time.'>
+        Project Visibility:
+      </Text>
       <StyledInput
         type='radio'
         id='visibilityPublic'

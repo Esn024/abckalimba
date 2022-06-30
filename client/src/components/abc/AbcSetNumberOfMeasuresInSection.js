@@ -16,7 +16,9 @@ const AbcSetNumberOfMeasuresInSection = ({
 
   return (
     <StyledLabel>
-      <Text># of Measures:</Text>
+      <Text title='Select number of measures in this section. Extra measures are added to the bottom.'>
+        # of Measures:
+      </Text>
       <StyledInput
         type='number'
         min='1'

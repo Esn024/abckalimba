@@ -26,7 +26,9 @@ const AbcSetNumberOfTines = () => {
 
   return (
     <StyledLabel>
-      <Text>Number of Tones:</Text>
+      <Text title='Change the number of pitches that is used in the piece.'>
+        Number of Tones:
+      </Text>
       <StyledInput
         type='number'
         id='quantity'

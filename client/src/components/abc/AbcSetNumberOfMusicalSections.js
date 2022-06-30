@@ -10,7 +10,9 @@ const AbcSetNumberOfMusicalSections = () => {
   return (
     <>
       <StyledLabel>
-        <Text>Musical Sections:</Text>
+        <Text title='Select number of musical sections in this piece, up to a maximum of 26. New sections will be added to the bottom. You can then order the musical sections in any order you like with the "Order of Sections" input at the bottom.'>
+          Musical Sections:
+        </Text>
         <StyledInput
           type='number'
           id='quantity'

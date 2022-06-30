@@ -13,7 +13,9 @@ const AbcSetBeatsPerMeasure = () => {
   return (
     <>
       <StyledLabel>
-        <Text>Beats Per Measure:</Text>
+        <Text title='Change how many beats there will be per measure. At the moment, this setting affects every measure in all sections of the song.'>
+          Beats Per Measure:
+        </Text>
         <StyledInput
           type='number'
           id='quantity'
