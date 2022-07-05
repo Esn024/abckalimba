@@ -48,7 +48,7 @@ express()
   .use(morgan('tiny'))
   .use(express.json())
   .use(express.urlencoded({ extended: false }))
-  .use('/', express.static(__dirname + '/'))
+  // .use('/', express.static(__dirname + '/'))
 
   // serves all our static files from the build directory
   .use(express.static(path.join(__dirname, 'build')))
