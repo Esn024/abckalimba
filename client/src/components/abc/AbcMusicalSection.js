@@ -5,7 +5,7 @@ import { AppContext } from '../AppContext';
 import AbcSetNumberOfMeasuresInSection from './AbcSetNumberOfMeasuresInSection.js';
 import AbcNoteGrid from './AbcNoteGrid.js';
 import AbcPlaybackControl from './AbcPlaybackControl.js';
-import useForceUpdate from '../../hooks/use-force-update.hook.js';
+// import useForceUpdate from '../../hooks/use-force-update.hook.js';
 
 const AbcMusicalSection = ({
   letterId,

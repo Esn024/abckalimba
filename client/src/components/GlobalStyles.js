@@ -135,6 +135,7 @@ a:hover {
     width: 30px;
     height:30px;
   }
+  
   .note-grid-row {
     display: flex;
     align-items: flex-start;
