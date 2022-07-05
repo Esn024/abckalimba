@@ -1,3 +1,7 @@
+# abcKalimbaSynth
+
+Currently deployed at: https://abc-kalimba-synth.herokuapp.com/
+
 abcKalimbaSynth is a musical tool that can be used for education and note-taking by players of tine-based instruments such as the Kalimba (thumb piano) or Marimba.
 
 You can select different tunings, create patterns, combine the patterns in different ways, export the results into either note grids or sheet music, and save your music as either a public project (visible to all) or a private one (visible to just you).
