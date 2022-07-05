@@ -117,14 +117,24 @@ const MyUserInfo = () => {
         <input
           type='password'
           placeholder='Password'
-          value={localCurrentUser ? localCurrentUser.password : ''}
+          value={
+            // if user is signed in, and password hasn't been changed, don't display anything (it would only be a confusing long hash, anyway, as that's what stored in the DB)
+            currentUser
+              ? localCurrentUser
+                ? localCurrentUser.password !== currentUser.password
+                  ? localCurrentUser.password
+                  : ''
+                : ''
+              : ''
+          }
           style={{
             boxShadow: passwordsMatch ? '' : '0 0 3px red',
           }}
           onChange={(ev) => {
             setLocalCurrentUser({
               ...localCurrentUser,
-              password: ev.target.value,
+              password:
+                ev.target.value === '' ? currentUser.password : ev.target.value,
             });
           }}
         />
@@ -132,14 +142,25 @@ const MyUserInfo = () => {
         <input
           type='password'
           placeholder='Repeat Password'
-          value={localCurrentUser ? localCurrentUser.password2 : ''}
+          value={
+            // if user is signed in, and password hasn't been changed, don't display anything (it would only be a confusing long hash, anyway, as that's what stored in the DB)
+            currentUser
+              ? localCurrentUser
+                ? localCurrentUser.password2 !== currentUser.password
+                  ? localCurrentUser.password2
+                  : ''
+                : ''
+              : ''
+          }
           style={{
             boxShadow: passwordsMatch ? '' : '0 0 3px red',
           }}
           onChange={(ev) => {
             setLocalCurrentUser({
               ...localCurrentUser,
-              password2: ev.target.value,
+              // if nothing is entered, assume password hasn't been changed
+              password2:
+                ev.target.value === '' ? currentUser.password : ev.target.value,
             });
           }}
         />

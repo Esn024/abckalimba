@@ -5,6 +5,8 @@ const { v4: uuidv4 } = require('uuid');
 const { MongoClient } = require('mongodb');
 const { sendResponse } = require('./utils');
 const { networkInterfaces } = require('os');
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
 
 require('dotenv').config();
 const { MONGO_URI } = process.env;
@@ -302,29 +304,39 @@ const signInUser = async (req, res) => {
     await client.connect();
 
     const db = client.db('abcsynth');
+    const encryptedPassword = bcrypt.hashSync(password, saltRounds);
+    // console.log({ encryptedPassword });
 
-    const query = { username, password };
-    const user = await db.collection('users').findOne(query);
+    const passwordIsSame = bcrypt.compareSync(password, encryptedPassword);
+    // console.log({ passwordIsSame });
 
-    if (user) {
-      let successMsg = `Found user! `;
+    if (passwordIsSame) {
+      const query = { username };
+      const user = await db.collection('users').findOne(query);
 
-      const newSignInDate = Date.now();
+      if (user) {
+        let successMsg = `Found user! `;
 
-      const newValues = { $set: { ...user, lastSignIn: newSignInDate } };
-      const userUpdated = await db
-        .collection('users')
-        .updateOne({ _id: user._id }, newValues);
+        const newSignInDate = Date.now();
 
-      if (userUpdated) {
-        successMsg += `Updated last sign in time to ${newSignInDate}.`;
-        sendResponse(res, 202, user._id, successMsg);
+        const newValues = { $set: { ...user, lastSignIn: newSignInDate } };
+        const userUpdated = await db
+          .collection('users')
+          .updateOne({ _id: user._id }, newValues);
+
+        if (userUpdated) {
+          successMsg += `Updated last sign in time to ${newSignInDate}.`;
+          sendResponse(res, 202, user._id, successMsg);
+        } else {
+          successMsg += 'Could not update last sign in time.';
+          sendResponse(res, 200, user._id, successMsg);
+        }
       } else {
-        successMsg += 'Could not update last sign in time.';
-        sendResponse(res, 200, user._id, successMsg);
+        const errMsg = 'No user was found...';
+        sendResponse(res, 404, null, errMsg);
       }
     } else {
-      const errMsg = 'No user was found...';
+      const errMsg = 'Wrong password';
       sendResponse(res, 404, null, errMsg);
     }
     client.close();
@@ -351,6 +363,7 @@ const addUser = async (req, res) => {
       const newUser = {
         _id: uuidv4(),
         ...req.body,
+        password: bcrypt.hashSync(password, saltRounds),
       };
       const insertedUser = await db.collection('users').insertOne(newUser);
 
@@ -456,7 +469,13 @@ const updateUser = async (req, res) => {
       );
 
       if (errMsg.length === 0) {
-        const newValues = { $set: { _id: userOriginal._id, ...req.body } };
+        const newValues = {
+          $set: {
+            _id: userOriginal._id,
+            ...req.body,
+            password: bcrypt.hashSync(password, saltRounds),
+          },
+        };
         const userUpdated = await db
           .collection('users')
           .updateOne(rQuery, newValues);
