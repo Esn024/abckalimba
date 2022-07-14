@@ -18,9 +18,10 @@ const AbcSetOrderOfSections = () => {
   // console.log({ orderOfSectionsRegex });
   // pattern={orderOfSectionsRegex}
 
+  //TODO in the future, should add this to the "title" description and add the functionality: 'which can also be written as "A3B3". Another example: "ABABCDEDE", aka. "(AB)2C(DE)2".'
   return (
     <StyledLabel>
-      <Text title='Write the order in which the sections should be played. E.g. "AAABBB", which can also be written as "A3B3". Another example: "ABABCDEDE", aka. "(AB)2C(DE)2".'>
+      <Text title='Write the order in which the sections should be played. E.g. "AAABBB"'>
         Order of Sections:
       </Text>
       <StyledInput
