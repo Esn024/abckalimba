@@ -24,16 +24,10 @@ const AbcMusicalSection = ({
     tempo,
     key,
     colorElements,
-    midiNumberToMidiNoteName,
-    midiNoteNameToAbc,
     tines,
-    resetPlayback,
-    goToSpecificPlaceInSong,
-    startPause,
     getEventCallback,
     getBeatCallback,
     getSequenceCallback,
-    objToToneRowStr,
     project,
   } = useContext(AppContext);
   const [notegridVisible, setNotegridVisible] = useState(true);
@@ -66,29 +60,29 @@ const AbcMusicalSection = ({
       add_classes: true,
     })[0];
 
-    initializeMusic(
-      visualObj,
-      synth,
-      getSequenceCallback(setAllNoteEvents, currentMusicalSection)
-    );
+    async function musicAndTiming() {
+      await initializeMusic(
+        visualObj,
+        synth,
+        getSequenceCallback(setAllNoteEvents, currentMusicalSection)
+      );
 
-    setTimingCallbacks(
-      new abcjs.TimingCallbacks(visualObj, {
-        eventCallback: getEventCallback(
-          colorElements,
-          musicIsPlaying,
-          setMusicIsPlaying
-        ),
-        //TODO the allNoteEvents array that gets sent here is one state update behind
-        beatCallback: getBeatCallback(
-          allNoteEvents,
-          setSliderPosition,
-          tempo,
-          currentMusicalSectionIndex,
-          beatsPerMeasure
-        ),
-      })
-    );
+      setTimingCallbacks(
+        new abcjs.TimingCallbacks(visualObj, {
+          eventCallback: getEventCallback(
+            colorElements,
+            musicIsPlaying,
+            setMusicIsPlaying
+          ),
+          beatCallback: getBeatCallback(
+            setSliderPosition,
+            currentMusicalSectionIndex,
+            beatsPerMeasure
+          ),
+        })
+      );
+    }
+    musicAndTiming();
   }, [tempo, key, musicalSections, tines, project]);
 
   return (

@@ -16,6 +16,7 @@ const AbcProjectVisibility = () => {
         value='public'
         checked={projectVisibility === 'public'}
         onClick={() => setProjectVisibility('public')}
+        readOnly
       />
       <StyledLabel htmlFor='public'>Public</StyledLabel>
       <StyledInput
@@ -25,6 +26,7 @@ const AbcProjectVisibility = () => {
         value='private'
         checked={projectVisibility === 'private'}
         onClick={() => setProjectVisibility('private')}
+        readOnly
       />
       <StyledLabel htmlFor='visibilityPrivate'>Private</StyledLabel>
     </Wrapper>

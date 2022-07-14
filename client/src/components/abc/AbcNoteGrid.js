@@ -1,15 +1,10 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext } from 'react';
 import styled from 'styled-components';
 import { AppContext } from '../AppContext';
-//clickOnNoteButton(keyboardLetter, abcNote)
 
 const AbcNoteGrid = ({ currentMusicalSectionIndex }) => {
-  // const [row, setRow] = useState(1);
   const {
     tines,
-    userPlayNote,
-    getRowNumFromIndex,
-    beatsPerMeasure,
     musicalSections,
     changeOneNote,
     thumbOneOrTwo,
@@ -17,7 +12,6 @@ const AbcNoteGrid = ({ currentMusicalSectionIndex }) => {
     projectName,
     indexToAlphabetLetter,
   } = useContext(AppContext);
-  // const rowBeatsTines = [];
 
   return (
     <>
@@ -88,39 +82,6 @@ const AbcNoteGrid = ({ currentMusicalSectionIndex }) => {
       </StyledButton>
     </>
   );
-  //   return (
-  //     <NoteGrid id='note-grid'>
-  //       {tines.map((tine, index) => (
-  //         <TimedNote
-  //           className='timed-note'
-  //           id='a-timed-note-1'
-  //           onClick='setNoteInNoteGrid(this)'
-  //         >
-  //           0
-  //         </TimedNote>
-  //       ))}
-
-  //       <NoteGridRow className='note-grid-row'>
-  //         {/* <TimedNote
-  //           className='timed-note'
-  //           id='a-timed-note-1'
-  //           onClick='setNoteInNoteGrid(this)'
-  //         > */}
-  //       </NoteGridRow>
-
-  //       <NoteGridRow className='note-grid-row'>
-  //         <TimedNote
-  //           className='timed-note'
-  //           id='a-timed-note-2'
-  //           onClick='setNoteInNoteGrid(this)'
-  //         >
-  //           0
-  //         </TimedNote>
-  //       </NoteGridRow>
-
-  //       {/* <button onClick='getAbcFromNoteGrid()'>Get ABC from note grid</button> */}
-  //     </NoteGrid>
-  //   );
 };
 
 const NoteGridMeasure = styled.div`
@@ -173,11 +134,6 @@ const TimedNote = styled.button`
       : note === 1
       ? `color: black`
       : `color: var(--color-cadmium-red)`}
-`;
-
-const Text = styled.p`
-  font-size: var(--font-size-small);
-  color: black;
 `;
 
 const StyledButton = styled.button`

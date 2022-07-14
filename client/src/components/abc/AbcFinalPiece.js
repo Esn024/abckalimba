@@ -55,19 +55,26 @@ const AbcFinalPiece = () => {
       add_classes: true,
     })[0];
 
-    initializeMusic(visualObj, synth, getSequenceCallback(setAllNoteEvents));
+    async function musicAndTiming() {
+      await initializeMusic(
+        visualObj,
+        synth,
+        getSequenceCallback(setAllNoteEvents)
+      );
 
-    setTimingCallbacks(
-      new abcjs.TimingCallbacks(visualObj, {
-        eventCallback: getEventCallback(
-          colorElements,
-          musicIsPlaying,
-          setMusicIsPlaying
-        ),
-        //TODO the allNoteEvents array that gets sent here is one state update behind
-        beatCallback: getBeatCallback(allNoteEvents, setSliderPosition),
-      })
-    );
+      setTimingCallbacks(
+        new abcjs.TimingCallbacks(visualObj, {
+          eventCallback: getEventCallback(
+            colorElements,
+            musicIsPlaying,
+            setMusicIsPlaying
+          ),
+          beatCallback: getBeatCallback(setSliderPosition),
+        })
+      );
+    }
+
+    musicAndTiming();
   }, [tempo, key, musicalSections, orderOfSections, tines, projectName]);
 
   return (

@@ -640,7 +640,14 @@ export const AppProvider = ({ children }) => {
     return abcjs.synth.pitchToNoteName[midiNumber];
   };
 
-  // function and variable to do with adding & removing the CSS that gives red color to elements that are "playing"
+  //helper function. Convert midi number to ABC note name. Finds the first matching abcNote value within the tines array (if there are both ^g (G-sharp) and _a (A-flat), it will return only one of them)
+  const midiNumberToAbc = (midiNumber, tines = tines) => {
+    return tines
+      .find((tine) => abcToMidiNumber(tine.abcNote) === midiNumber)
+      .map((tine) => tine.abcNote);
+  };
+
+  // function and variable to do with adding & removing the CSS that gives a red color to elements that are "playing" (in the sheet music notation)
   const colorElements = (currentEls) => {
     // check if there is a new note, or if there are only rests
     let newNote = false;
@@ -649,9 +656,9 @@ export const AppProvider = ({ children }) => {
         newNote = true;
       }
     });
-    //if there is a new note, remove any previous red color, otherwise keep it until a new note shows up
+    //if there is a new note, remove any previous color, otherwise keep it until a new note shows up
     if (newNote) {
-      // remove any earlier red coloration
+      // remove any earlier coloration
       Array.from(document.querySelectorAll('.color')).forEach((el) =>
         el.classList.remove('color')
       );
@@ -819,50 +826,33 @@ w:${modifiedDescription}
     musicIsPlaying,
     setMusicIsPlaying
   ) => {
-    // the function to change colours to red
+    // the function to change colours to green
     const eventCallback = (ev) => {
       if (!ev) {
         setMusicIsPlaying(!musicIsPlaying);
         return;
       }
 
+      // add red color to currently playing notes in the sheet music
       colorElements(ev.elements);
-    };
+      // console.log({ ev });
 
-    return eventCallback;
-  };
-
-  const getBeatCallback = (
-    allNoteEvents,
-    setSliderPosition,
-    tempo = 180,
-    currentMusicalSectionIndex,
-    beatsPerMeasure
-  ) => {
-    // this runs every beat
-    const beatCallback = async (beatNumber, totalBeats) => {
-      // console.log({ beatNumber });
+      //add green colour to the currently playing notes of the visual music keyboard
 
       // array of MIDI pitches currently playing (e.g. [60, 62])
-      // const currentPitches = allNoteEvents
-      //   .filter((e) => e.beatNumber === beatNumber)
-      //   .map((e) => e.pitch);
-      // since I've added an abcNoteName to each event, I can also get the abcPitches
-      const currentAbcPitches = allNoteEvents
-        .filter((e) => e.beatNumber === beatNumber)
-        .map((e) => e.abcNoteName);
+      const currentPitches = ev.midiPitches.map((e) => e.pitch);
 
       // get indices of current tines playing
-      const currentTinesPlaying = tines
+      const currentTinesPlayingIndices = tines
         .map((tine, index) => {
           return { ...tine, index };
         })
-        .filter((tine) => currentAbcPitches.includes(tine.abcNote))
+        .filter((tine) =>
+          currentPitches.includes(abcToMidiNumber(tine.abcNote))
+        )
         .map((tine) => tine.index);
-      // console.log({ allNoteEvents });
       // console.log({ currentPitches });
-      // console.log({ currentAbcPitches });
-      // console.log({ currentTinesPlaying });
+      // console.log({ currentTinesPlayingIndices });
 
       // how long the tone should be colored for (depends on the tempo).
       const fullLengthOfBeat = (1000 * 60) / tempo;
@@ -870,7 +860,7 @@ w:${modifiedDescription}
 
       // change colour of tines active in current beat
       tines.forEach((tine, index) => {
-        if (currentTinesPlaying.includes(index)) {
+        if (currentTinesPlayingIndices.includes(index)) {
           const tineEl = document.querySelector('#tine-' + index);
           tineEl.classList.add('active-tine');
           // after a time interval, remove the "active-tine" class, thereby removing the color
@@ -879,8 +869,20 @@ w:${modifiedDescription}
           }, msToChangeColor);
         }
       });
+    };
 
-      // console.log({ currentMusicalSectionIndex });
+    return eventCallback;
+  };
+
+  const getBeatCallback = (
+    setSliderPosition,
+    currentMusicalSectionIndex,
+    beatsPerMeasure
+  ) => {
+    // this runs every beat
+    const beatCallback = async (beatNumber, totalBeats) => {
+      // console.log({ beatNumber });
+
       // make the current note grid row different colour
       if (currentMusicalSectionIndex !== undefined) {
         // console.log('test2');
@@ -1318,6 +1320,7 @@ w:${modifiedDescription}
         abcToMidiNoteName,
         midiNoteNameToNumber,
         midiNumberToMidiNoteName,
+        midiNumberToAbc,
         noteGridToAbc,
         singleMusicalSectionToAbc,
         musicalSectionsToAbc,
