@@ -820,11 +820,19 @@ w:${modifiedDescription}
     return abc;
   };
 
+  // get the name of one abc note from an abc string, given a start and end character
+  const getOneAbcNoteFromStr = (abcStr, start, end) => {
+    return abcStr.slice(start, end).trim();
+  };
+
   // the three big callback functions below (eventCallback, sequenceCallback and beatCallback) are returned with getter functions, because in ABCJS the parameters that can be passed into these callbacks are already pre-defined.
+  // the eventCallback actually runs every single 8th note (because the note grid is transformed into an abc string in such a way that there is one event every 8th note, even if it's an 8th rest)
   const getEventCallback = (
     colorElements,
     musicIsPlaying,
-    setMusicIsPlaying
+    setMusicIsPlaying,
+    abc,
+    currentMusicalSectionIndex
   ) => {
     // the function to change colours to green
     const eventCallback = (ev) => {
@@ -836,11 +844,35 @@ w:${modifiedDescription}
       // add red color to currently playing notes in the sheet music
       colorElements(ev.elements);
       // console.log({ ev });
+      // console.log({ abc });
+
+      // measure number, beginning with 0
+      const measureNumber = ev.measureNumber;
+      // beat number in measure, beginning with 0 (grab the beat number from the DOM element class beginning with "abcjs-n")
+      const beatNumber =
+        ev.elements[0][0].className.baseVal.match(/abcjs-n(\d)/)[1] * 1;
+
+      // console.log({ currentMusicalSectionIndex });
+      // console.log({ musicalSections });
+
+      // console.log({
+      //   measureNumber,
+      //   beatNumber
+      // });
+
+      // get the abcNotes currently playing from the abc string (this also includes "z" rests)
+      let currentAbcNotes = [];
+      for (let i = 0; i < ev.endCharArray.length; i++) {
+        currentAbcNotes.push(
+          getOneAbcNoteFromStr(abc, ev.startCharArray[i], ev.endCharArray[i])
+        );
+      }
+      // console.log({ currentAbcNotes });
 
       //add green colour to the currently playing notes of the visual music keyboard
 
       // array of MIDI pitches currently playing (e.g. [60, 62])
-      const currentPitches = ev.midiPitches.map((e) => e.pitch);
+      // const currentPitches = ev.midiPitches.map((e) => e.pitch);
 
       // get indices of current tines playing
       const currentTinesPlayingIndices = tines
@@ -848,7 +880,8 @@ w:${modifiedDescription}
           return { ...tine, index };
         })
         .filter((tine) =>
-          currentPitches.includes(abcToMidiNumber(tine.abcNote))
+          // currentPitches.includes(abcToMidiNumber(tine.abcNote))
+          currentAbcNotes.includes(tine.abcNote)
         )
         .map((tine) => tine.index);
       // console.log({ currentPitches });
@@ -869,33 +902,11 @@ w:${modifiedDescription}
           }, msToChangeColor);
         }
       });
-    };
-
-    return eventCallback;
-  };
-
-  const getBeatCallback = (
-    setSliderPosition,
-    currentMusicalSectionIndex,
-    beatsPerMeasure
-  ) => {
-    // this runs every beat
-    const beatCallback = async (beatNumber, totalBeats) => {
-      // console.log({ beatNumber });
 
       // make the current note grid row different colour
       if (currentMusicalSectionIndex !== undefined) {
         // console.log('test2');
-        const currentMeasure =
-          beatNumber === totalBeats
-            ? 0
-            : Math.floor(beatNumber / beatsPerMeasure);
-        const currentBeatInMeasure =
-          beatNumber === totalBeats
-            ? 0
-            : beatNumber - currentMeasure * beatsPerMeasure;
-
-        const rowId = `musicalSection-${currentMusicalSectionIndex}-measure-${currentMeasure}-beat-${currentBeatInMeasure}`;
+        const rowId = `musicalSection-${currentMusicalSectionIndex}-measure-${measureNumber}-beat-${beatNumber}`;
 
         const currentRowEl = document.getElementById(rowId);
 
@@ -916,7 +927,47 @@ w:${modifiedDescription}
           }
         }
       }
+    };
 
+    return eventCallback;
+  };
+
+  const getBeatCallback = (
+    setSliderPosition
+    // currentMusicalSectionIndex,
+    // beatsPerMeasure
+  ) => {
+    // this runs every beat
+    const beatCallback = async (beatNumber, totalBeats) => {
+      // console.log({ beatNumber });
+      // // make the current note grid row different colour
+      // if (currentMusicalSectionIndex !== undefined) {
+      //   // console.log('test2');
+      //   const currentMeasure =
+      //     beatNumber === totalBeats
+      //       ? 0
+      //       : Math.floor(beatNumber / beatsPerMeasure);
+      //   const currentBeatInMeasure =
+      //     beatNumber === totalBeats
+      //       ? 0
+      //       : beatNumber - currentMeasure * beatsPerMeasure;
+      //   const rowId = `musicalSection-${currentMusicalSectionIndex}-measure-${currentMeasure}-beat-${currentBeatInMeasure}`;
+      //   const currentRowEl = document.getElementById(rowId);
+      //   if (currentRowEl) {
+      //     const allMeasuresEl = currentRowEl.parentNode.parentNode;
+      //     // first, remove green color from any other row in current musical section.
+      //     const allNodesInMeasure =
+      //       allMeasuresEl.getElementsByTagName('button');
+      //     for (let i = 0; i < allNodesInMeasure.length; i++) {
+      //       allNodesInMeasure[i].classList.remove('active-row');
+      //     }
+      //     // now add green color to current row
+      //     const currentRowNodes = currentRowEl.getElementsByTagName('button');
+      //     for (let i = 0; i < currentRowNodes.length; i++) {
+      //       currentRowNodes[i].classList.add('active-row');
+      //     }
+      //   }
+      // }
       // move the position of the audio slider
       setSliderPosition((beatNumber / totalBeats) * 100);
     };
@@ -939,6 +990,7 @@ w:${modifiedDescription}
 
       tracks.forEach((track, trackIndex) => {
         track.forEach((event) => {
+          // console.log({ event });
           //which measure this event is in
           // const measure = Math.floor((event.start * 8) / beatsPerMeasure);
 
@@ -955,6 +1007,8 @@ w:${modifiedDescription}
 
           // ABC notation note name
           const abcNoteName = midiNoteNameToAbc(midiNoteName);
+
+          //TODO check if this will work getOneAbcNoteFromStr(abc, ev.startCharArray[i], ev.endCharArray[i]);
 
           // apply any tuning modifications set by the user.
           tines.forEach((tine) => {
@@ -1032,7 +1086,8 @@ w:${modifiedDescription}
     synth,
     timingCallbacks,
     setMusicIsPlaying,
-    setSliderPosition
+    setSliderPosition,
+    currentMusicalSectionIndex
   ) => {
     setMusicIsPlaying(false);
     timingCallbacks.stop();
@@ -1042,6 +1097,18 @@ w:${modifiedDescription}
     Array.from(document.querySelectorAll('.color')).forEach((el) =>
       el.classList.remove('color')
     );
+
+    //remove any remaining green colour on any row inside the section
+    if (currentMusicalSectionIndex !== 'final') {
+      const allMeasuresEl = document.getElementById(
+        `musicalSection-${currentMusicalSectionIndex}`
+      );
+
+      const allNodesInMeasure = allMeasuresEl.getElementsByTagName('button');
+      for (let i = 0; i < allNodesInMeasure.length; i++) {
+        allNodesInMeasure[i].classList.remove('active-row');
+      }
+    }
   };
 
   const goToSpecificPlaceInSong = async (position, synth, timingCallbacks) => {

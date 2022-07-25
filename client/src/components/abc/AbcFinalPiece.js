@@ -67,7 +67,8 @@ const AbcFinalPiece = () => {
           eventCallback: getEventCallback(
             colorElements,
             musicIsPlaying,
-            setMusicIsPlaying
+            setMusicIsPlaying,
+            abc
           ),
           beatCallback: getBeatCallback(setSliderPosition),
         })
