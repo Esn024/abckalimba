@@ -13,7 +13,7 @@ const AbcSetBeatsPerMeasure = () => {
   return (
     <>
       <StyledLabel>
-        <Text title='Change how many beats there will be per measure. At the moment, this setting affects every measure in all sections of the song. Maximum is 8 beats/measure (it cannot be higher due to a bug in ABCJS, so that is the limit until the bug is fixed).'>
+        <Text title='Change how many beats there will be per measure. At the moment, this setting affects every measure in all sections of the song.'>
           Beats Per Measure:
         </Text>
         <StyledInput
@@ -21,7 +21,7 @@ const AbcSetBeatsPerMeasure = () => {
           id='quantity'
           name='quantity'
           min='2'
-          max='8'
+          max='20'
           value={beatsPerMeasure}
           onChange={(e) => {
             const newBeatsPerMeasure = e.target.value * 1;

@@ -72,13 +72,11 @@ const AbcMusicalSection = ({
           eventCallback: getEventCallback(
             colorElements,
             musicIsPlaying,
-            setMusicIsPlaying
+            setMusicIsPlaying,
+            abc,
+            currentMusicalSectionIndex
           ),
-          beatCallback: getBeatCallback(
-            setSliderPosition,
-            currentMusicalSectionIndex,
-            beatsPerMeasure
-          ),
+          beatCallback: getBeatCallback(setSliderPosition),
         })
       );
     }
