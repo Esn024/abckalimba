@@ -23,8 +23,13 @@ const AbcPlaybackControl = ({
           synth,
           timingCallbacks,
           setMusicIsPlaying,
+<<<<<<< HEAD
           setSliderPosition
           // currentMusicalSectionIndex
+=======
+          setSliderPosition,
+          currentMusicalSectionIndex
+>>>>>>> 5bd5c4af8a823929f568221fefd4626d7b1a01ea
         );
         synth.start();
         timingCallbacks.start();
