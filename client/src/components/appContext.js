@@ -649,13 +649,17 @@ export const AppProvider = ({ children }) => {
 
   // function and variable to do with adding & removing the CSS that gives a red color to elements that are "playing" (in the sheet music notation)
   const colorElements = (currentEls) => {
+    // console.log({ currentEls });
     // check if there is a new note, or if there are only rests
     let newNote = false;
     currentEls.forEach((el) => {
-      if (el[0].classList.contains('abcjs-note')) {
+      // console.log(el[0]);
+      // console.log(el[0].dataset.name);
+      if (el[0].dataset.name === 'note') {
         newNote = true;
       }
     });
+    // console.log({ newNote });
     //if there is a new note, remove any previous color, otherwise keep it until a new note shows up
     if (newNote) {
       // remove any earlier coloration
@@ -668,7 +672,10 @@ export const AppProvider = ({ children }) => {
     for (let i = 0; i < currentEls.length; i++) {
       //console.log('currentEls[i]', currentEls[i]);
       for (let j = 0; j < currentEls[i].length; j++) {
-        //console.log('currentEls[i][j]', currentEls[i][j]);
+        // console.log(
+        //   `currentEls[${i}][${j}].classList`,
+        //   currentEls[i][j].classList
+        // );
         currentEls[i][j].classList.add('color');
       }
     }
@@ -843,7 +850,7 @@ w:${modifiedDescription}
 
       // add red color to currently playing notes in the sheet music
       colorElements(ev.elements);
-      // console.log({ ev });
+      console.log({ ev });
       // console.log({ abc });
 
       // measure number, beginning with 0
@@ -851,6 +858,10 @@ w:${modifiedDescription}
       // beat number in measure, beginning with 0 (grab the beat number from the DOM element class beginning with "abcjs-n")
       const beatNumber =
         ev.elements[0][0].className.baseVal.match(/abcjs-n(\d)/)[1] * 1;
+      // beat number since start of song
+      // const beatNumberSinceStart = ev.elements[0][0].dataset.index * 1;
+      // console.log({ beatNumberSinceStart });
+      // ev.elements[0][0].dataset.index*1
 
       // console.log({ currentMusicalSectionIndex });
       // console.log({ musicalSections });
@@ -939,35 +950,6 @@ w:${modifiedDescription}
   ) => {
     // this runs every beat
     const beatCallback = async (beatNumber, totalBeats) => {
-      // console.log({ beatNumber });
-      // // make the current note grid row different colour
-      // if (currentMusicalSectionIndex !== undefined) {
-      //   // console.log('test2');
-      //   const currentMeasure =
-      //     beatNumber === totalBeats
-      //       ? 0
-      //       : Math.floor(beatNumber / beatsPerMeasure);
-      //   const currentBeatInMeasure =
-      //     beatNumber === totalBeats
-      //       ? 0
-      //       : beatNumber - currentMeasure * beatsPerMeasure;
-      //   const rowId = `musicalSection-${currentMusicalSectionIndex}-measure-${currentMeasure}-beat-${currentBeatInMeasure}`;
-      //   const currentRowEl = document.getElementById(rowId);
-      //   if (currentRowEl) {
-      //     const allMeasuresEl = currentRowEl.parentNode.parentNode;
-      //     // first, remove green color from any other row in current musical section.
-      //     const allNodesInMeasure =
-      //       allMeasuresEl.getElementsByTagName('button');
-      //     for (let i = 0; i < allNodesInMeasure.length; i++) {
-      //       allNodesInMeasure[i].classList.remove('active-row');
-      //     }
-      //     // now add green color to current row
-      //     const currentRowNodes = currentRowEl.getElementsByTagName('button');
-      //     for (let i = 0; i < currentRowNodes.length; i++) {
-      //       currentRowNodes[i].classList.add('active-row');
-      //     }
-      //   }
-      // }
       // move the position of the audio slider
       setSliderPosition((beatNumber / totalBeats) * 100);
     };
@@ -1099,14 +1081,18 @@ w:${modifiedDescription}
     );
 
     //remove any remaining green colour on any row inside the section
-    if (currentMusicalSectionIndex !== 'final') {
+    if (
+      currentMusicalSectionIndex !== 'final' &&
+      currentMusicalSectionIndex !== undefined
+    ) {
       const allMeasuresEl = document.getElementById(
         `musicalSection-${currentMusicalSectionIndex}`
       );
-
-      const allNodesInMeasure = allMeasuresEl.getElementsByTagName('button');
-      for (let i = 0; i < allNodesInMeasure.length; i++) {
-        allNodesInMeasure[i].classList.remove('active-row');
+      if (allMeasuresEl) {
+        const allNodesInMeasure = allMeasuresEl.getElementsByTagName('button');
+        for (let i = 0; i < allNodesInMeasure.length; i++) {
+          allNodesInMeasure[i].classList.remove('active-row');
+        }
       }
     }
   };
