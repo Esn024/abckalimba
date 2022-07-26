@@ -848,9 +848,9 @@ w:${modifiedDescription}
         return;
       }
 
-      // add red color to currently playing notes in the sheet music
+      // add red color to currently playing notes in the sheet music. TODO this doesn't currently work when a musical section is first loaded, but it works after anything changes and for final piece
       colorElements(ev.elements);
-      console.log({ ev });
+      // console.log({ ev });
       // console.log({ abc });
 
       // measure number, beginning with 0
@@ -871,30 +871,58 @@ w:${modifiedDescription}
       //   beatNumber
       // });
 
-      // get the abcNotes currently playing from the abc string (this also includes "z" rests)
-      let currentAbcNotes = [];
-      for (let i = 0; i < ev.endCharArray.length; i++) {
-        currentAbcNotes.push(
-          getOneAbcNoteFromStr(abc, ev.startCharArray[i], ev.endCharArray[i])
-        );
-      }
-      // console.log({ currentAbcNotes });
-
       //add green colour to the currently playing notes of the visual music keyboard
 
       // array of MIDI pitches currently playing (e.g. [60, 62])
       // const currentPitches = ev.midiPitches.map((e) => e.pitch);
 
-      // get indices of current tines playing
-      const currentTinesPlayingIndices = tines
-        .map((tine, index) => {
-          return { ...tine, index };
-        })
-        .filter((tine) =>
-          // currentPitches.includes(abcToMidiNumber(tine.abcNote))
-          currentAbcNotes.includes(tine.abcNote)
-        )
-        .map((tine) => tine.index);
+      // get indices of current tines playing,
+      let currentTinesPlayingIndices;
+
+      // based on note grid, if one exists (this isn't the "final" piece, and there IS a currentMusicalSectionIndex)
+      if (currentMusicalSectionIndex !== undefined) {
+        currentTinesPlayingIndices = musicalSections[
+          currentMusicalSectionIndex
+        ].measures[measureNumber][beatNumber].reduce(
+          (arr, e, i) => (e !== 0 && arr.push(i), arr),
+          []
+        );
+
+        // console.log({ currentTinesPlayingIndices });
+      } else {
+        // get the abcNotes currently playing from the abc string (this also includes "z" rests)
+        let currentAbcNotes = [];
+        for (let i = 0; i < ev.endCharArray.length; i++) {
+          currentAbcNotes.push(
+            getOneAbcNoteFromStr(abc, ev.startCharArray[i], ev.endCharArray[i])
+          );
+        }
+        // console.log({ currentAbcNotes });
+
+        // get indices of current tines playing based on currentAbcNotes (this has the flaw of not differentiating between duplicate notes in the instrument's tuning, and getting ALL indices of a note. However, it may be the only option for "final piece", where a note grid is absent, at least for now)
+        currentTinesPlayingIndices = tines
+          .map((tine, index) => {
+            return { ...tine, index };
+          })
+          .filter((tine) =>
+            // currentPitches.includes(abcToMidiNumber(tine.abcNote))
+            currentAbcNotes.includes(tine.abcNote)
+          )
+          .map((tine) => tine.index);
+        // console.log({ currentPitches });
+        // console.log({ currentTinesPlayingIndices });
+      }
+
+      // get indices of current tines playing based on currentAbcNotes (this has the flaw of not differentiating between duplicate notes in the instrument's tuning, and getting ALL indices of a note. However, it may be the only option for "final piece", where a note grid is absent, at least for now)
+      // const currentTinesPlayingIndices = tines
+      //   .map((tine, index) => {
+      //     return { ...tine, index };
+      //   })
+      //   .filter((tine) =>
+      //     // currentPitches.includes(abcToMidiNumber(tine.abcNote))
+      //     currentAbcNotes.includes(tine.abcNote)
+      //   )
+      //   .map((tine) => tine.index);
       // console.log({ currentPitches });
       // console.log({ currentTinesPlayingIndices });
 

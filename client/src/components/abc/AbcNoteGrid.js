@@ -38,6 +38,7 @@ const AbcNoteGrid = ({ currentMusicalSectionIndex }) => {
                             <TimedNote
                               key={uniqueNoteId}
                               id={uniqueNoteId}
+                              className={`note${note}`}
                               note={note}
                               onClick={() => {
                                 // tine-0-key-a
@@ -116,24 +117,7 @@ const TimedNote = styled.button`
   &:hover {
     cursor: pointer;
     background: var(--color-dark-green);
-    ${({ note }) =>
-      note === 0
-        ? `
-    color: silver;
-  `
-        : note === 1
-        ? `color: black`
-        : `color: var(--color-cadmium-red)`}
   }
-
-  ${({ note }) =>
-    note === 0
-      ? `
-    color: silver;
-  `
-      : note === 1
-      ? `color: black`
-      : `color: var(--color-cadmium-red)`}
 `;
 
 const StyledButton = styled.button`

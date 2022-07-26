@@ -142,4 +142,15 @@ a:hover {
     justify-content: center;
   }
 
+  .note0 {
+    color: silver;
+  }
+
+  .note1 {
+    color: black;
+  }
+
+  .note2 {
+    color: var(--color-cadmium-red);
+  }
 `;
