@@ -57,21 +57,25 @@ export const AppProvider = ({ children }) => {
       keyboardLetter: 'a',
       abcNote: 'a',
       cents: 0,
+      color: 0,
     },
     {
       keyboardLetter: 'w',
       abcNote: 'b',
       cents: 0,
+      color: 1,
     },
     {
       keyboardLetter: 's',
       abcNote: 'c',
       cents: 0,
+      color: 0,
     },
     {
       keyboardLetter: 'e',
       abcNote: 'd',
       cents: 0,
+      color: 1,
     },
   ]);
   // what a click on the note-grid means. "1" is thumb one, "2" is thumb two. (if clicked again, notegrid toggles to "0" - a musical rest)
@@ -100,18 +104,20 @@ export const AppProvider = ({ children }) => {
   ]);
 
   const [toneRowStrings, setToneRowStrings] = useState([
-    '5 tones (c d e f g) [awsed]',
-    '6 tones (c d e f g a) [awsedr]',
-    '7 tones (c d-20 e f+20 g a b) [awsedrf]',
-    '17 tones (^c-40 ^g-40 B-20 ^f-20 A e ^C-40 a A, d+20 E e ^F-20 ^f-20 ^G-40 ^g-40 A) [awsedrftgyhujikol]',
+    '5 tones (c d e f g) [awsed] {....}',
+    '6 tones (c d e f g a) [awsedr] {.....}',
+    '7 tones (c d-20 e f+20 g a b) [awsedrf] {.l.l.l.}',
+    '17 tones (^c-40 ^g-40 B-20 ^f-20 A e ^C-40 a A, d+20 E e ^F-20 ^f-20 ^G-40 ^g-40 A) [awsedrftgyhujikol] {.l.l.l.l.l.l.l.l.}',
   ]);
 
   // convert a tone row string into a properly-organized tines object
   const toneRowStrToObj = (str) => {
     if (str) {
+      // regexp for a string input missing the keyboard letter and colors info. If they're missing, they should be added in automatically
+
       // the below regexp assumes a string input of the sort that the tone rows are stored in in the DB of the site
       const toneRowStrRegexp =
-        /(^\d+)\stones\s\(([-^_+',a-gA-G\s\d]{2,})\)\s\[([a-z]{2,})\]/;
+        /(^\d+)\stones\s\(([-^_+',a-gA-G\s\d]{2,})\)\s\[([a-z]{2,})\]\s{([\.l]{2,})}/;
       // the below regexp is for capturing info about one abcNote and any tuning adjustment
       const abcNoteAndCentsRegexp = /([\^_]?[a-gA-G][',]{0,4})(([-+])(\d+))?/;
 
@@ -121,13 +127,18 @@ export const AppProvider = ({ children }) => {
         // const numberOfTones = result[1] * 1;
         const abcNotesAndCentsStr = result[2];
         const keyboardLettersStr = result[3];
+        const colorsStr = result[4];
 
         const keyboardLetters = keyboardLettersStr.split('');
+        const colors = colorsStr
+          .split('')
+          .map((symbol) => (symbol === '.' ? 0 : 1));
 
         const tinesArr = abcNotesAndCentsStr.split(' ').map((str, index) => {
           const result = str.match(abcNoteAndCentsRegexp);
 
           const keyboardLetter = keyboardLetters[index];
+          const color = colors[index] * 1;
 
           const abcNote = result[1];
 
@@ -139,7 +150,7 @@ export const AppProvider = ({ children }) => {
               : centsAmount * -1
             : 0;
 
-          return { keyboardLetter, abcNote, cents };
+          return { keyboardLetter, abcNote, cents, color };
         });
 
         // console.log({ tines, tinesArr });
@@ -154,12 +165,14 @@ export const AppProvider = ({ children }) => {
     if (tines) {
       let abcNotesAndCentsArr = [];
       let keyboardLettersStr = '';
+      let colorsStr = '';
       const numberOfTones = tines.length;
 
       tines.forEach((tine) => {
         // if empty values, just add "c"
         keyboardLettersStr +=
           tine.keyboardLetter.length > 0 ? tine.keyboardLetter : 'c';
+        colorsStr += tine.color === 0 ? '.' : 'l';
         let abcNoteAndCentsStr = tine.abcNote.match(validAbcNoteRegex)
           ? tine.abcNote
           : 'C,,';
@@ -173,7 +186,7 @@ export const AppProvider = ({ children }) => {
       });
       const allAbcNotesAndCentsStr = abcNotesAndCentsArr.join(' ');
 
-      const finalStr = `${numberOfTones} tones (${allAbcNotesAndCentsStr}) [${keyboardLettersStr}]`;
+      const finalStr = `${numberOfTones} tones (${allAbcNotesAndCentsStr}) [${keyboardLettersStr}] {${colorsStr}}`;
 
       return finalStr;
     }
@@ -241,6 +254,7 @@ export const AppProvider = ({ children }) => {
               keyboardLetter: '',
               abcNote: '',
               cents: 0,
+              color: 0,
             })),
           ]
         : tines.slice(0, newNumberOfTines)
@@ -423,11 +437,12 @@ export const AppProvider = ({ children }) => {
     return newArray;
   };
 
-  //find how many times index goes into number of tines
+  //find how many times index goes into number of tines. TODO this function is not currently used. What was it originally to be used for?
   const getRowNumFromIndex = (tines, index) => {
-    Math.floor((index + 1) / tines.length);
+    return Math.floor((index + 1) / tines.length);
   };
 
+  //TODO rewrite this to not use abcjs at all, just convert the abc note to MIDI pitch and add cents
   const userPlayNote = async (abcNoteName, cents) => {
     const abcNoteNameIsValid = abcNoteName.match(validAbcNoteRegex);
     if (abcNoteNameIsValid) {
@@ -483,6 +498,7 @@ export const AppProvider = ({ children }) => {
     }
   };
 
+  // change value of one note in a musical section
   const changeOneNote = (
     musicalSectionIndex,
     measureIndex,
@@ -682,7 +698,7 @@ export const AppProvider = ({ children }) => {
   };
 
   // convert measures stored in the format of a note grid array into abc notation (returns a 2-item array of abc for the left and right hand)
-  const noteGridToAbc = (measures) => {
+  const noteGridToAbc = (measures, key = 'C') => {
     let handOneAbcNotesThisBeat = [];
     let handTwoAbcNotesThisBeat = [];
 
@@ -749,7 +765,7 @@ export const AppProvider = ({ children }) => {
   ) => {
     const { letterId, description, measures, numberOfMeasures } =
       currentMusicalSection;
-    const [handOneAbc, handTwoAbc] = noteGridToAbc(measures);
+    const [handOneAbc, handTwoAbc] = noteGridToAbc(measures, key);
 
     // TODO may need to update the below line later in case this number will be able to change mid-piece
     const beatsPerBar = measures[0].length;
@@ -1168,9 +1184,12 @@ w:${modifiedDescription}
     a.print();
   };
 
-  //0 is A, 1 is B, etc.
+  //0 is A, 1 is B, etc.; 26 is a, 27 is b, etc.
   const indexToAlphabetLetter = (indexNumber) => {
-    return String.fromCharCode(indexNumber + 65);
+    const charCode = indexNumber >= 26 ? indexNumber + 71 : indexNumber + 65;
+    const alphabetLetter = String.fromCharCode(charCode);
+    // console.log({ alphabetLetter });
+    return alphabetLetter;
   };
 
   const saveImageById = (nodeId, filename) => {

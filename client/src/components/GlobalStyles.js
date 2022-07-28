@@ -153,4 +153,8 @@ a:hover {
   .note2 {
     color: var(--color-cadmium-red);
   }
+
+  .darktine {
+    filter: brightness(85%);
+  }
 `;

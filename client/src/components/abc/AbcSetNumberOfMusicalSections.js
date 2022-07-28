@@ -3,14 +3,19 @@ import styled from 'styled-components';
 import { AppContext } from '../AppContext';
 
 const AbcSetNumberOfMusicalSections = () => {
-  const { musicalSections, setMusicalSections, beatsPerMeasure, tines } =
-    useContext(AppContext);
+  const {
+    musicalSections,
+    setMusicalSections,
+    beatsPerMeasure,
+    tines,
+    indexToAlphabetLetter,
+  } = useContext(AppContext);
   const [numberOfMusicalSections, setNumberOfMusicalSections] = useState(1);
 
   return (
     <>
       <StyledLabel>
-        <Text title='Select number of musical sections in this piece, up to a maximum of 26. New sections will be added to the bottom. You can then order the musical sections in any order you like with the "Order of Sections" input at the bottom.'>
+        <Text title='Select number of musical sections in this piece, up to a maximum of 52. New sections will be added to the bottom. You can then order the musical sections in any order you like with the "Order of Sections" input at the bottom. The first 26 sections will be named the 26 letters of the alphabet, UPPERCASE, and the next 26 will be the same letters again but lowercase.'>
           Musical Sections:
         </Text>
         <StyledInput
@@ -18,7 +23,7 @@ const AbcSetNumberOfMusicalSections = () => {
           id='quantity'
           name='quantity'
           min='1'
-          max='26'
+          max='52'
           value={numberOfMusicalSections}
           onChange={(e) => {
             const newNumberOfMusicalSections = e.target.value * 1;
@@ -33,8 +38,8 @@ const AbcSetNumberOfMusicalSections = () => {
                         newNumberOfMusicalSections - musicalSections.length,
                     }).map((el) => ({
                       // make sure that the 1st musical section is "A", the 2nd "B" and so on
-                      letterId: `${String.fromCharCode(
-                        newNumberOfMusicalSections + 64
+                      letterId: `${indexToAlphabetLetter(
+                        newNumberOfMusicalSections - 1
                       )}`,
                       description: '',
                       numberOfMeasures: 1,

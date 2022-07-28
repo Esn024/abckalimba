@@ -2,7 +2,7 @@ import React, { useContext, useRef, useEffect } from 'react';
 import styled from 'styled-components';
 import { AppContext } from '../AppContext';
 
-const AbcTine = ({ abcNote, keyboardLetter, cents, tineIndex }) => {
+const AbcTine = ({ abcNote, keyboardLetter, cents, color, tineIndex }) => {
   const {
     userPlayNote,
     abcToMidiNoteName,
@@ -39,7 +39,7 @@ const AbcTine = ({ abcNote, keyboardLetter, cents, tineIndex }) => {
 
   return (
     <Tine
-      className='tine'
+      className={`tine${color === 1 ? ' darktine' : ''}`}
       id={'tine-' + tineIndex}
       onClick={() => {
         userPlayNote(abcNote, cents);
