@@ -104,14 +104,15 @@ export const AppProvider = ({ children }) => {
   ]);
 
   const [toneRowStrings, setToneRowStrings] = useState([
-    '5 tones (c d e f g) [awsed] {....}',
-    '6 tones (c d e f g a) [awsedr] {.....}',
+    '5 tones (c d e f g) [awsed] {.....}',
+    '6 tones (c d e f g a) [awsedr] {......}',
     '7 tones (c d-20 e f+20 g a b) [awsedrf] {.l.l.l.}',
     '17 tones (^c-40 ^g-40 B-20 ^f-20 A e ^C-40 a A, d+20 E e ^F-20 ^f-20 ^G-40 ^g-40 A) [awsedrftgyhujikol] {.l.l.l.l.l.l.l.l.}',
   ]);
 
   // convert a tone row string into a properly-organized tines object
   const toneRowStrToObj = (str) => {
+    // console.log({ str });
     if (str) {
       // regexp for a string input missing the keyboard letter and colors info. If they're missing, they should be added in automatically
 
@@ -122,6 +123,8 @@ export const AppProvider = ({ children }) => {
       const abcNoteAndCentsRegexp = /([\^_]?[a-gA-G][',]{0,4})(([-+])(\d+))?/;
 
       const result = str.match(toneRowStrRegexp);
+
+      // console.log({ result });
 
       if (result) {
         // const numberOfTones = result[1] * 1;
@@ -188,6 +191,7 @@ export const AppProvider = ({ children }) => {
 
       const finalStr = `${numberOfTones} tones (${allAbcNotesAndCentsStr}) [${keyboardLettersStr}] {${colorsStr}}`;
 
+      // console.log({ finalStr });
       return finalStr;
     }
   };

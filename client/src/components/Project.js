@@ -80,7 +80,7 @@ const Project = () => {
     setBeatsPerMeasure(project ? project.beatsPerMeasure : 4);
     setTines(
       toneRowStrToObj(
-        project ? project.toneRowStr : '5 tones (c d e f g) [awsed]'
+        project ? project.toneRowStr : '5 tones (c d e f g) [awsed] {.....}'
       )
     );
     setThumbOneOrTwo(1);
@@ -123,7 +123,7 @@ const Project = () => {
       setBeatsPerMeasure('4');
       setTines(
         toneRowStrToObj(
-          project ? project.toneRowStr : '5 tones (c d e f g) [awsed]'
+          project ? project.toneRowStr : '5 tones (c d e f g) [awsed] {.....}'
         )
       );
       setThumbOneOrTwo(1);
