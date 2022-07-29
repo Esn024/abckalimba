@@ -26,7 +26,7 @@ const AbcTines = () => {
                 let newTines = [...tines];
                 newTines[index].color = newTines[index].color === 0 ? 1 : 0;
                 // console.log(newTines[index].color);
-                console.log(tines[index]);
+                // console.log(tines[index]);
 
                 setTines(newTines);
               }}

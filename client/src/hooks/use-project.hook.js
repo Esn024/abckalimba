@@ -28,7 +28,7 @@ const useProject = (projectId = null, created = null, currentUserId = null) => {
               projectName: '',
               projectDescription: '',
               projectVisibility: 'private',
-              toneRowStr: '5 tones (c d e f g) [awsed]',
+              toneRowStr: '5 tones (c d e f g) [awsed]{.....}',
               musicalSections: [
                 {
                   letterId: 'A',

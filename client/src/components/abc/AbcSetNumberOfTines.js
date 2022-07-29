@@ -13,8 +13,11 @@ const AbcSetNumberOfTines = () => {
     updateMusicalSectionsAfterTineNumberChange,
   } = useContext(AppContext);
 
+  // console.log({ tines });
+
   // update numberOfTines & musicalSections if the tines are updated
   useEffect(() => {
+    console.log({ tines });
     setNumberOfTines(tines.length);
     updateMusicalSectionsAfterTineNumberChange(
       tines.length,

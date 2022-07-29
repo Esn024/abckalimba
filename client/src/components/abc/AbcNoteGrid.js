@@ -38,7 +38,9 @@ const AbcNoteGrid = ({ currentMusicalSectionIndex }) => {
                             <TimedNote
                               key={uniqueNoteId}
                               id={uniqueNoteId}
-                              className={`note${note}`}
+                              className={`note${note}${
+                                tines[noteIndex].color === 1 ? ' darktine' : ''
+                              }`}
                               note={note}
                               onClick={() => {
                                 // tine-0-key-a
