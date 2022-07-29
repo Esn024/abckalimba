@@ -17,7 +17,7 @@ const AbcSetNumberOfTines = () => {
 
   // update numberOfTines & musicalSections if the tines are updated
   useEffect(() => {
-    console.log({ tines });
+    // console.log({ tines });
     setNumberOfTines(tines.length);
     updateMusicalSectionsAfterTineNumberChange(
       tines.length,
