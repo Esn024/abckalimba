@@ -63,8 +63,11 @@ const Project = () => {
   } = useContext(AppContext);
 
   // check if the path starts with /myproject/
-  const myProject =
-    window.location.pathname.match(/^\/([a-z]+)\//)[1] === 'myprojects';
+  // const myProjectExists = window.location.pathname.match(/^\/([a-z]+)\//);
+  const myProject = window.location.pathname.match(/^\/([a-z]+)\//)
+    ? window.location.pathname.match(/^\/([a-z]+)\//)[1] === 'myprojects'
+    : null;
+  // console.log({ myProjectExists, myProject });
 
   //if it is "myProject", it will load a project to be edited by current user with all permissions, assuming current user has permission to edit it; otherwise, it will attempt to load it as a public project, which can be forked
   const [project, setProject] = useProject(
@@ -160,11 +163,7 @@ const Project = () => {
 
   return (
     <Wrapper>
-      {projectName && (
-        <ProjectName>
-          {projectName} - {myProject ? 'My Project' : 'Another Project'}
-        </ProjectName>
-      )}
+      {projectName && <ProjectName>{projectName}</ProjectName>}
       {project && (
         <>
           <Description>
@@ -222,10 +221,10 @@ const Project = () => {
       )}
       <StyledButton2
         onClick={() => {
-          const privateProjectId = project._id;
-          const username = currentUser.username;
-          const created = project.created;
-          const modified = project.modified;
+          const privateProjectId = project?._id;
+          const username = currentUser?.username;
+          const created = project?.created ?? null;
+          const modified = project?.modified ?? null;
 
           // console.log({ privateProjectId, username, created, modified });
 
@@ -273,8 +272,7 @@ const Project = () => {
                 tempo,
                 key,
                 beatsPerMeasure,
-                username,
-                projectid
+                username
               );
         }}
       >

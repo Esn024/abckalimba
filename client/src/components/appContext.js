@@ -877,7 +877,8 @@ w:${modifiedDescription}
       const measureNumber = ev.measureNumber;
       // beat number in measure, beginning with 0 (grab the beat number from the DOM element class beginning with "abcjs-n")
       const beatNumber =
-        ev.elements[0][0].className.baseVal.match(/abcjs-n(\d)/)[1] * 1;
+        ev.elements[0][0].className.baseVal.match(/abcjs-n([0-9]+)/)[1] * 1;
+      // console.log({ beatNumber });
       // beat number since start of song
       // const beatNumberSinceStart = ev.elements[0][0].dataset.index * 1;
       // console.log({ beatNumberSinceStart });
@@ -966,6 +967,7 @@ w:${modifiedDescription}
       if (currentMusicalSectionIndex !== undefined) {
         // console.log('test2');
         const rowId = `musicalSection-${currentMusicalSectionIndex}-measure-${measureNumber}-beat-${beatNumber}`;
+        console.log({ rowId });
 
         const currentRowEl = document.getElementById(rowId);
 
@@ -1217,6 +1219,20 @@ w:${modifiedDescription}
   ) => {
     // console.log({ formData });
     // console.log({ toneRowStr });
+    // console.log({
+    //   setProject,
+    //   projectName,
+    //   projectDescription,
+    //   projectVisibility,
+    //   toneRowStr,
+    //   musicalSections,
+    //   orderOfSections,
+    //   tempo,
+    //   key,
+    //   beatsPerMeasure,
+    //   username,
+    // });
+
     const created = Date.now();
     fetch('/api/projects', {
       method: 'POST',

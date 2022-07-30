@@ -4,10 +4,13 @@ import styled from 'styled-components';
 import abcjs from 'abcjs';
 // import Abcjs from 'react-abcjs';
 import { saveAsPng, saveAsJpeg } from 'save-html-as-image';
+import Project from './Project.js';
 import AbcTines from './abc/AbcTines.js';
 import AbcSetNumberOfTines from './abc/AbcSetNumberOfTines';
 import AbcSelectToneRow from './abc/AbcSelectToneRow';
 import AbcKeyDefinitions from './abc/AbcKeyDefinitions.js';
+
+import useProject from '../hooks/use-project.hook.js';
 
 import AbcSetBeatsPerMeasure from './abc/AbcSetBeatsPerMeasure';
 import AbcSetTempo from './abc/AbcSetTempo';
@@ -29,80 +32,7 @@ import AbcProjectVisibility from './abc/AbcProjectVisibility.js';
 import { AppContext } from './AppContext';
 
 const Home = () => {
-  const {
-    userId,
-    tines,
-    musicalSections,
-    hideAllSections,
-    setHideAllSections,
-    projectName,
-    projectDescription,
-    printDivById,
-    currentUser,
-    saveNewProject,
-    projectVisibility,
-    orderOfSections,
-    tempo,
-    key,
-    beatsPerMeasure,
-    objToToneRowStr,
-  } = useContext(AppContext);
-
-  return (
-    <Wrapper>
-      {projectName && <ProjectName>{projectName}</ProjectName>}
-      {projectDescription && <Description>{projectDescription}</Description>}
-      <AbcSetNumberOfTines />
-      <AbcSelectToneRow />
-      <AbcKeyDefinitions />
-      <AbcTines />
-      <HorizontalWrapper>
-        <AbcSetNumberOfMusicalSections />
-        <AbcSetBeatsPerMeasure />
-        <AbcSetTempo />
-        {/* <AbcSetKey /> // TODO, no sense in adding this in until the abc notes are actually modified based on what the key is */}
-      </HorizontalWrapper>
-      <HorizontalWrapper>
-        <AbcSelectThumb />
-        <StyledButton onClick={() => setHideAllSections(!hideAllSections)}>
-          {hideAllSections ? 'Unhide' : 'Hide'} all sections
-        </StyledButton>
-      </HorizontalWrapper>
-      {musicalSections.map((section, i) => (
-        <AbcMusicalSection
-          key={i}
-          currentMusicalSectionIndex={i}
-          letterId={section.letterId}
-          numberOfMeasures={section.numberOfMeasures}
-        />
-      ))}
-      <AbcFinalPiece />
-      <AbcSetProjectName />
-      <AbcDescription />
-      <AbcProjectVisibility />
-      <StyledButton2
-        onClick={() =>
-          saveNewProject(
-            projectName,
-            projectDescription,
-            projectVisibility,
-            objToToneRowStr(tines),
-            musicalSections,
-            orderOfSections,
-            tempo,
-            key,
-            beatsPerMeasure,
-            currentUser.username
-          )
-        }
-      >
-        Save project
-      </StyledButton2>
-      <StyledButton2 onClick={() => printDivById('final-score')}>
-        Print music score
-      </StyledButton2>
-    </Wrapper>
-  );
+  return <Project />;
 };
 
 // display flex makes it not work
