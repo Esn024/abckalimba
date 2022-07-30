@@ -49,7 +49,21 @@ const AbcPlaybackControl = ({
           );
         }}
       >
-        {musicIsPlaying ? '⏸' : '▶'}
+        {musicIsPlaying ? (
+          <img
+            src={require('../../assets/pause.svg').default}
+            alt='Pause'
+            height='12px'
+            width='8px'
+          />
+        ) : (
+          <img
+            src={require('../../assets/play.svg').default}
+            alt='Play'
+            height='16px'
+            width='8px'
+          />
+        )}
       </PlaybackButton>
       <PlaybackButton
         onClick={() =>
@@ -62,7 +76,12 @@ const AbcPlaybackControl = ({
           )
         }
       >
-        ⏹
+        <img
+          src={require('../../assets/stop.svg').default}
+          alt='Stop'
+          height='16px'
+          width='8px'
+        />
       </PlaybackButton>
       <input
         type='range'
