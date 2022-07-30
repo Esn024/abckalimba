@@ -967,7 +967,7 @@ w:${modifiedDescription}
       if (currentMusicalSectionIndex !== undefined) {
         // console.log('test2');
         const rowId = `musicalSection-${currentMusicalSectionIndex}-measure-${measureNumber}-beat-${beatNumber}`;
-        console.log({ rowId });
+        // console.log({ rowId });
 
         const currentRowEl = document.getElementById(rowId);
 
