@@ -206,6 +206,7 @@ const Project = () => {
           key={i}
           currentMusicalSectionIndex={i}
           letterId={section.letterId}
+          description={section.description}
           numberOfMeasures={section.numberOfMeasures}
         />
       ))}

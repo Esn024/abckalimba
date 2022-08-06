@@ -1039,7 +1039,7 @@ const updateProject = async (req, res) => {
   } = req.body;
 
   const updatedValues = {
-    _id: privateProjectId,
+    // _id: privateProjectId,
     projectId,
     projectName,
     projectDescription,
@@ -1130,6 +1130,7 @@ const updateProject = async (req, res) => {
           const toneRow = await db.collection('tonerows').findOne(tQuery);
 
           if (toneRow) {
+            let toneRowUpdatedResp;
             // console.log('tone row exists');
 
             //check if project is in the tone row's projectIds array

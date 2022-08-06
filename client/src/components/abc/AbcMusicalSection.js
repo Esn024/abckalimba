@@ -83,6 +83,7 @@ const AbcMusicalSection = ({
     musicAndTiming();
   }, [tempo, key, musicalSections, tines, project]);
 
+  // console.log({ description });
   return (
     <Wrapper
       id={`section-${letterId}`}
@@ -92,6 +93,7 @@ const AbcMusicalSection = ({
         <Text>Section {letterId}</Text>
         <StyledInput
           placeholder='(optional notes)'
+          value={description ? description : ''}
           onChange={(e) => {
             //update description
             const newDescription = e.target.value;
@@ -100,7 +102,7 @@ const AbcMusicalSection = ({
               newDescription
             );
           }}
-        ></StyledInput>
+        />
       </HorizontalWrapper>
       <AbcPlaybackControl
         currentMusicalSectionIndex={currentMusicalSectionIndex}
