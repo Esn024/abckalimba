@@ -60,6 +60,7 @@ const Project = () => {
     setHideAllSections,
     setOrderOfSections,
     setProjectVisibility,
+    userPlayNote,
   } = useContext(AppContext);
 
   // check if the path starts with /myproject/
@@ -75,6 +76,12 @@ const Project = () => {
     null,
     myProject ? userId : null
   );
+
+  //try to play a non-existent note, to properly initialize MIDI and avoid errors.
+  //TODO figure out how to avoid this workaround
+  useEffect(() => {
+    userPlayNote('h');
+  }, []);
 
   // update values in AppContext when project changes to a different one
   useEffect(() => {

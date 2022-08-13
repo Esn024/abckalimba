@@ -43,6 +43,7 @@ const AbcMusicalSection = ({
   const refForScoreDiv = useRef(null);
   const idForScoreDiv = 'score-' + currentMusicalSectionIndex;
 
+  // console.log({ tines });
   // initialize music
   useEffect(() => {
     // console.log('tonerowStr', objToToneRowStr(tines));

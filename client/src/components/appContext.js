@@ -27,8 +27,9 @@ export const AppProvider = ({ children }) => {
       const resJSON = await response.json();
       const user = resJSON.data;
 
+      // console.log({ user });
       // update the current user
-      setCurrentUser(user);
+      if (user) setCurrentUser(user);
     };
 
     // if there is a user id, run the fetchCurrentUser function
@@ -43,6 +44,8 @@ export const AppProvider = ({ children }) => {
   }, [userId]);
 
   const [audioContext, setAudioContext] = useState(new window.AudioContext());
+
+  // const [synth, setSynth] = useState(new abcjs.synth.CreateSynth());
   const [beatsPerMeasure, setBeatsPerMeasure] = useState(4);
   const [tempo, setTempo] = useState(180);
   const [projectName, setProjectName] = useState('');
@@ -447,7 +450,9 @@ export const AppProvider = ({ children }) => {
   };
 
   //TODO rewrite this to not use abcjs at all, just convert the abc note to MIDI pitch and add cents
-  const userPlayNote = async (abcNoteName, cents) => {
+  const userPlayNote = async (abcNoteName, cents = 0) => {
+    const synth = new abcjs.synth.CreateSynth();
+    console.log('userPlayNote', abcNoteName);
     const abcNoteNameIsValid = abcNoteName.match(validAbcNoteRegex);
     if (abcNoteNameIsValid) {
       // get the midi pitch of the abc note name
@@ -472,8 +477,6 @@ export const AppProvider = ({ children }) => {
       };
 
       try {
-        const synth = new abcjs.synth.CreateSynth();
-
         //should the below line be here?
         await audioContext.resume();
         // In theory the AC shouldn't start suspended because it is being initialized in a click handler, but iOS seems to anyway.
@@ -1075,6 +1078,7 @@ w:${modifiedDescription}
 
   // load sheet music score from correctly-formatted abc notation into a specific div. Must pass in the "synth" object loaded with "new abcjs.synth.CreateSynth();" (inside a useEffect)
   const initializeMusic = async (visualObj, synth, sequenceCallback) => {
+    console.log('initialize music');
     // console.log({ abc, idForScoreDiv, synth });
 
     // const visualObj = abcjs.renderAbc(idForScoreDiv, abc, {
@@ -1160,6 +1164,7 @@ w:${modifiedDescription}
     setMusicIsPlaying,
     sliderPosition
   ) => {
+    // console.log('startPause', synth);
     const newMusicIsPlaying = !musicIsPlaying;
     // console.log({ newMusicIsPlaying });
     // console.log({ timingCallbacks });
