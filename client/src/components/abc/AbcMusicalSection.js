@@ -31,6 +31,9 @@ const AbcMusicalSection = ({
     getBeatCallback,
     getSequenceCallback,
     project,
+    audioContext,
+    musicInitialized,
+    setMusicInitialized,
   } = useContext(AppContext);
   const [notegridVisible, setNotegridVisible] = useState(!hideAllGrids);
   const [scoreVisible, setScoreVisible] = useState(!hideAllScores);
@@ -58,30 +61,42 @@ const AbcMusicalSection = ({
       key
     );
 
+    // console.log({ idForScoreDiv, abc });
+
     const visualObj = abcjs.renderAbc(idForScoreDiv, abc, {
       responsive: 'resize',
       add_classes: true,
     })[0];
 
+    // console.log({ visualObj });
+
     async function musicAndTiming() {
+      console.log('musicAndTiming');
+      // if (audioContext.state !== 'running') await audioContext.resume();
+
       await initializeMusic(
         visualObj,
         synth,
         getSequenceCallback(setAllNoteEvents, currentMusicalSection)
       );
 
-      setTimingCallbacks(
-        new abcjs.TimingCallbacks(visualObj, {
-          eventCallback: getEventCallback(
-            colorElements,
-            musicIsPlaying,
-            setMusicIsPlaying,
-            abc,
-            currentMusicalSectionIndex
-          ),
-          beatCallback: getBeatCallback(setSliderPosition),
-        })
-      );
+      if (!musicInitialized) setMusicInitialized(true);
+      console.log('music initialized');
+
+      const newTimingCallbacks = new abcjs.TimingCallbacks(visualObj, {
+        eventCallback: getEventCallback(
+          colorElements,
+          musicIsPlaying,
+          setMusicIsPlaying,
+          abc,
+          currentMusicalSectionIndex
+        ),
+        beatCallback: getBeatCallback(setSliderPosition),
+      });
+
+      // console.log({ newTimingCallbacks });
+
+      setTimingCallbacks(newTimingCallbacks);
     }
     musicAndTiming();
   }, [tempo, key, musicalSections, tines, project]);

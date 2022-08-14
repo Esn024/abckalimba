@@ -44,6 +44,7 @@ export const AppProvider = ({ children }) => {
   }, [userId]);
 
   const [audioContext, setAudioContext] = useState(new window.AudioContext());
+  const [musicInitialized, setMusicInitialized] = useState(false);
 
   // const [synth, setSynth] = useState(new abcjs.synth.CreateSynth());
   const [beatsPerMeasure, setBeatsPerMeasure] = useState(4);
@@ -1169,10 +1170,16 @@ w:${modifiedDescription}
       timingCallbacks.pause();
     } else {
       try {
-        await synth.start();
+        if (!timingCallbacks) {
+          console.log('no timingCallbacks');
+        } else {
+          await synth.start();
 
-        // if slider is at 0, make sure it starts at the very beginning
-        sliderPosition > 0 ? timingCallbacks.start() : timingCallbacks.start(0);
+          // if slider is at 0, make sure it starts at the very beginning
+          sliderPosition > 0
+            ? timingCallbacks.start()
+            : timingCallbacks.start(0);
+        }
       } catch (error) {
         console.log('Audio failed', error);
       }
@@ -1397,7 +1404,10 @@ w:${modifiedDescription}
   return (
     <AppContext.Provider
       value={{
+        audioContext,
         setAudioContext,
+        musicInitialized,
+        setMusicInitialized,
         userId,
         setUserId,
         currentUser,

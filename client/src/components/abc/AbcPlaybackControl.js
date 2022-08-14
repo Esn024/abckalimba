@@ -11,15 +11,19 @@ const AbcPlaybackControl = ({
   sliderPosition,
   setSliderPosition,
 }) => {
-  const { resetPlayback, goToSpecificPlaceInSong, startPause } =
-    useContext(AppContext);
+  const {
+    resetPlayback,
+    goToSpecificPlaceInSong,
+    startPause,
+    musicInitialized,
+  } = useContext(AppContext);
 
   // loop music
   useEffect(() => {
     if (sliderPosition === 100) {
       //reset
       const loop = async () => {
-        resetPlayback(
+        await resetPlayback(
           synth,
           timingCallbacks,
           setMusicIsPlaying,
@@ -36,53 +40,96 @@ const AbcPlaybackControl = ({
 
   return (
     <HorizontalWrapper>
-      <PlaybackButton
-        onClick={() => {
-          //setMusicIsPlaying(!musicIsPlaying);
-          // console.log({ musicIsPlaying });
-          startPause(
-            synth,
-            timingCallbacks,
-            musicIsPlaying,
-            setMusicIsPlaying,
-            sliderPosition
-          );
-        }}
-      >
-        {musicIsPlaying ? (
-          <img
-            src={require('../../assets/pause.svg').default}
-            alt='Pause'
-            height='12px'
-            width='8px'
-          />
-        ) : (
-          <img
-            src={require('../../assets/play.svg').default}
-            alt='Play'
-            height='16px'
-            width='8px'
-          />
-        )}
-      </PlaybackButton>
-      <PlaybackButton
-        onClick={() =>
-          resetPlayback(
-            synth,
-            timingCallbacks,
-            setMusicIsPlaying,
-            setSliderPosition,
-            currentMusicalSectionIndex
-          )
-        }
-      >
-        <img
-          src={require('../../assets/stop.svg').default}
-          alt='Stop'
-          height='16px'
-          width='8px'
-        />
-      </PlaybackButton>
+      {musicInitialized ? (
+        <>
+          <PlaybackButton
+            onClick={async () => {
+              //setMusicIsPlaying(!musicIsPlaying);
+              // console.log({ musicIsPlaying });
+              // console.log({ musicInitialized });
+              if (!musicInitialized) {
+                await resetPlayback(
+                  synth,
+                  timingCallbacks,
+                  setMusicIsPlaying,
+                  setSliderPosition,
+                  currentMusicalSectionIndex
+                );
+
+                // setTimeout(() => {
+                //   console.log({ musicInitialized });
+                //   console.log({ timingCallbacks });
+                //   startPause(
+                //     synth,
+                //     timingCallbacks,
+                //     musicIsPlaying,
+                //     setMusicIsPlaying,
+                //     sliderPosition
+                //   );
+                // }, '1500');
+              } else {
+                // console.log('between reset and startpause');
+                startPause(
+                  synth,
+                  timingCallbacks,
+                  musicIsPlaying,
+                  setMusicIsPlaying,
+                  sliderPosition
+                );
+              }
+            }}
+          >
+            {musicIsPlaying ? (
+              <img
+                src={require('../../assets/pause.svg').default}
+                alt='Pause'
+                height='12px'
+                width='8px'
+              />
+            ) : (
+              <img
+                src={require('../../assets/play.svg').default}
+                alt='Play'
+                height='16px'
+                width='8px'
+              />
+            )}
+          </PlaybackButton>
+
+          <PlaybackButton
+            onClick={async () =>
+              await resetPlayback(
+                synth,
+                timingCallbacks,
+                setMusicIsPlaying,
+                setSliderPosition,
+                currentMusicalSectionIndex
+              )
+            }
+          >
+            <img
+              src={require('../../assets/stop.svg').default}
+              alt='Stop'
+              height='16px'
+              width='8px'
+            />
+          </PlaybackButton>
+        </>
+      ) : (
+        <PlaybackButton2
+          onClick={async () =>
+            await resetPlayback(
+              synth,
+              timingCallbacks,
+              setMusicIsPlaying,
+              setSliderPosition,
+              currentMusicalSectionIndex
+            )
+          }
+        >
+          Play
+        </PlaybackButton2>
+      )}
       <input
         type='range'
         min='0'
@@ -117,6 +164,14 @@ const PlaybackButton = styled(StyledButton)`
   align-items: center;
   justify-content: center;
   width: 22px;
+  height: 22px;
+`;
+
+const PlaybackButton2 = styled(StyledButton)`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
   height: 22px;
 `;
 

@@ -27,6 +27,8 @@ const AbcFinalPiece = () => {
     getEventCallback,
     getBeatCallback,
     getSequenceCallback,
+    musicInitialized,
+    setMusicInitialized,
   } = useContext(AppContext);
 
   const [scoreVisible, setScoreVisible] = useState(true);
@@ -61,6 +63,7 @@ const AbcFinalPiece = () => {
         synth,
         getSequenceCallback(setAllNoteEvents)
       );
+      if (!musicInitialized) setMusicInitialized(true);
 
       setTimingCallbacks(
         new abcjs.TimingCallbacks(visualObj, {
