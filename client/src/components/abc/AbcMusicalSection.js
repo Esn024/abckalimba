@@ -15,6 +15,8 @@ const AbcMusicalSection = ({
 }) => {
   const {
     hideAllSections,
+    hideAllGrids,
+    hideAllScores,
     beatsPerMeasure,
     musicalSections,
     updateDescriptionOfMusicalSection,
@@ -30,8 +32,8 @@ const AbcMusicalSection = ({
     getSequenceCallback,
     project,
   } = useContext(AppContext);
-  const [notegridVisible, setNotegridVisible] = useState(true);
-  const [scoreVisible, setScoreVisible] = useState(true);
+  const [notegridVisible, setNotegridVisible] = useState(!hideAllGrids);
+  const [scoreVisible, setScoreVisible] = useState(!hideAllScores);
   const [musicIsPlaying, setMusicIsPlaying] = useState(false);
   //TODO move into object so it can be passed be reference? Or else, just pass the ID into the beatCallback, and the ID never changes...
   const [sliderPosition, setSliderPosition] = useState(0);
@@ -83,6 +85,16 @@ const AbcMusicalSection = ({
     }
     musicAndTiming();
   }, [tempo, key, musicalSections, tines, project]);
+
+  //visibility of notegrid
+  useEffect(() => {
+    setNotegridVisible(!hideAllGrids);
+  }, [hideAllGrids]);
+
+  //visibility of score
+  useEffect(() => {
+    setScoreVisible(!hideAllScores);
+  }, [hideAllScores]);
 
   // console.log({ description });
   return (

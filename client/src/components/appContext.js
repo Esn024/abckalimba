@@ -55,6 +55,8 @@ export const AppProvider = ({ children }) => {
   const [orderOfSections, setOrderOfSections] = useState('AA');
 
   const [hideAllSections, setHideAllSections] = useState(false);
+  const [hideAllGrids, setHideAllGrids] = useState(false);
+  const [hideAllScores, setHideAllScores] = useState(false);
   const [tines, setTines] = useState([
     {
       keyboardLetter: 'a',
@@ -452,7 +454,7 @@ export const AppProvider = ({ children }) => {
   //TODO rewrite this to not use abcjs at all, just convert the abc note to MIDI pitch and add cents
   const userPlayNote = async (abcNoteName, cents = 0) => {
     const synth = new abcjs.synth.CreateSynth();
-    console.log('userPlayNote', abcNoteName);
+    // console.log('userPlayNote', abcNoteName);
     const abcNoteNameIsValid = abcNoteName.match(validAbcNoteRegex);
     if (abcNoteNameIsValid) {
       // get the midi pitch of the abc note name
@@ -1078,7 +1080,7 @@ w:${modifiedDescription}
 
   // load sheet music score from correctly-formatted abc notation into a specific div. Must pass in the "synth" object loaded with "new abcjs.synth.CreateSynth();" (inside a useEffect)
   const initializeMusic = async (visualObj, synth, sequenceCallback) => {
-    console.log('initialize music');
+    // console.log('initialize music');
     // console.log({ abc, idForScoreDiv, synth });
 
     // const visualObj = abcjs.renderAbc(idForScoreDiv, abc, {
@@ -1424,6 +1426,10 @@ w:${modifiedDescription}
         setProjectDescription,
         hideAllSections,
         setHideAllSections,
+        hideAllGrids,
+        setHideAllGrids,
+        hideAllScores,
+        setHideAllScores,
         orderOfSections,
         setOrderOfSections,
         projectVisibility,

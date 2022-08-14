@@ -34,6 +34,8 @@ const Project = () => {
     tines,
     musicalSections,
     hideAllSections,
+    hideAllGrids,
+    hideAllScores,
     projectName,
     projectDescription,
     printDivById,
@@ -58,6 +60,8 @@ const Project = () => {
     setProjectName,
     setProjectDescription,
     setHideAllSections,
+    setHideAllGrids,
+    setHideAllScores,
     setOrderOfSections,
     setProjectVisibility,
     userPlayNote,
@@ -124,6 +128,8 @@ const Project = () => {
     setProjectName(project ? project.projectName : '');
     setProjectDescription(project ? project.projectDescription : '');
     setHideAllSections(false);
+    setHideAllGrids(false);
+    setHideAllScores(false);
     setOrderOfSections(project ? project.orderOfSections : 'AA');
     setProjectVisibility(project ? project.projectVisibility : 'private');
 
@@ -163,6 +169,8 @@ const Project = () => {
       setProjectName('');
       setProjectDescription('');
       setHideAllSections(false);
+      setHideAllGrids(false);
+      setHideAllScores(false);
       setOrderOfSections('AA');
       setProjectVisibility('private');
     };
@@ -206,6 +214,12 @@ const Project = () => {
         <AbcSelectThumb />
         <StyledButton onClick={() => setHideAllSections(!hideAllSections)}>
           {hideAllSections ? 'Unhide' : 'Hide'} all sections
+        </StyledButton>
+        <StyledButton onClick={() => setHideAllGrids(!hideAllGrids)}>
+          {hideAllGrids ? 'Unhide' : 'Hide'} all grids
+        </StyledButton>
+        <StyledButton onClick={() => setHideAllScores(!hideAllScores)}>
+          {hideAllScores ? 'Unhide' : 'Hide'} all scores
         </StyledButton>
       </HorizontalWrapper>
       {musicalSections.map((section, i) => (
