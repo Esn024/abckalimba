@@ -9,7 +9,7 @@ const About = () => {
     <Wrapper>
       <h1>About</h1>
       <p>
-        abcKalimbaSynth is a musical tool that can be used for education and
+        abcKalimba is a musical tool that can be used for education and
         note-taking by players of tine-based instruments such as the Kalimba
         (thumb piano) or Marimba.
       </p>

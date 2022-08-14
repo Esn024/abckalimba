@@ -9,7 +9,7 @@ const Header = () => {
   return (
     <HeaderElement>
       <Link to='/'>
-        <h1>abcKalimbaSynth</h1>
+        <h1>abcKalimba</h1>
       </Link>
       <HorizontalWrapper>
         <SiteLinks>

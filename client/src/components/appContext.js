@@ -479,8 +479,9 @@ export const AppProvider = ({ children }) => {
       };
 
       try {
-        //should the below line be here?
-        await audioContext.resume();
+        // console.log(audioContext.state);
+
+        if (audioContext.state !== 'running') await audioContext.resume();
         // In theory the AC shouldn't start suspended because it is being initialized in a click handler, but iOS seems to anyway.
 
         // console.log('PUBLIC_URI', `${process.env.PUBLIC_URL}/soundfonts`);
@@ -960,11 +961,13 @@ w:${modifiedDescription}
       tines.forEach((tine, index) => {
         if (currentTinesPlayingIndices.includes(index)) {
           const tineEl = document.querySelector('#tine-' + index);
-          tineEl.classList.add('active-tine');
-          // after a time interval, remove the "active-tine" class, thereby removing the color
-          setTimeout(() => {
-            tineEl.classList.remove('active-tine');
-          }, msToChangeColor);
+          if (tineEl) {
+            tineEl.classList.add('active-tine');
+            // after a time interval, remove the "active-tine" class, thereby removing the color
+            setTimeout(() => {
+              tineEl.classList.remove('active-tine');
+            }, msToChangeColor);
+          }
         }
       });
 
@@ -1081,24 +1084,10 @@ w:${modifiedDescription}
   // load sheet music score from correctly-formatted abc notation into a specific div. Must pass in the "synth" object loaded with "new abcjs.synth.CreateSynth();" (inside a useEffect)
   const initializeMusic = async (visualObj, synth, sequenceCallback) => {
     // console.log('initialize music');
-    // console.log({ abc, idForScoreDiv, synth });
-
-    // const visualObj = abcjs.renderAbc(idForScoreDiv, abc, {
-    //   responsive: 'resize',
-    //   add_classes: true,
-    // })[0];
-
-    // let allNoteEvents = [];
 
     // console.log('PUBLIC_URI', `${process.env.PUBLIC_URL}/soundfonts`);
 
     try {
-      // const synth = new abcjs.synth.CreateSynth();
-
-      //should the below line be here?
-      await audioContext.resume();
-      // In theory the AC shouldn't start suspended because it is being initialized in a click handler, but iOS seems to anyway.
-
       await synth.init({
         audioContext: audioContext,
         visualObj: visualObj,
@@ -1120,7 +1109,7 @@ w:${modifiedDescription}
     }
   };
 
-  const resetPlayback = (
+  const resetPlayback = async (
     synth,
     timingCallbacks,
     setMusicIsPlaying,
@@ -1128,7 +1117,10 @@ w:${modifiedDescription}
     currentMusicalSectionIndex
   ) => {
     setMusicIsPlaying(false);
-    timingCallbacks.stop();
+
+    if (audioContext.state !== 'running') await audioContext.resume();
+
+    if (timingCallbacks) timingCallbacks.stop();
     setSliderPosition(0);
     synth.stop();
     // remove any remaining red coloration
@@ -1154,6 +1146,7 @@ w:${modifiedDescription}
   };
 
   const goToSpecificPlaceInSong = async (position, synth, timingCallbacks) => {
+    if (audioContext.state !== 'running') await audioContext.resume();
     //console.log({position});
     await synth.seek(position);
     timingCallbacks.setProgress(position);
@@ -1166,6 +1159,7 @@ w:${modifiedDescription}
     setMusicIsPlaying,
     sliderPosition
   ) => {
+    if (audioContext.state !== 'running') await audioContext.resume();
     // console.log('startPause', synth);
     const newMusicIsPlaying = !musicIsPlaying;
     // console.log({ newMusicIsPlaying });
@@ -1174,9 +1168,14 @@ w:${modifiedDescription}
       await synth.pause();
       timingCallbacks.pause();
     } else {
-      await synth.start();
-      // if slider is at 0, make sure it starts at the very beginning
-      sliderPosition > 0 ? timingCallbacks.start() : timingCallbacks.start(0);
+      try {
+        await synth.start();
+
+        // if slider is at 0, make sure it starts at the very beginning
+        sliderPosition > 0 ? timingCallbacks.start() : timingCallbacks.start(0);
+      } catch (error) {
+        console.log('Audio failed', error);
+      }
     }
     setMusicIsPlaying(newMusicIsPlaying);
   };
