@@ -716,7 +716,23 @@ export const AppProvider = ({ children }) => {
     let handOneAbc = '';
     let handTwoAbc = '';
 
+    // if any notes are held over from previous beat, value > 1
+    let handOneNoteDuration = 1;
+    let handTwoNoteDuration = 1;
+
     measures.forEach((measure) => {
+      //noteduration
+      //multiplenotes [g2b2]
+      //there is a new note
+      //a metrical division (either ' ' if also new note, or '-' to have a tie) [g2b2-g4b4]
+      /* 7 - 4/3
+      8 - 4/4
+      12 - 4/4/4
+      16 - 4/4/4/4
+      20 - 4/4/4/4/4
+      */
+      // check at beginning of NEXT beat whether to place notes for previous beat, or else place what you have if it's the last beat
+
       measure.forEach((beat) => {
         beat.forEach((note, index) => {
           // TODO modify the abc note based on the key

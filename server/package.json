@@ -2,7 +2,7 @@
   "name": "server",
   "version": "1.0.0",
   "main": "index.js",
-  "license": "",
+  "license": "AGPL-3.0-or-later",
   "scripts": {
     "dev": "nodemon index.js",
     "start": "node index.js"
@@ -17,6 +17,6 @@
     "uuid": "^8.3.2"
   },
   "engines": {
-    "node": "14.18.0"
+    "node": "17.9.1"
   }
 }
