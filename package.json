@@ -1,11 +1,12 @@
 {
   "name": "server",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "server/index.js",
   "license": "AGPL-3.0-or-later",
   "scripts": {
-    "dev": "nodemon index.js",
-    "start": "node index.js"
+    "dev": "nodemon server/index.js",
+    "start": "node server/index.js",
+    "build": "cd client && yarn install && yarn run build"
   },
   "dependencies": {
     "bcrypt": "^5.0.1",

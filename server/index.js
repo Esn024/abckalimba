@@ -34,6 +34,7 @@ const {
 } = require('./handlers');
 
 express()
+  //each app.use(middleware) is called every time a request is sent to the server.
   .use(function (req, res, next) {
     res.header(
       'Access-Control-Allow-Methods',
@@ -48,12 +49,12 @@ express()
   .use(morgan('tiny'))
   .use(express.json())
   .use(express.urlencoded({ extended: false }))
-  // .use('/', express.static(__dirname + '/'))
+  // .use('/', express.static(__dirname + '/')) //"__dirname/" (the first "/" argument can be left out; that's the default)
 
-  // serves all our static files from the build directory
-  .use(express.static(path.join(__dirname, 'build')))
+  // serves all our static files from the build directory ("__dirname/build")
+  .use(express.static(path.join(__dirname, '..', 'client', 'build')))
 
-  // Have Node serve the files for our built React app
+  // Have Node serve the files for our built React app from build in client folder, assuming "server" and "client"  are separate folders (../client/build)
   // .use(express.static(path.resolve(__dirname, '../client/build')))
 
   // REST endpoints
@@ -90,9 +91,9 @@ express()
   .get('/api/tonerows', getToneRows)
   .get('/api/tonerows/:id', getToneRow)
 
-  // All other GET requests not handled before will return our React app
+  // All other GET requests not handled before will return our React app (__dirname/build/index.html)
   .get('/*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'build', 'index.html'));
+    res.sendFile(path.join(__dirname, '..', 'client', 'build', 'index.html'));
   })
 
   .listen(PORT, () => {
